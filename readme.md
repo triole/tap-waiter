@@ -1,4 +1,4 @@
-# Example ![example workflow](https://github.com/triole/example/actions/workflows/build.yaml/badge.svg)
+# Yaml Indexer ![example workflow](https://github.com/triole/yaml-indexer/actions/workflows/build.yaml/badge.svg)
 
 <!--- mdtoc: toc begin -->
 
