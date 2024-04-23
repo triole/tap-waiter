@@ -21,14 +21,6 @@ func absPath(str string) string {
 	return p
 }
 
-func readFile(filename string) (b []byte) {
-	b, err := os.ReadFile(filename)
-	lg.IfErrError(
-		err, "can not read file", logseal.F{"path": filename},
-	)
-	return
-}
-
 func getFileMeta(filename string) (fm tFileMeta) {
 	fil, err := os.Stat(filename)
 	if err != nil {
