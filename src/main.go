@@ -47,7 +47,7 @@ func makeJoinerIndex(dataPath string, outFile string, threads int, showProgressB
 		chin := make(chan string, threads)
 		chout := make(chan tJoinerEntry, threads)
 
-		lg.Info("md files to process", logseal.F{"no": ln, "threads": threads})
+		lg.Info("files to index", logseal.F{"no": ln, "threads": threads})
 
 		if showProgressBar {
 			bar = progressbar.Default(int64(ln))

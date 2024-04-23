@@ -5,7 +5,7 @@ import "time"
 type tJoinerEntry struct {
 	Path     string                 `json:"path"`
 	Ext      string                 `json:"ext"`
-	FileMeta tFileMeta              `json:"meta"`
+	FileMeta tFileMeta              `json:"file_metadata"`
 	Data     map[string]interface{} `json:"data"`
 }
 

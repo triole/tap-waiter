@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"os"
 	"path/filepath"
@@ -8,6 +9,9 @@ import (
 
 	"github.com/pelletier/go-toml/v2"
 	"github.com/triole/logseal"
+	"github.com/yuin/goldmark"
+	goldmarkmeta "github.com/yuin/goldmark-meta"
+	"github.com/yuin/goldmark/parser"
 	"gopkg.in/yaml.v3"
 )
 
@@ -33,13 +37,19 @@ func readFile(filename string) (data map[string]interface{}) {
 	if err == nil {
 		switch filepath.Ext(filename) {
 		case ".json":
-			data, err = readJson(by)
+			if !CLI.Slim {
+				data, err = readJson(by)
+			}
 		case ".md":
 			data, err = readMarkdown(by)
 		case ".toml":
-			data, err = readToml(by)
+			if !CLI.Slim {
+				data, err = readToml(by)
+			}
 		case ".yaml":
-			data, err = readYaml(by)
+			if !CLI.Slim {
+				data, err = readYaml(by)
+			}
 		}
 		lg.IfErrError(
 			"can not unmarshal data", logseal.F{"path": filename, "error": err},
@@ -64,5 +74,20 @@ func readYaml(by []byte) (data map[string]interface{}, err error) {
 }
 
 func readMarkdown(by []byte) (data map[string]interface{}, err error) {
+	var buf bytes.Buffer
+	markdown := goldmark.New(
+		goldmark.WithExtensions(
+			goldmarkmeta.Meta,
+		),
+	)
+	context := parser.NewContext()
+	err = markdown.Convert(by, &buf, parser.WithContext(context))
+	if err == nil {
+		data = make(map[string]interface{})
+		data["front_matter"] = goldmarkmeta.Get(context)
+		if !CLI.Slim {
+			data["body"] = string(by)
+		}
+	}
 	return
 }
