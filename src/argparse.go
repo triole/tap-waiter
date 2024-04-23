@@ -20,14 +20,8 @@ var (
 )
 
 var CLI struct {
-	Path        string `help:"path to scan, default is current dir" arg:"" optional:"" default:"${curdir}"`
-	Rxfilter    string `help:"regex filter to only return matching files on find" short:"r" default:"${filter}"`
-	Output      string `help:"json file to write output into" short:"o" default:"${output}"`
-	Slim        bool   `help:"slim output json that does not contain content of indexed files"`
+	Conf        string `help:"path to scan, default is current dir" arg:"" optional:"" default:"${curdir}"`
 	Threads     int    `help:"max threads, default no of avail. cpu threads" short:"t" default:"${proc}"`
-	Watch       bool   `help:"watch folder and run rebuild on file change" short:"w"`
-	Interval    int32  `help:"watch interval to check for changes in seconds" default:"60" short:"i"`
-	Force       bool   `help:"force overwrite of output json file" default:"false" short:"f"`
 	LogFile     string `help:"log file" default:"/dev/stdout"`
 	LogLevel    string `help:"log level" default:"info" enum:"trace,debug,info,error"`
 	LogNoColors bool   `help:"disable output colours, print plain text"`

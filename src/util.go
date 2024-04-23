@@ -15,7 +15,7 @@ func absPath(str string) string {
 	p, err := filepath.Abs(str)
 	lg.IfErrFatal(
 		"invalid file path", logseal.F{
-			"path": CLI.Path, "error": err,
+			"path": str, "error": err,
 		},
 	)
 	return p
