@@ -28,15 +28,15 @@ func main() {
 	if CLI.Watch {
 		watch(dataPath, outJSON)
 	} else {
-		makeLunrIndex(dataPath, outJSON, CLI.Threads, true)
+		makeJoinerIndex(dataPath, outJSON, CLI.Threads, true)
 	}
 }
 
-func makeLunrIndex(dataPath string, outFile string, threads int, showProgressBar bool) {
+func makeJoinerIndex(dataPath string, outFile string, threads int, showProgressBar bool) {
 	start := time.Now()
 
 	var bar *progressbar.ProgressBar
-	var lunrIndex tJoinerIndex
+	var joinerIndex tJoinerIndex
 
 	dataFiles := find(dataPath, ".(toml|yaml|json)$")
 	ln := len(dataFiles)
@@ -51,7 +51,7 @@ func makeLunrIndex(dataPath string, outFile string, threads int, showProgressBar
 		lg.Info("md files to process", logseal.F{"no": ln, "threads": threads})
 		potentialEmptyLine()
 
-		if showProgressBar == true {
+		if showProgressBar {
 			bar = progressbar.Default(int64(ln))
 		}
 
@@ -61,10 +61,10 @@ func makeLunrIndex(dataPath string, outFile string, threads int, showProgressBar
 
 		c := 0
 		for li := range chout {
-			if showProgressBar == true {
+			if showProgressBar {
 				bar.Add(1)
 			}
-			lunrIndex = append(lunrIndex, li)
+			joinerIndex = append(joinerIndex, li)
 			c++
 			if c >= ln {
 				close(chin)
@@ -74,7 +74,11 @@ func makeLunrIndex(dataPath string, outFile string, threads int, showProgressBar
 		}
 
 		potentialEmptyLine()
-		writeJSON(lunrIndex, outFile)
+		if !CLI.DryRun {
+			writeJSON(joinerIndex, outFile)
+		} else {
+			pprint(joinerIndex)
+		}
 
 		lg.Info("done", logseal.F{"duration": time.Since(start)})
 		potentialEmptyLine()

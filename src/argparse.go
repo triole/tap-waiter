@@ -30,6 +30,7 @@ var CLI struct {
 	LogLevel    string `help:"log level" default:"info" enum:"trace,debug,info,error"`
 	LogNoColors bool   `help:"disable output colours, print plain text"`
 	LogJSON     bool   `help:"enable json log, instead of text one"`
+	DryRun      bool   `help:"dry run, just print final data, do not write to file" short:"n"`
 	VersionFlag bool   `help:"display version" short:"V"`
 }
 

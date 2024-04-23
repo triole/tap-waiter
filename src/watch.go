@@ -44,7 +44,7 @@ func watch(mdPath string, outJSON string) {
 	}
 }
 
-func runRebuildOnce(mdPath string, outJSON string, chin chan time.Time) {
+func runRebuildOnce(basePath string, outJSON string, chin chan time.Time) {
 	current := time.Now()
 	last := time.Now()
 	diff := diffReached(last, current)
@@ -54,8 +54,8 @@ func runRebuildOnce(mdPath string, outJSON string, chin chan time.Time) {
 		last = current
 		current = t
 		diff = diffReached(last, current)
-		if lastDiff == false && diff == true {
-			makeLunrIndex(mdPath, outJSON, CLI.Threads, false)
+		if !lastDiff && diff {
+			makeJoinerIndex(basePath, outJSON, CLI.Threads, false)
 		}
 	}
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -30,4 +31,9 @@ func readFile(filename string) (b []byte) {
 		err, "can not read file", logseal.F{"path": filename},
 	)
 	return
+}
+
+func pprint(i interface{}) {
+	s, _ := json.MarshalIndent(i, "", "\t")
+	fmt.Println(string(s))
 }
