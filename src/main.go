@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"sort"
 	"time"
 
 	"github.com/schollz/progressbar/v3"
@@ -71,6 +72,7 @@ func makeJoinerIndex(dataPath string, outFile string, threads int, showProgressB
 			}
 		}
 
+		sort.Sort(tJoinerIndex(joinerIndex))
 		if !CLI.DryRun {
 			writeJSON(joinerIndex, outFile)
 		} else {

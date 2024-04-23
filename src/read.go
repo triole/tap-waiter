@@ -17,9 +17,12 @@ import (
 
 func readDataFile(filename string, basePath string, chin chan string, chout chan tJoinerEntry) {
 	chin <- filename
-
+	pth := strings.TrimPrefix(
+		strings.TrimPrefix(filename, basePath), string(filepath.Separator),
+	)
 	je := tJoinerEntry{
-		Path:     strings.TrimPrefix(strings.TrimPrefix(filename, basePath), "/"),
+		Depth:    len(strings.Split(pth, string(filepath.Separator))),
+		Path:     pth,
 		Ext:      filepath.Ext(filename),
 		FileMeta: getFileMeta(filename),
 		Data:     readFile(filename),
