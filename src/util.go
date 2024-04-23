@@ -49,6 +49,6 @@ func expandTime(t time.Time) (r tDateTime) {
 }
 
 func pprint(i interface{}) {
-	s, _ := json.MarshalIndent(i, "", "\t")
+	s, _ := json.MarshalIndent(i, "", "  ")
 	fmt.Println(string(s))
 }
