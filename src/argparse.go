@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path"
 	"regexp"
 	"runtime"
 	"strconv"
@@ -12,18 +13,19 @@ import (
 )
 
 var (
-	lg = logseal.Init("debug", nil, true, false)
+	BUILDTAGS      string
+	appName        = "tyson joiner"
+	appDescription = "recursively find toml, yaml or json files and return an array containing all of them"
+	appMainversion = "0.1"
 )
 
 var CLI struct {
-	Path        string `help:"path to scan, default it current dir" arg:"" optional:"" default:"${curdir}"`
-	Threads     int    `help:"max threads to run, default no of avail. cpu threads" short:"t" default:"${proc}"`
-	Limit       int    `help:"max of requests to execute" short:"l" default:"0"`
-	UA          string `help:"user agent" short:"u" default:"${ua}"`
-	OmdbBaseURL string `help:"omdb base url, for firing requests" short:"b" default:"${omdbBaseURL}"`
-	Force       bool   `help:"force overwrite because usually episode list are skipped when existent" short:"f"`
-	Verbose     bool   `help:"verbose mode" short:"v"`
-	DryRun      bool   `help:"dry run, just print don't do" short:"n"`
+	Path        string `help:"path to scan, default is current dir" arg:"" optional:"" default:"${curdir}"`
+	Output      string `help:"json file to write output into" short:"o" default:"${output}"`
+	Threads     int    `help:"max threads, default no of avail. cpu threads" short:"t" default:"${proc}"`
+	Watch       bool   `help:"watch folder and run rebuild on file change" short:"w"`
+	Interval    int32  `help:"watch interval to check for changes in seconds" default:"60" short:"i"`
+	Force       bool   `help:"force overwrite of output json file" default:"false" short:"f"`
 	LogFile     string `help:"log file" default:"/dev/stdout"`
 	LogLevel    string `help:"log level" default:"info" enum:"trace,debug,info,error"`
 	LogNoColors bool   `help:"disable output colours, print plain text"`
@@ -42,10 +44,10 @@ func parseArgs() {
 			Summary: true,
 		}),
 		kong.Vars{
-			"curdir":      curdir,
-			"proc":        strconv.Itoa(runtime.NumCPU()),
-			"ua":          "Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0",
-			"omdbBaseURL": "http://www.omdbapi.com/?plot=full",
+			"curdir":  curdir,
+			"logfile": path.Join(os.TempDir(), alnum(appName)+".log"),
+			"output":  path.Join(curdir, "tyson.json"),
+			"proc":    strconv.Itoa(runtime.NumCPU()),
 		},
 	)
 	_ = ctx.Run()
@@ -62,4 +64,10 @@ func printBuildTags(buildtags string) {
 	s := regexp.ReplaceAllString(buildtags, "\n")
 	s = strings.Replace(s, "_subversion: ", "Version: "+appMainversion+".", -1)
 	fmt.Printf("%s\n", s)
+}
+
+func alnum(s string) string {
+	s = strings.ToLower(s)
+	re := regexp.MustCompile("[^a-z0-9_-]")
+	return re.ReplaceAllString(s, "-")
 }

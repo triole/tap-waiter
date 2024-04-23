@@ -1,0 +1,20 @@
+---
+enable_tile: true
+title: Astrophysical Simulation Codes 
+description: Collection of astrophysical simulation codes
+  Open Source or Shared codebase 
+image: /tiles/img/p4n-simcollection.png
+sort_indicator: 1050
+
+metadata:
+  - URL: https://results.punch4nfdi.de/?md=/docs/Compute/Codes/astro-codes.md
+  - Tags:
+    - Cosmology
+    - Large Scale Simulations
+    - Particle code
+    - Adaptive Mesh Refinement (AMR) codes
+    - HPC support by JSC and LRZ
+
+healthcheck:
+  enable: false
+  id: https://www.g-vo.org
