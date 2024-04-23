@@ -38,7 +38,7 @@ func getLastMod(filename string) (t time.Time) {
 		lg.Error("syscall stat failed", logseal.F{"path": filename, "error": err})
 	}
 	ux := scs.Ctim.Sec
-	t = time.Unix(ux, 0)
+	t = time.Unix(int64(ux), 0)
 	return t
 }
 
