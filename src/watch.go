@@ -21,7 +21,7 @@ func watch(mdPath string, outJSON string) {
 	go func() {
 		for {
 			select {
-			case _ = <-w.Event:
+			case <-w.Event:
 				chin <- time.Now()
 			case err := <-w.Error:
 				log.Fatalln(err)
@@ -66,7 +66,7 @@ func diffReached(last time.Time, current time.Time) bool {
 }
 
 func ticker(chin chan time.Time) {
-	for _ = range time.Tick(time.Duration(1) * time.Second) {
+	for range time.Tick(time.Duration(1) * time.Second) {
 		chin <- time.Now()
 	}
 }

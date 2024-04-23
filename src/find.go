@@ -8,15 +8,6 @@ import (
 	"github.com/triole/logseal"
 )
 
-var (
-	fi  os.FileInfo
-	err error
-)
-
-func mkdir(foldername string) {
-	os.MkdirAll(foldername, os.ModePerm)
-}
-
 func find(basedir string, rxFilter string) []string {
 	inf, err := os.Stat(basedir)
 	if err != nil {
@@ -26,7 +17,7 @@ func find(basedir string, rxFilter string) []string {
 			},
 		)
 	}
-	if inf.IsDir() == false {
+	if !inf.IsDir() {
 		lg.Fatal(
 			"not a folder, please provide a directory to look for md files.",
 			logseal.F{"path": basedir},
@@ -40,7 +31,7 @@ func find(basedir string, rxFilter string) []string {
 		if rxf.MatchString(path) {
 			inf, err := os.Stat(path)
 			if err == nil {
-				if inf.IsDir() == false {
+				if !inf.IsDir() {
 					filelist = append(filelist, path)
 				}
 			} else {
@@ -49,6 +40,6 @@ func find(basedir string, rxFilter string) []string {
 		}
 		return nil
 	})
-	lg.IfErrFatal("find files failed", logseal.F{"path": basedir})
+	lg.IfErrFatal("find files failed", logseal.F{"path": basedir, "error": err})
 	return filelist
 }
