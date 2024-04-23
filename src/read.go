@@ -34,6 +34,8 @@ func readFile(filename string) (data map[string]interface{}) {
 		switch filepath.Ext(filename) {
 		case ".json":
 			data, err = readJson(by)
+		case ".md":
+			data, err = readMarkdown(by)
 		case ".toml":
 			data, err = readToml(by)
 		case ".yaml":
@@ -59,4 +61,8 @@ func readToml(by []byte) (data map[string]interface{}, err error) {
 func readYaml(by []byte) (data map[string]interface{}, err error) {
 	err = yaml.Unmarshal(by, &data)
 	return data, err
+}
+
+func readMarkdown(by []byte) (data map[string]interface{}, err error) {
+	return
 }

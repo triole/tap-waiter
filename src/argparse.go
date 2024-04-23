@@ -21,6 +21,7 @@ var (
 
 var CLI struct {
 	Path        string `help:"path to scan, default is current dir" arg:"" optional:"" default:"${curdir}"`
+	Rxfilter    string `help:"regex filter to only return matching files on find" short:"r" default:"${filter}"`
 	Output      string `help:"json file to write output into" short:"o" default:"${output}"`
 	Threads     int    `help:"max threads, default no of avail. cpu threads" short:"t" default:"${proc}"`
 	Watch       bool   `help:"watch folder and run rebuild on file change" short:"w"`
@@ -49,6 +50,7 @@ func parseArgs() {
 			"logfile": path.Join(os.TempDir(), alnum(appName)+".log"),
 			"output":  path.Join(curdir, "tyson.json"),
 			"proc":    strconv.Itoa(runtime.NumCPU()),
+			"filter":  "\\.(md|toml|yaml|json)$",
 		},
 	)
 	_ = ctx.Run()

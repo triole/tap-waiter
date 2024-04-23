@@ -38,7 +38,7 @@ func makeJoinerIndex(dataPath string, outFile string, threads int, showProgressB
 	var bar *progressbar.ProgressBar
 	var joinerIndex tJoinerIndex
 
-	dataFiles := find(dataPath, ".(toml|yaml|json)$")
+	dataFiles := find(dataPath, CLI.Rxfilter)
 	ln := len(dataFiles)
 
 	if ln < 1 {
