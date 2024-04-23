@@ -47,9 +47,7 @@ func makeJoinerIndex(dataPath string, outFile string, threads int, showProgressB
 		chin := make(chan string, threads)
 		chout := make(chan tJoinerEntry, threads)
 
-		potentialEmptyLine()
 		lg.Info("md files to process", logseal.F{"no": ln, "threads": threads})
-		potentialEmptyLine()
 
 		if showProgressBar {
 			bar = progressbar.Default(int64(ln))
@@ -73,7 +71,6 @@ func makeJoinerIndex(dataPath string, outFile string, threads int, showProgressB
 			}
 		}
 
-		potentialEmptyLine()
 		if !CLI.DryRun {
 			writeJSON(joinerIndex, outFile)
 		} else {
@@ -81,7 +78,6 @@ func makeJoinerIndex(dataPath string, outFile string, threads int, showProgressB
 		}
 
 		lg.Info("done", logseal.F{"duration": time.Since(start)})
-		potentialEmptyLine()
 	}
 
 }

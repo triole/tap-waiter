@@ -12,8 +12,9 @@ func readDataFile(filename string, basePath string, chin chan string, chout chan
 	by := readFile(filename)
 
 	je := tJoinerEntry{
-		Path: strings.TrimPrefix(strings.TrimPrefix(filename, basePath), "/"),
-		Data: readYaml(by),
+		Path:     strings.TrimPrefix(strings.TrimPrefix(filename, basePath), "/"),
+		FileMeta: getFileMeta(filename),
+		Data:     readYaml(by),
 	}
 	chout <- je
 	<-chin

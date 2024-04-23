@@ -5,15 +5,11 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"syscall"
+	"time"
 
 	"github.com/triole/logseal"
 )
-
-func potentialEmptyLine() {
-	if !CLI.Watch {
-		fmt.Printf("\n")
-	}
-}
 
 func absPath(str string) string {
 	p, err := filepath.Abs(str)
@@ -31,6 +27,33 @@ func readFile(filename string) (b []byte) {
 		err, "can not read file", logseal.F{"path": filename},
 	)
 	return
+}
+
+func getFileMeta(filename string) (fm tFileMeta) {
+	fil, err := os.Stat(filename)
+	if err != nil {
+		lg.Error("can not stat file", logseal.F{"path": filename, "error": err})
+		return
+	}
+	fm.LastMod = expandTime(fil.ModTime())
+	fm.Created = expandTime(getLastMod(filename))
+	return
+}
+
+func getLastMod(filename string) (t time.Time) {
+	var scs syscall.Stat_t
+	if err := syscall.Stat(filename, &scs); err != nil {
+		lg.Error("syscall stat failed", logseal.F{"path": filename, "error": err})
+	}
+	ux := scs.Ctim.Sec
+	t = time.Unix(ux, 0)
+	return t
+}
+
+func expandTime(t time.Time) (r tDateTime) {
+	r.Time = t
+	r.Unix = t.Unix()
+	return r
 }
 
 func pprint(i interface{}) {
