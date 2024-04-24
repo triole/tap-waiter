@@ -1,20 +1,18 @@
 ---
-enable_tile: true
-title: Astrophysical Simulation Codes 
-description: Collection of astrophysical simulation codes
-  Open Source or Shared codebase 
-image: /tiles/img/p4n-simcollection.png
-sort_indicator: 1050
-
-metadata:
-  - URL: https://results.punch4nfdi.de/?md=/docs/Compute/Codes/astro-codes.md
-  - Tags:
-    - Cosmology
-    - Large Scale Simulations
-    - Particle code
-    - Adaptive Mesh Refinement (AMR) codes
-    - HPC support by JSC and LRZ
-
-healthcheck:
-  enable: false
-  id: https://www.g-vo.org
+title: Yar Pirate Ipsum
+description: Yar Pirate Ipsum text description
+text: Fore flogging spike take a caulk chase knave hands skysail
+  Chain Shot Sink me. Spanish Main mutiny flogging avast lateen
+  sail aye wench marooned hardtack handsomely. Spyglass yardarm
+  black spot pillage schooner transom heave to spirits Spanish
+  Main fore. Smartly fore run a rig scurvy keel Sink me code of
+  conduct ho wench hang the jib. Execution dock gangplank bilged
+  on her anchor mizzenmast chase guns lass fathom nipper crimp
+  hang the jib. Lateen sail sheet belaying pin hempen halter jack
+  run a rig barque Yellow Jack chantey fire in the hole. Line
+  bilge water Barbary Coast weigh anchor Admiral of the Black
+  flogging long clothes clap of thunder quarterdeck Plate Fleet.
+  Long clothes Chain Shot clipper run a shot across the bow hulk
+  boatswain jury mast to go on account dance the hempen jig piracy.
+  Chandler grapple league Jack Tar capstan killick overhaul fathom
+  bounty Admiral of the Black.

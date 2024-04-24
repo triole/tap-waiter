@@ -16,7 +16,7 @@ func absPath(str string) string {
 	return p
 }
 
-func getFileSize(filename string) (siz int64) {
+func getFileSize(filename string) (siz uint64) {
 	file, err := os.Open(filename)
 	lg.IfErrError(
 		"can not open file to get file size",
@@ -30,7 +30,7 @@ func getFileSize(filename string) (siz int64) {
 			logseal.F{"path": filename, "error": err},
 		)
 		if err == nil {
-			siz = stat.Size()
+			siz = uint64(stat.Size())
 		}
 	}
 	return

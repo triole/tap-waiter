@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/c2h5oh/datasize"
 	"github.com/pelletier/go-toml/v2"
 	"github.com/triole/logseal"
 	"github.com/yuin/goldmark"
@@ -27,11 +28,23 @@ func readDataFile(filename string, ps tEndpoint, chin chan string, chout chan tJ
 	je := tJoinerEntry{
 		Path: pth,
 	}
-	if ps.ReturnValues.Content || ps.ReturnValues.SplitMarkdownFrontMatter {
-		je.Content = readFileContent(filename, ps)
-	}
+	fileSize := getFileSize(filename)
 	if ps.ReturnValues.Size {
-		je.Size = getFileSize(filename)
+		je.Size = fileSize
+	}
+	if ps.MaxReturnSizeBytes > fileSize {
+		if ps.ReturnValues.Content || ps.ReturnValues.SplitMarkdownFrontMatter {
+			je.Content = readFileContent(filename, ps)
+		}
+	} else {
+		lg.Trace(
+			"do not display file content, size limit exceeded",
+			logseal.F{
+				"path":      filename,
+				"file_size": datasize.ByteSize(fileSize).HumanReadable(),
+				"max_size":  datasize.ByteSize(ps.MaxReturnSizeBytes).HumanReadable(),
+			},
+		)
 	}
 	if ps.ReturnValues.FileCreated {
 		je.FileCreated = getFileCreated(filename)

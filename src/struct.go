@@ -8,7 +8,7 @@ import (
 
 type tJoinerEntry struct {
 	Path        string                 `json:"path"`
-	Size        int64                  `json:"size,omitempty"`
+	Size        uint64                 `json:"size,omitempty"`
 	FileLastMod int64                  `json:"file_lastmod,omitempty"`
 	FileCreated int64                  `json:"file_created,omitempty"`
 	FrontMatter map[string]interface{} `json:"front_matter,omitempty"`

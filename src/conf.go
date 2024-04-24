@@ -4,6 +4,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/c2h5oh/datasize"
 	"github.com/triole/logseal"
 	"gopkg.in/yaml.v3"
 )
@@ -14,9 +15,11 @@ type tConf struct {
 }
 
 type tEndpoint struct {
-	Folder       string        `yaml:"folder"`
-	RxFilter     string        `yaml:"rxfilter"`
-	ReturnValues tReturnValues `yaml:"return_values"`
+	Folder             string `yaml:"folder"`
+	RxFilter           string `yaml:"rxfilter"`
+	MaxReturnSize      string `yaml:"max_return_size"`
+	MaxReturnSizeBytes uint64
+	ReturnValues       tReturnValues `yaml:"return_values"`
 }
 
 type tReturnValues struct {
@@ -52,6 +55,17 @@ func readConfig(filename string) (conf tConf) {
 	for key, val := range tempconf.API {
 		key = "/" + path.Clean(key)
 		val.Folder = absPath(val.Folder)
+		var v datasize.ByteSize
+		err = v.UnmarshalText([]byte(val.MaxReturnSize))
+		if err == nil {
+			val.MaxReturnSizeBytes = v.Bytes()
+		} else {
+			lg.Fatal(
+				"unable to parse config's max_return_size", logseal.F{
+					"error": err,
+				},
+			)
+		}
 		conf.API[key] = val
 	}
 	return

@@ -17,7 +17,7 @@ func main() {
 	parseArgs()
 	lg = logseal.Init(CLI.LogLevel, CLI.LogFile, CLI.LogNoColors, CLI.LogJSON)
 	conf = readConfig(CLI.Conf)
-	lg.Debug("start "+appName, logseal.F{"config": fmt.Sprintf("%+v", conf)})
+	lg.Debug("run "+appName, logseal.F{"config": fmt.Sprintf("%+v", conf)})
 	if CLI.ValidateConf {
 		pprint(conf)
 		os.Exit(0)
@@ -35,7 +35,10 @@ func makeJoinerIndex(ps tEndpoint, threads int) (joinerIndex tJoinerIndex) {
 		chin := make(chan string, threads)
 		chout := make(chan tJoinerEntry, threads)
 
-		lg.Debug("files to index", logseal.F{"no": ln, "threads": threads})
+		lg.Debug(
+			"start to process files",
+			logseal.F{"no": ln, "threads": threads},
+		)
 
 		for _, fil := range dataFiles {
 			go readDataFile(fil, ps, chin, chout)
