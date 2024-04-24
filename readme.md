@@ -20,23 +20,63 @@ A configuration file is required and defines the listening port and the api defi
 ---
 port: 8080
 api:
-  test.json:
+  all.json:
     folder: ../testdata
-    rxfilter: "\\.md$"
-    no_file_content: false
-    no_file_metadata: false
+    rxfilter: ".+"
+    max_return_size: 10K
+    return_values:
+      size: false
+      file_created: false
+      file_lastmod: false
+      content: false
+      split_markdown_front_matter: false
 
-test_no_content.json:
-  folder: ../testdata
-  rxfilter: "\\.(md|json|toml|yaml)$"
-  no_file_content: true
-  no_file_metadata: false
+  list.json:
+    folder: ../testdata
+    rxfilter: ".+"
+    return_values:
+      size: false
+      file_created: false
+      file_lastmod: false
+      content: false
+      split_markdown_front_matter: false
 
-test_no_content_no_metadata.json:
-  folder: ../testdata
-  rxfilter: "\\.(md|json|toml|yaml)$"
-  no_file_content: true
-  no_file_metadata: true
+  md_body_only.json:
+    folder: ../testdata
+    rxfilter: "\\.(md)$"
+    max_return_size: 10K
+    return_values:
+      size: false
+      file_created: false
+      file_lastmod: false
+      content: true
+      split_markdown_front_matter: false
+
+  md_frontmatter_only.json:
+    folder: ../testdata
+    rxfilter: "\\.(md)$"
+    max_return_size: 10K
+    return_values:
+      size: false
+      file_created: false
+      file_lastmod: false
+      content: false
+      split_markdown_front_matter: true
+
+  yaml_dates.json:
+    folder: ../testdata
+    rxfilter: "\\.(ya?ml)$"
+    max_return_size: 1K
+    return_values:
+      file_created: true
+      file_lastmod: true
+
+  yaml_sizes_created_and_content.json:
+    folder: ../testdata
+    rxfilter: "\\.(ya?ml)$"
+    max_return_size: 500B
+    return_values:
+      file_created: true
+      size: true
+      content: true
 ```
-
-The settings above configure two api endpoints listening on `/test.json` and `/testslim.json` that serve json data indexed from the mentioned folders.
