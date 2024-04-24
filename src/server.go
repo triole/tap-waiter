@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -40,5 +41,7 @@ func serveContent(w http.ResponseWriter, r *http.Request) {
 
 func return404(w http.ResponseWriter) {
 	w.WriteHeader(404)
-	w.Write([]byte("404 - " + http.StatusText(404)))
+	w.Write([]byte(
+		fmt.Sprintf("[ \"404 - %s\" ]", http.StatusText(404)),
+	))
 }

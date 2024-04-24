@@ -56,6 +56,9 @@ func readConfig(filename string) (conf tConf) {
 		key = "/" + path.Clean(key)
 		val.Folder = absPath(val.Folder)
 		var v datasize.ByteSize
+		if val.MaxReturnSize == "" {
+			val.MaxReturnSize = "10K"
+		}
 		err = v.UnmarshalText([]byte(val.MaxReturnSize))
 		if err == nil {
 			val.MaxReturnSizeBytes = v.Bytes()

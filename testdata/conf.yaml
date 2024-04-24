@@ -1,5 +1,5 @@
 ---
-port: 8080
+port: 17777
 api:
   all.json:
     folder: ../testdata
@@ -59,4 +59,10 @@ api:
     return_values:
       file_created: true
       size: true
+      content: true
+
+  yaml_default_max_return_size.json:
+    folder: ../testdata
+    rxfilter: "\\.(ya?ml)$"
+    return_values:
       content: true
