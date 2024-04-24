@@ -1,8 +1,6 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
 	"os"
 	"path/filepath"
 	"syscall"
@@ -46,9 +44,4 @@ func expandTime(t time.Time) (r tDateTime) {
 	r.Time = t
 	r.Unix = t.Unix()
 	return r
-}
-
-func pprint(i interface{}) {
-	s, _ := json.MarshalIndent(i, "", "  ")
-	fmt.Println(string(s))
 }

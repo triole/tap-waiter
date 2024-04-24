@@ -20,6 +20,7 @@ func runServer(conf tConf) {
 }
 
 func serveContent(w http.ResponseWriter, r *http.Request) {
+	lg.Trace("got request", logseal.F{"endpoint": r.URL})
 	key := r.URL.String()
 	if val, ok := conf.API[key]; ok {
 		start := time.Now()

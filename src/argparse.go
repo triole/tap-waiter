@@ -14,8 +14,8 @@ import (
 
 var (
 	BUILDTAGS      string
-	appName        = "tyson joiner"
-	appDescription = "recursively find toml, yaml or json files and return an array containing all of them"
+	appName        = "tyson tap"
+	appDescription = "scan folders for toml, yaml, json or markdown files and offer a web server to fetch information about them"
 	appMainversion = "0.1"
 )
 

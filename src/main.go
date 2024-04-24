@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"sort"
 
 	"github.com/triole/logseal"
@@ -15,10 +16,11 @@ func main() {
 	parseArgs()
 	lg = logseal.Init(CLI.LogLevel, CLI.LogFile, CLI.LogNoColors, CLI.LogJSON)
 	conf = readConfig(CLI.Conf)
+	lg.Debug("start "+appName, logseal.F{"config": fmt.Sprintf("%+v", conf)})
 	runServer(conf)
 }
 
-func makeJoinerIndex(ps tPathSet, threads int) (joinerIndex tJoinerIndex) {
+func makeJoinerIndex(ps tEndpoint, threads int) (joinerIndex tJoinerIndex) {
 	dataFiles := find(ps.Folder, ps.RxFilter)
 	ln := len(dataFiles)
 
@@ -31,7 +33,7 @@ func makeJoinerIndex(ps tPathSet, threads int) (joinerIndex tJoinerIndex) {
 		lg.Debug("files to index", logseal.F{"no": ln, "threads": threads})
 
 		for _, fil := range dataFiles {
-			go readDataFile(fil, ps.Slim, ps.Folder, chin, chout)
+			go readDataFile(fil, ps, chin, chout)
 		}
 
 		c := 0

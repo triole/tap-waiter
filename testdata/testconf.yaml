@@ -1,0 +1,52 @@
+---
+port: 8080
+api:
+  all.json:
+    folder: ../testdata
+    rxfilter: "\\.md$"
+    readers:
+      json:
+        omit_metadata: false
+        omit_content: false
+      toml:
+        omit_metadata: false
+        omit_content: false
+      yaml:
+        omit_metadata: false
+        omit_content: false
+      markdown:
+        omit_metadata: false
+        omit_front_matter: false
+        omit_body: false
+
+  md_no_body.json:
+    folder: ../testdata
+    rxfilter: "\\.(md)$"
+    readers:
+      markdown:
+        omit_metadata: true
+        omit_body: false
+
+  md_no_body_no_frontmatter.json:
+    folder: ../testdata
+    rxfilter: "\\.(md)$"
+    readers:
+      markdown:
+        omit_metadata: true
+        omit_body: false
+        omit_front_matter: false
+
+  yaml_no_body.json:
+    folder: ../testdata
+    rxfilter: "\\.(yaml)$"
+    readers:
+      yaml:
+        omit_content: true
+
+  yaml_no_body_no_metadata.json:
+    folder: ../testdata
+    rxfilter: "\\.(yaml)$"
+    readers:
+      yaml:
+        omit_metadata: true
+        omit_content: true

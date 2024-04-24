@@ -6,11 +6,11 @@ import (
 )
 
 type tJoinerEntry struct {
-	Path     string                 `json:"path"`
-	Depth    int                    `json:"depth"`
-	Ext      string                 `json:"ext"`
-	FileMeta tFileMeta              `json:"file_metadata"`
-	Data     map[string]interface{} `json:"data"`
+	Path         string                 `json:"path"`
+	Depth        int                    `json:"depth"`
+	Ext          string                 `json:"ext"`
+	FileMetadata tFileMeta              `json:"file_metadata,omitempty"`
+	Content      map[string]interface{} `json:"content,omitempty"`
 }
 
 type tJoinerIndex []tJoinerEntry
@@ -30,11 +30,11 @@ func (arr tJoinerIndex) Swap(i, j int) {
 }
 
 type tDateTime struct {
-	Time time.Time
-	Unix int64
+	Time time.Time `json:"time,omitempty"`
+	Unix int64     `json:"unix,omitempty"`
 }
 
 type tFileMeta struct {
-	LastMod tDateTime
-	Created tDateTime
+	LastMod tDateTime `json:"lastmod,omitempty"`
+	Created tDateTime `json:"created,omitempty"`
 }
