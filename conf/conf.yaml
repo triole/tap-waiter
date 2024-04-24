@@ -1,28 +1,47 @@
 ---
-# port where to serve the api
 port: 8080
-
-# api endpoint settings, every dictionary entry creates a new url
 api:
-  # enspoint url as mentioned above
-  test_all.json:
-    # folder to be scanned for files
+  all.json:
     folder: ../testdata
-    # filter to only consider files that match the regular expression below
-    rxfilter: "\\.(toml|yaml|json|md)$"
-    # readers configuration, all settings displayed below are the default values,
-    # if left out they'll be set like this
-    readers:
-      json:
-        metadata: true
-        body: true
-      toml:
-        metadata: true
-        body: true
-      yaml:
-        metadata: true
-        body: true
-      markdown:
-        metadata: true
-        front_matter: true
-        body: true
+    rxfilter: "\\.+$"
+    return_values:
+      size: false
+      file_created: false
+      file_lastmod: false
+      content: false
+      split_markdown_front_matter: false
+
+  md_body_only.json:
+    folder: ../testdata
+    rxfilter: "\\.(md)$"
+    return_values:
+      size: false
+      file_created: false
+      file_lastmod: false
+      content: true
+      split_markdown_front_matter: false
+
+  md_frontmatter_only.json:
+    folder: ../testdata
+    rxfilter: "\\.(md)$"
+    return_values:
+      size: false
+      file_created: false
+      file_lastmod: false
+      content: false
+      split_markdown_front_matter: true
+
+  yaml_dates.json:
+    folder: ../testdata
+    rxfilter: "\\.(yaml)$"
+    return_values:
+      file_created: true
+      file_lastmod: true
+
+  yaml_sizes_created_and_content.json:
+    folder: ../testdata
+    rxfilter: "\\.(yaml)$"
+    return_values:
+      file_created: true
+      size: true
+      content: true

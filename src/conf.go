@@ -14,27 +14,18 @@ type tConf struct {
 }
 
 type tEndpoint struct {
-	Folder   string   `yaml:"folder"`
-	RxFilter string   `yaml:"rxfilter"`
-	Readers  tReaders `yaml:"readers"`
+	Folder       string        `yaml:"folder"`
+	RxFilter     string        `yaml:"rxfilter"`
+	ReturnValues tReturnValues `yaml:"return_values"`
 }
 
-type tReaders struct {
-	Json     tReaderDefault  `yaml:"json"`
-	Toml     tReaderDefault  `yaml:"toml"`
-	Yaml     tReaderDefault  `yaml:"yaml"`
-	Markdown tReaderMarkdown `yaml:"markdown"`
-}
-
-type tReaderDefault struct {
-	OmitMetadata bool `yaml:"omit_metadata"`
-	OmitContent  bool `yaml:"omit_content"`
-}
-
-type tReaderMarkdown struct {
-	OmitMetadata    bool `yaml:"omit_metadata"`
-	OmitFrontMatter bool `yaml:"omit_front_matter"`
-	OmitBody        bool `yaml:"omit_body"`
+type tReturnValues struct {
+	Metadata                 bool `yaml:"metadata"`
+	Content                  bool `yaml:"content"`
+	Size                     bool `yaml:"size"`
+	FileLastMod              bool `yaml:"file_lastmod"`
+	FileCreated              bool `yaml:"file_created"`
+	SplitMarkdownFrontMatter bool `yaml:"split_markdown_front_matter"`
 }
 
 func newConf() tConf {

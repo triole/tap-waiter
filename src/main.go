@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"sort"
 
 	"github.com/triole/logseal"
@@ -17,6 +18,10 @@ func main() {
 	lg = logseal.Init(CLI.LogLevel, CLI.LogFile, CLI.LogNoColors, CLI.LogJSON)
 	conf = readConfig(CLI.Conf)
 	lg.Debug("start "+appName, logseal.F{"config": fmt.Sprintf("%+v", conf)})
+	if CLI.ValidateConf {
+		pprint(conf)
+		os.Exit(0)
+	}
 	runServer(conf)
 }
 

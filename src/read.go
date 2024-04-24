@@ -25,49 +25,25 @@ func readDataFile(filename string, ps tEndpoint, chin chan string, chout chan tJ
 		"path": filename, "endpoint_config": fmt.Sprintf("%+v", ps),
 	})
 	je := tJoinerEntry{
-		Depth:   len(strings.Split(pth, string(filepath.Separator))) - 1,
-		Path:    pth,
-		Ext:     filepath.Ext(filename),
-		Content: readFileContent(filename, ps),
+		Path: pth,
 	}
-	fm := readFileMeta(filename, ps)
-	if !fm.LastMod.Time.IsZero() {
-		je.FileMetadata.LastMod = fm.LastMod
-	} else {
-		lg.Trace("omit lastmod metadata", logseal.F{"path": filename})
+	if ps.ReturnValues.Content || ps.ReturnValues.SplitMarkdownFrontMatter {
+		je.Content = readFileContent(filename, ps)
 	}
-	if !fm.Created.Time.IsZero() {
-		je.FileMetadata.Created = fm.Created
-	} else {
-		lg.Trace("omit created metadata", logseal.F{"path": filename})
+	if ps.ReturnValues.Size {
+		je.Size = getFileSize(filename)
+	}
+	if ps.ReturnValues.FileCreated {
+		je.FileCreated = getFileCreated(filename)
+	}
+	if ps.ReturnValues.FileLastMod {
+		je.FileLastMod = getFileLastMod(filename)
 	}
 	chout <- je
 	<-chin
 }
 
-func readFileMeta(filename string, ps tEndpoint) (fm tFileMeta) {
-	switch filepath.Ext(filename) {
-	case ".json":
-		if !ps.Readers.Json.OmitMetadata {
-			fm = getFileMeta(filename)
-		}
-	case ".md":
-		if !ps.Readers.Markdown.OmitMetadata {
-			fm = getFileMeta(filename)
-		}
-	case ".toml":
-		if !ps.Readers.Toml.OmitContent {
-			fm = getFileMeta(filename)
-		}
-	case ".yaml":
-		if !ps.Readers.Yaml.OmitContent {
-			fm = getFileMeta(filename)
-		}
-	}
-	return
-}
-
-func readFileContent(filename string, ps tEndpoint) (data map[string]interface{}) {
+func readFileContent(filename string, ps tEndpoint) (content map[string]interface{}) {
 	by, err := os.ReadFile(filename)
 	lg.IfErrError(
 		"can not read file", logseal.F{"path": filename, "error": err},
@@ -75,19 +51,13 @@ func readFileContent(filename string, ps tEndpoint) (data map[string]interface{}
 	if err == nil {
 		switch filepath.Ext(filename) {
 		case ".json":
-			if !ps.Readers.Json.OmitContent {
-				data, err = readJson(by)
-			}
-		case ".md":
-			data, err = readMarkdown(by, ps.Readers.Markdown)
+			content, err = readJson(by)
 		case ".toml":
-			if !ps.Readers.Toml.OmitContent {
-				data, err = readToml(by)
-			}
+			content, err = readToml(by)
 		case ".yaml":
-			if !ps.Readers.Yaml.OmitContent {
-				data, err = readYaml(by)
-			}
+			content, err = readYaml(by)
+		case ".md":
+			content, err = readMarkdown(by, ps.ReturnValues)
 		}
 		lg.IfErrError(
 			"can not unmarshal data", logseal.F{"path": filename, "error": err},
@@ -96,22 +66,23 @@ func readFileContent(filename string, ps tEndpoint) (data map[string]interface{}
 	return
 }
 
-func readJson(by []byte) (data map[string]interface{}, err error) {
-	err = json.Unmarshal(by, &data)
-	return data, err
+func readJson(by []byte) (content map[string]interface{}, err error) {
+	err = json.Unmarshal(by, &content)
+	return content, err
 }
 
-func readToml(by []byte) (data map[string]interface{}, err error) {
-	err = toml.Unmarshal(by, &data)
-	return data, err
+func readToml(by []byte) (content map[string]interface{}, err error) {
+	err = toml.Unmarshal(by, &content)
+	return content, err
 }
 
-func readYaml(by []byte) (data map[string]interface{}, err error) {
-	err = yaml.Unmarshal(by, &data)
-	return data, err
+func readYaml(by []byte) (content map[string]interface{}, err error) {
+	err = yaml.Unmarshal(by, &content)
+	return content, err
 }
 
-func readMarkdown(by []byte, omit tReaderMarkdown) (data map[string]interface{}, err error) {
+func readMarkdown(by []byte, rv tReturnValues) (content map[string]interface{}, err error) {
+	content = make(map[string]interface{})
 	var buf bytes.Buffer
 	markdown := goldmark.New(
 		goldmark.WithExtensions(
@@ -121,12 +92,11 @@ func readMarkdown(by []byte, omit tReaderMarkdown) (data map[string]interface{},
 	context := parser.NewContext()
 	err = markdown.Convert(by, &buf, parser.WithContext(context))
 	if err == nil {
-		data = make(map[string]interface{})
-		if !omit.OmitFrontMatter {
-			data["front_matter"] = goldmarkmeta.Get(context)
+		if rv.Content {
+			content["body"] = string(by)
 		}
-		if !omit.OmitBody {
-			data["body"] = string(by)
+		if rv.SplitMarkdownFrontMatter {
+			content["front_matter"] = goldmarkmeta.Get(context)
 		}
 	}
 	return
