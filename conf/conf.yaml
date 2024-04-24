@@ -16,8 +16,9 @@ api:
     # only detect files which fit the regex filter
     rxfilter: ".+"
 
-    # relevant if return content is enabled, maximum file size up to which file
-    # content will be returned to json, if file is bigger no content is shown
+    # maximum file size up to which file content will appear in json
+    # default is 10K to avoid too big json outputs
+    # only relevant if content return is enabled
     max_return_size: 10K
 
     # set of return values, values which should appear in the final json
