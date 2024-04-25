@@ -26,7 +26,7 @@ func serveContent(w http.ResponseWriter, r *http.Request) {
 	if val, ok := conf.API[key]; ok {
 		start := time.Now()
 		ji := makeJoinerIndex(val, CLI.Threads)
-		lg.Info(
+		lg.Debug(
 			"serve json",
 			logseal.F{
 				"url": key, "path": val.Folder, "rxfilter": val.RxFilter, "duration": time.Since(start),
