@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/c2h5oh/datasize"
 	"github.com/pelletier/go-toml/v2"
@@ -57,25 +58,49 @@ func readDataFile(filename string, ps tEndpoint, chin chan string, chout chan tJ
 }
 
 func readFileContent(filename string, ps tEndpoint) (content map[string]interface{}) {
-	by, err := os.ReadFile(filename)
+	by, isTextfile, err := readFile(filename)
+	if isTextfile {
+		if err == nil {
+			switch filepath.Ext(filename) {
+			case ".json":
+				content, err = readJson(by)
+			case ".toml":
+				content, err = readToml(by)
+			case ".yaml", ".yml":
+				content, err = readYaml(by)
+			case ".md":
+				content, err = readMarkdown(by, ps.ReturnValues)
+			default:
+				content = byteToBody(by)
+			}
+			lg.IfErrError(
+				"error reading file",
+				logseal.F{
+					"path": filename, "error": err, "is_text_file": isTextfile,
+				},
+			)
+		}
+	} else {
+		lg.Debug(
+			"no text file, skip reading",
+			logseal.F{"path": filename, "is_text_file": isTextfile},
+		)
+	}
+	return
+}
+
+func byteToBody(by []byte) (m map[string]interface{}) {
+	m = make(map[string]interface{})
+	m["body"] = string(by)
+	return
+}
+
+func readFile(filename string) (by []byte, isTextfile bool, err error) {
+	by, err = os.ReadFile(filename)
+	isTextfile = utf8.ValidString(string(by))
 	lg.IfErrError(
 		"can not read file", logseal.F{"path": filename, "error": err},
 	)
-	if err == nil {
-		switch filepath.Ext(filename) {
-		case ".json":
-			content, err = readJson(by)
-		case ".toml":
-			content, err = readToml(by)
-		case ".yaml":
-			content, err = readYaml(by)
-		case ".md":
-			content, err = readMarkdown(by, ps.ReturnValues)
-		}
-		lg.IfErrError(
-			"can not unmarshal data", logseal.F{"path": filename, "error": err},
-		)
-	}
 	return
 }
 

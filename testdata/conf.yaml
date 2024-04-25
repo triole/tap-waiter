@@ -6,11 +6,11 @@ api:
     rxfilter: ".+"
     max_return_size: 10K
     return_values:
-      size: false
-      file_created: false
-      file_lastmod: false
-      content: false
-      split_markdown_front_matter: false
+      size: true
+      file_created: true
+      file_lastmod: true
+      content: true
+      split_markdown_front_matter: true
 
   list.json:
     folder: ../testdata
