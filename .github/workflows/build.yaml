@@ -34,7 +34,7 @@ jobs:
         env:
           GOROOT: /home/runner/.local/go
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # APP_NAME: binary_name
+          APP_NAME: tyson_tap
           SOURCE_FOLDER: src
           # TARGET_FOLDER: build
         run: curl -sL https://raw.githubusercontent.com/triole/ghwfe/master/sh/go_build.sh
