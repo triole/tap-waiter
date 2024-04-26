@@ -33,17 +33,20 @@ api:
     # maximum file size up to which file content will appear in json
     # default is 10K to avoid too big json outputs
     # only relevant if content return is enabled
-    max_return_size: 10K
+    max_return_size: 10KB
 
-    # set of return values, values which should appear in the final json
+    # set of return values to add to the final json
     return_values:
-      # add file size in bytes
+      # an array of the file path split at the path separator
+      split_path: false
+
+      # file size in bytes
       size: false
 
-      # add file created date
+      # file created date
       file_created: false
 
-      # add file modified date
+      # file modified date
       file_lastmod: false
 
       # display file content, note max_return_size
