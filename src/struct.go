@@ -8,6 +8,7 @@ import (
 
 type tJoinerEntry struct {
 	Path        string                 `json:"path"`
+	SplitPath   []string               `json:"split_path,omitempty"`
 	Size        uint64                 `json:"size,omitempty"`
 	FileLastMod int64                  `json:"file_lastmod,omitempty"`
 	FileCreated int64                  `json:"file_created,omitempty"`

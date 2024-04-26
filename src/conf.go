@@ -23,6 +23,7 @@ type tEndpoint struct {
 }
 
 type tReturnValues struct {
+	SplitPath                bool `yaml:"split_path"`
 	Metadata                 bool `yaml:"metadata"`
 	Content                  bool `yaml:"content"`
 	Size                     bool `yaml:"size"`

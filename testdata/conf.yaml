@@ -6,6 +6,7 @@ api:
     rxfilter: ".+"
     max_return_size: 10K
     return_values:
+      split_path: true
       size: true
       file_created: true
       file_lastmod: true
@@ -16,6 +17,7 @@ api:
     folder: ../testdata
     rxfilter: ".+"
     return_values:
+      split_path: true
       size: false
       file_created: false
       file_lastmod: false
@@ -27,6 +29,7 @@ api:
     rxfilter: "\\.(md)$"
     max_return_size: 10K
     return_values:
+      split_path: false
       size: false
       file_created: false
       file_lastmod: false
@@ -38,6 +41,7 @@ api:
     rxfilter: "\\.(md)$"
     max_return_size: 10K
     return_values:
+      split_path: false
       size: false
       file_created: false
       file_lastmod: false

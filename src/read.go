@@ -47,6 +47,9 @@ func readDataFile(filename string, ps tEndpoint, chin chan string, chout chan tJ
 			},
 		)
 	}
+	if ps.ReturnValues.SplitPath {
+		je.SplitPath = strings.Split(pth, string(filepath.Separator))
+	}
 	if ps.ReturnValues.FileCreated {
 		je.FileCreated = getFileCreated(filename)
 	}
