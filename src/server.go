@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/triole/logseal"
@@ -39,19 +40,20 @@ func serveContent(w http.ResponseWriter, r *http.Request) {
 
 	params := r.URL.Query()
 	for key, values := range params {
-		for _, value := range values {
-			if key == "sortby" {
-				idxParams.SortBy = value
+		lowKey := strings.ToLower(key)
+		for _, val := range values {
+			lowVal := strings.ToLower(val)
+			if lowKey == "sortby" {
+				idxParams.SortBy = lowVal
 			}
-			if key == "order" && value == "asc" {
+			if lowKey == "order" && lowVal == "asc" {
 				idxParams.Ascending = true
 			}
-			if key == "order" && value == "desc" {
+			if lowKey == "order" && lowVal == "desc" {
 				idxParams.Ascending = false
 			}
 		}
 	}
-	fmt.Printf("%+v\n", url)
 	if val, ok := conf.API[url]; ok {
 		idxParams.Endpoint = val
 		start := time.Now()

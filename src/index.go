@@ -82,16 +82,30 @@ func makeJoinerIndex(params tIDXParams) (joinerIndex tJoinerIndex) {
 }
 
 func sortJoinerIndex(arr tJoinerIndex, params tIDXParams) tJoinerIndex {
-	sort.Sort(tJoinerIndex(arr))
-	if params.SortBy == "lastmod" && params.Ascending {
+	switch params.SortBy {
+	case "created":
 		sort.Slice(arr, func(i, j int) bool {
-			return arr[i].LastMod > arr[j].LastMod
+			if !params.Ascending {
+				return arr[i].Created > arr[j].Created
+			}
+			return arr[i].Created < arr[j].Created
 		})
-	}
-	if params.SortBy == "lastmod" && !params.Ascending {
+	case "lastmod":
 		sort.Slice(arr, func(i, j int) bool {
+			if !params.Ascending {
+				return arr[i].LastMod > arr[j].LastMod
+			}
 			return arr[i].LastMod < arr[j].LastMod
 		})
+	case "size":
+		sort.Slice(arr, func(i, j int) bool {
+			if !params.Ascending {
+				return arr[i].Size > arr[j].Size
+			}
+			return arr[i].Size < arr[j].Size
+		})
+	default:
+		sort.Sort(tJoinerIndex(arr))
 	}
 	return arr
 }
