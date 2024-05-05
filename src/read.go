@@ -50,11 +50,11 @@ func readDataFile(filename string, ps tEndpoint, chin chan string, chout chan tJ
 	if ps.ReturnValues.SplitPath {
 		je.SplitPath = strings.Split(pth, string(filepath.Separator))
 	}
-	if ps.ReturnValues.FileCreated {
-		je.FileCreated = getFileCreated(filename)
+	if ps.ReturnValues.Created {
+		je.Created = getFileCreated(filename)
 	}
-	if ps.ReturnValues.FileLastMod {
-		je.FileLastMod = getFileLastMod(filename)
+	if ps.ReturnValues.LastMod {
+		je.LastMod = getFileLastMod(filename)
 	}
 	chout <- je
 	<-chin

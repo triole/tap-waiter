@@ -27,8 +27,8 @@ type tReturnValues struct {
 	Metadata                 bool `yaml:"metadata"`
 	Content                  bool `yaml:"content"`
 	Size                     bool `yaml:"size"`
-	FileLastMod              bool `yaml:"file_lastmod"`
-	FileCreated              bool `yaml:"file_created"`
+	LastMod                  bool `yaml:"lastmod"`
+	Created                  bool `yaml:"created"`
 	SplitMarkdownFrontMatter bool `yaml:"split_markdown_front_matter"`
 }
 

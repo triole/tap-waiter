@@ -10,6 +10,13 @@ import (
 	"github.com/triole/logseal"
 )
 
+type tIDXParams struct {
+	Endpoint  tEndpoint
+	SortBy    string
+	Ascending bool
+	Threads   int
+}
+
 func runServer(conf tConf) {
 	http.HandleFunc("/", serveContent)
 	portstr := strconv.Itoa(conf.Port)
@@ -21,15 +28,38 @@ func runServer(conf tConf) {
 }
 
 func serveContent(w http.ResponseWriter, r *http.Request) {
+	idxParams := tIDXParams{
+		SortBy:    "path",
+		Ascending: true,
+		Threads:   CLI.Threads,
+	}
+
 	lg.Trace("got request", logseal.F{"endpoint": r.URL})
-	key := r.URL.String()
-	if val, ok := conf.API[key]; ok {
+	url := r.URL.Path
+
+	params := r.URL.Query()
+	for key, values := range params {
+		for _, value := range values {
+			if key == "sortby" {
+				idxParams.SortBy = value
+			}
+			if key == "order" && value == "asc" {
+				idxParams.Ascending = true
+			}
+			if key == "order" && value == "desc" {
+				idxParams.Ascending = false
+			}
+		}
+	}
+	fmt.Printf("%+v\n", url)
+	if val, ok := conf.API[url]; ok {
+		idxParams.Endpoint = val
 		start := time.Now()
-		ji := makeJoinerIndex(val, CLI.Threads)
+		ji := makeJoinerIndex(idxParams)
 		lg.Debug(
 			"serve json",
 			logseal.F{
-				"url": key, "path": val.Folder, "rxfilter": val.RxFilter, "duration": time.Since(start),
+				"url": url, "path": val.Folder, "rxfilter": val.RxFilter, "duration": time.Since(start),
 			},
 		)
 		w.Header().Add("Content Type", "application/json")
