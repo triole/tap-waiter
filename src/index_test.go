@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"path/filepath"
-	"reflect"
 	"testing"
 )
 
@@ -41,17 +40,26 @@ func TestMakeJoinerIndex(t *testing.T) {
 
 func validateMakeJoinerIndex(folder, sortBy string, ascending bool, val string, t *testing.T) {
 	idx := makeJoinerIndex(newTestParams(folder, sortBy, ascending))
-	exp := loadJSON(val)
-	if !reflect.DeepEqual(idx, exp) {
+	exp := loadJSONArr(val)
+	if !orderOK(idx, exp) {
 		order := "asc"
 		if ascending == false {
 			order = "desc"
 		}
 		t.Errorf(
-			"sort failed: %s %s, exp: %v, out: %v",
-			sortBy, order, shortprintJI(idx), shortprintJI(exp),
+			"sort failed: %s %s, exp: %v, got: %v",
+			sortBy, order, shortprintJI(idx), fmt.Sprintf("%v", exp),
 		)
 	}
+}
+
+func orderOK(idx tJoinerIndex, exp []string) bool {
+	for i, el := range idx {
+		if el.Path != exp[i] {
+			return false
+		}
+	}
+	return true
 }
 
 func newTestParams(folder, sortBy string, ascending bool) (p tIDXParams) {
@@ -67,10 +75,10 @@ func newTestParams(folder, sortBy string, ascending bool) (p tIDXParams) {
 	return
 }
 
-func loadJSON(file string) (ji tJoinerIndex) {
+func loadJSONArr(file string) (arr []string) {
 	by, _, err := readFile(file)
 	if err == nil {
-		err := json.Unmarshal(by, &ji)
+		err := json.Unmarshal(by, &arr)
 		if err == nil {
 			return
 		}

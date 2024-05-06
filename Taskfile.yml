@@ -26,16 +26,12 @@ tasks:
 
   test:
     desc: run go tests
-    sources:
-      - "{{.SOURCE_FOLDER}}/*"
-    method: timestamp
     cmds:
-      - cmd: >-
+      - cmd: |
           for fol in {{.MODULES}}; do
-              echo -e "\nTest ${fol}"
-              cd "${fol}"
-              go test -timeout 30s -trace go.trace -race -cover
-          -bench=. .
+            echo -e "\nTest ${fol}"
+            cd "${fol}"
+            go test -timeout 30s -trace go.trace -race -cover -bench=. .
           done
     vars:
       MODULES:
