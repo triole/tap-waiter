@@ -105,7 +105,11 @@ func sortJoinerIndex(arr tJoinerIndex, params tIDXParams) tJoinerIndex {
 			return arr[i].Size < arr[j].Size
 		})
 	default:
-		sort.Sort(tJoinerIndex(arr))
+		if params.Ascending {
+			sort.Sort(tJoinerIndex(arr))
+		} else {
+			sort.Sort(sort.Reverse(tJoinerIndex(arr)))
+		}
 	}
 	return arr
 }

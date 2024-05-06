@@ -2,7 +2,7 @@
 port: 17777
 api:
   all.json:
-    folder: ../testdata
+    folder: ../testdata/dump
     rxfilter: ".+"
     max_return_size: 10K
     return_values:
@@ -14,7 +14,7 @@ api:
       split_markdown_front_matter: true
 
   list.json:
-    folder: ../testdata
+    folder: ../testdata/dump
     rxfilter: ".+"
     return_values:
       split_path: true
@@ -24,8 +24,16 @@ api:
       content: false
       split_markdown_front_matter: false
 
+  sort.json:
+    folder: ../testdata/dump/yaml
+    rxfilter: ".+"
+    return_values:
+      size: true
+      file_created: true
+      file_lastmod: true
+
   md_body_only.json:
-    folder: ../testdata
+    folder: ../testdata/dump
     rxfilter: "\\.(md)$"
     max_return_size: 10K
     return_values:
@@ -37,7 +45,7 @@ api:
       split_markdown_front_matter: false
 
   md_frontmatter_only.json:
-    folder: ../testdata
+    folder: ../testdata/dump
     rxfilter: "\\.(md)$"
     max_return_size: 10K
     return_values:
@@ -49,7 +57,7 @@ api:
       split_markdown_front_matter: true
 
   yaml_dates.json:
-    folder: ../testdata
+    folder: ../testdata/dump
     rxfilter: "\\.(ya?ml)$"
     max_return_size: 1K
     return_values:
@@ -57,7 +65,7 @@ api:
       file_lastmod: true
 
   yaml_sizes_created_and_content.json:
-    folder: ../testdata
+    folder: ../testdata/dump
     rxfilter: "\\.(ya?ml)$"
     max_return_size: 500B
     return_values:
@@ -66,7 +74,7 @@ api:
       content: true
 
   yaml_default_max_return_size.json:
-    folder: ../testdata
+    folder: ../testdata/dump
     rxfilter: "\\.(ya?ml)$"
     return_values:
       content: true
