@@ -1,4 +1,4 @@
-# Tyson Tap ![example workflow](https://github.com/triole/tyson-tap/actions/workflows/build.yaml/badge.svg)
+# Tyson Tap ![example workflow](https://github.com/triole/tyson-tap/actions/workflows/build.yaml/badge.svg) ![example workflow](https://github.com/triole/tyson-tap/actions/workflows/test.yaml/badge.svg)
 
 - [Synopsis](#synopsis)
 - [Configuration](#configuration)
