@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	lg   = logseal.Init("debug", nil, true, false)
+	lg   = logseal.Init("info", nil, true, false)
 	conf = tConf{}
 )
 
