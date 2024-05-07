@@ -9,29 +9,31 @@ func TestParseFilter(t *testing.T) {
 		"front_matter.title==this+is+a+title",
 		tIDXParamsFilter{
 			Prefix: "front_matter.title", Operator: "==", Suffix: "this is a title",
-		},
-		t,
+		}, t,
 	)
 	validateParseFilter(
 		"front_matter.title!=not+the+title",
 		tIDXParamsFilter{
 			Prefix: "front_matter.title", Operator: "!=", Suffix: "not the title",
-		},
-		t,
+		}, t,
 	)
 	validateParseFilter(
 		"front_matter.tags*=title2",
 		tIDXParamsFilter{
 			Prefix: "front_matter.tags", Operator: "*=", Suffix: "title2",
-		},
-		t,
+		}, t,
 	)
 	validateParseFilter(
 		"front_matter.tags!*=title",
 		tIDXParamsFilter{
 			Prefix: "front_matter.tags", Operator: "!*=", Suffix: "title",
-		},
-		t,
+		}, t,
+	)
+	validateParseFilter(
+		"front_matter.title*=title[0-9]{1,2}",
+		tIDXParamsFilter{
+			Prefix: "front_matter.title", Operator: "*=", Suffix: "title[0-9]{1,2}",
+		}, t,
 	)
 }
 

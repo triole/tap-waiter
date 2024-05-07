@@ -114,13 +114,56 @@ func createDummyFiles() (arr []string) {
 	os.MkdirAll(tempFolder, os.ModePerm)
 	for i := 1; i <= 3; i++ {
 		name := filepath.Join(tempFolder, fmt.Sprintf("%03d", i)+".tmp")
-		f, err := os.Create(name)
+		_, err := os.Stat(name)
 		if err != nil {
-			log.Fatal(err)
+			f, err := os.Create(name)
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer f.Close()
+			time.Sleep(time.Duration(1000) * time.Millisecond)
 		}
-		defer f.Close()
 		arr = append(arr, filepath.Base(name))
-		time.Sleep(time.Duration(1000) * time.Millisecond)
 	}
 	return
+}
+
+func TestGetMapVal(t *testing.T) {
+	ep := newTestEndpoint()
+	content := readFileContent(
+		filepath.Join(testFolder, "dump/markdown/1.md"), ep,
+	)
+	validateGetMapVal(
+		"front_matter.title", content, []string{"title1"}, t,
+	)
+	validateGetMapVal(
+		"front_matter.tags", content, []string{"tag1", "tag2"}, t,
+	)
+}
+
+func validateGetMapVal(key string, mp map[string]interface{}, exp []string, t *testing.T) {
+	b := false
+	res := getMapVal(key, mp)
+	if len(exp) == len(res) {
+		for i, x := range res {
+			if x != exp[i] {
+				b = true
+			}
+		}
+	} else {
+		b = true
+	}
+	if b {
+		t.Errorf("error get map val, exp: %v, res: %v", exp, res)
+	}
+}
+
+func newTestEndpoint() tEndpoint {
+	return tEndpoint{ReturnValues: tReturnValues{
+		Created:                  true,
+		LastMod:                  true,
+		Content:                  true,
+		SplitMarkdownFrontMatter: true,
+		Size:                     true,
+	}}
 }

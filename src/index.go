@@ -10,13 +10,12 @@ import (
 )
 
 type tJoinerEntry struct {
-	Path        string                 `json:"path"`
-	SplitPath   []string               `json:"split_path,omitempty"`
-	Size        uint64                 `json:"size,omitempty"`
-	LastMod     int64                  `json:"lastmod,omitempty"`
-	Created     int64                  `json:"created,omitempty"`
-	FrontMatter map[string]interface{} `json:"front_matter,omitempty"`
-	Content     map[string]interface{} `json:"content,omitempty"`
+	Path      string                 `json:"path"`
+	SplitPath []string               `json:"split_path,omitempty"`
+	Size      uint64                 `json:"size,omitempty"`
+	LastMod   int64                  `json:"lastmod,omitempty"`
+	Created   int64                  `json:"created,omitempty"`
+	Content   map[string]interface{} `json:"content,omitempty"`
 }
 
 type tJoinerIndex []tJoinerEntry
@@ -114,8 +113,29 @@ func sortJoinerIndex(arr tJoinerIndex, params tIDXParams) tJoinerIndex {
 }
 
 func filterJoinerIndex(arr tJoinerIndex, params tIDXParams) tJoinerIndex {
-	for _, el := range arr {
-		fmt.Printf("%+v\n", el)
-	}
+	// fmt.Printf("%+v\n", params.Filter)
+	// for _, el := range arr {
+	// if getMapVal(params.Filter.Prefix, el.Content) {
+	// 	fmt.Printf("%+v\n", "YEP")
+	// }
+	// fmt.Printf("%+v\n", el.Content["front_matter"])
+	// }
 	return arr
+}
+
+func getMapVal(key string, dict map[string]interface{}) (s []string) {
+	pth := strings.Split(key, ".")
+	if val, ok := dict[pth[0]]; ok {
+		switch vl := val.(type) {
+		case map[string]interface{}:
+			s = getMapVal(strings.Join(pth[1:], "."), vl)
+		case []interface{}:
+			for _, x := range vl {
+				s = append(s, x.(string))
+			}
+		default:
+			s = []string{vl.(string)}
+		}
+	}
+	return
 }
