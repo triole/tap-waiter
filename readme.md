@@ -57,3 +57,13 @@ api:
       # have only front matter in the final json
       split_markdown_front_matter: false
 ```
+
+# URL Parameters
+
+Here are a few URL parameter examples which are hopefully self explanatory.
+
+```
+?sortby=created
+?sortby=lastmod&order=asc
+?sortby=size&order=desc
+```
