@@ -41,7 +41,7 @@ func (arr tJoinerIndex) Swap(i, j int) {
 
 func makeJoinerIndex(params tIDXParams) (joinerIndex tJoinerIndex) {
 	lg.Debug(
-		"make joiner index",
+		"make joiner index and start measure duration",
 		logseal.F{"index_params": fmt.Sprintf("%+v", params)},
 	)
 	dataFiles := find(params.Endpoint.Folder, params.Endpoint.RxFilter)
@@ -73,10 +73,9 @@ func makeJoinerIndex(params tIDXParams) (joinerIndex tJoinerIndex) {
 			}
 		}
 		joinerIndex = sortJoinerIndex(joinerIndex, params)
-		lg.Debug(
-			"index created",
-			logseal.F{"path": params.Endpoint.Folder},
-		)
+		if len(params.Filter.Errors) == 0 {
+			joinerIndex = filterJoinerIndex(joinerIndex, params)
+		}
 	}
 	return
 }
@@ -110,6 +109,13 @@ func sortJoinerIndex(arr tJoinerIndex, params tIDXParams) tJoinerIndex {
 		} else {
 			sort.Sort(sort.Reverse(tJoinerIndex(arr)))
 		}
+	}
+	return arr
+}
+
+func filterJoinerIndex(arr tJoinerIndex, params tIDXParams) tJoinerIndex {
+	for _, el := range arr {
+		fmt.Printf("%+v\n", el)
 	}
 	return arr
 }

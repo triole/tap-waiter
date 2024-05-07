@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"syscall"
 
 	"github.com/triole/logseal"
@@ -58,4 +59,10 @@ func getFileLastMod(filename string) (uts int64) {
 func pprint(i interface{}) {
 	s, _ := json.MarshalIndent(i, "", "  ")
 	fmt.Println(string(s))
+}
+
+func rxFind(rx string, content string) (r string) {
+	temp, _ := regexp.Compile(rx)
+	r = temp.FindString(content)
+	return
 }

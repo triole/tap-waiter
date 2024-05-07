@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -23,9 +22,6 @@ func readDataFile(filename string, ps tEndpoint, chin chan string, chout chan tJ
 	pth := strings.TrimPrefix(
 		strings.TrimPrefix(filename, ps.Folder), string(filepath.Separator),
 	)
-	lg.Trace("process file", logseal.F{
-		"path": filename, "endpoint_config": fmt.Sprintf("%+v", ps),
-	})
 	je := tJoinerEntry{
 		Path: pth,
 	}
