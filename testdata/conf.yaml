@@ -8,8 +8,8 @@ api:
     return_values:
       split_path: true
       size: true
-      file_created: true
-      file_lastmod: true
+      created: true
+      lastmod: true
       content: true
       split_markdown_front_matter: true
 
@@ -19,8 +19,8 @@ api:
     return_values:
       split_path: true
       size: false
-      file_created: false
-      file_lastmod: false
+      created: false
+      lastmod: false
       content: false
       split_markdown_front_matter: false
 
@@ -29,8 +29,8 @@ api:
     rxfilter: ".+"
     return_values:
       size: true
-      file_created: true
-      file_lastmod: true
+      created: true
+      lastmod: true
 
   md_body_only.json:
     folder: ../testdata/dump
@@ -39,8 +39,8 @@ api:
     return_values:
       split_path: false
       size: false
-      file_created: false
-      file_lastmod: false
+      created: false
+      lastmod: false
       content: true
       split_markdown_front_matter: false
 
@@ -51,8 +51,8 @@ api:
     return_values:
       split_path: false
       size: false
-      file_created: false
-      file_lastmod: false
+      created: false
+      lastmod: false
       content: false
       split_markdown_front_matter: true
 
@@ -61,15 +61,15 @@ api:
     rxfilter: "\\.(ya?ml)$"
     max_return_size: 1K
     return_values:
-      file_created: true
-      file_lastmod: true
+      created: true
+      lastmod: true
 
   yaml_sizes_created_and_content.json:
     folder: ../testdata/dump
     rxfilter: "\\.(ya?ml)$"
     max_return_size: 500B
     return_values:
-      file_created: true
+      created: true
       size: true
       content: true
 

@@ -30,10 +30,10 @@ api:
       size: false
 
       # file created date
-      file_created: false
+      created: false
 
       # file modified date
-      file_lastmod: false
+      lastmod: false
 
       # display file content, note max_return_size
       content: false
