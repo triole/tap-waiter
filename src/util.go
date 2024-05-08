@@ -61,8 +61,12 @@ func pprint(i interface{}) {
 	fmt.Println(string(s))
 }
 
-func rxFind(rx string, content string) (r string) {
+func rxFind(rx string, content string) string {
 	temp, _ := regexp.Compile(rx)
-	r = temp.FindString(content)
-	return
+	return temp.FindString(content)
+}
+
+func rxMatch(rx string, content string) bool {
+	temp, _ := regexp.Compile(rx)
+	return temp.MatchString(content)
 }

@@ -60,7 +60,7 @@ func contains(slice []string, item string) bool {
 }
 
 func appliedFilterTraceMessage(name string, content, filter []string, r bool) {
-	lg.Trace("applied filter "+name,
+	lg.Trace("applied filter: "+name,
 		logseal.F{"content": content, "filter": filter, "result": r},
 	)
 }
