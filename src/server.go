@@ -27,6 +27,7 @@ type tIDXParamsFilter struct {
 	Operator string
 	Suffix   []string
 	Errors   []error
+	Enabled  bool
 }
 
 func runServer(conf tConf) {
@@ -45,6 +46,7 @@ func serveContent(w http.ResponseWriter, r *http.Request) {
 		SortBy:    "path",
 		Ascending: true,
 		Threads:   CLI.Threads,
+		Filter:    tIDXParamsFilter{Enabled: false},
 	}
 
 	url, err := decodeURL(r.URL.Path)
@@ -114,6 +116,8 @@ func parseFilterString(s string) (fil tIDXParamsFilter) {
 		for _, el := range fil.Errors {
 			lg.Error(el)
 		}
+	} else {
+		fil.Enabled = true
 	}
 	return
 }

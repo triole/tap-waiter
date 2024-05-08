@@ -72,7 +72,7 @@ func makeJoinerIndex(params tIDXParams) (joinerIndex tJoinerIndex) {
 			}
 		}
 		joinerIndex = sortJoinerIndex(joinerIndex, params)
-		if len(params.Filter.Errors) == 0 {
+		if params.Filter.Enabled {
 			joinerIndex = filterJoinerIndex(joinerIndex, params)
 		}
 	}
@@ -118,16 +118,18 @@ func filterJoinerIndex(arr tJoinerIndex, params tIDXParams) (newArr tJoinerIndex
 		match := false
 		if len(val) > 0 {
 			switch params.Filter.Operator {
+			case "===":
+				match = equalSlices(val, params.Filter.Suffix)
+			case "!==":
+				match = notEqualSlices(val, params.Filter.Suffix)
 			case "==":
-				match = equalSlices(params.Filter.Suffix, val)
+				match = containsSlice(val, params.Filter.Suffix)
 			case "!=":
-				match = notEqualSlices(params.Filter.Suffix, val)
-			case "=*":
-				fmt.Println("to be implemented")
-			case "!=*":
-				fmt.Println("to be implemented")
-			case "=~":
-				fmt.Println("to be implemented")
+				match = notContainsSlice(val, params.Filter.Suffix)
+				// case "=*":
+				// 	fmt.Println("to be implemented")
+				// case "!=*":
+				// 	fmt.Println("to be implemented")
 			}
 			if match {
 				newArr = append(newArr, el)
