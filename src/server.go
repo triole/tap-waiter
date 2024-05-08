@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -24,7 +25,7 @@ type tIDXParams struct {
 type tIDXParamsFilter struct {
 	Prefix   string
 	Operator string
-	Suffix   string
+	Suffix   []string
 	Errors   []error
 }
 
@@ -46,23 +47,28 @@ func serveContent(w http.ResponseWriter, r *http.Request) {
 		Threads:   CLI.Threads,
 	}
 
-	url := r.URL.Path
-	params := r.URL.Query()
-	for key, values := range params {
-		lowKey := strings.ToLower(key)
-		for _, val := range values {
-			lowVal := strings.ToLower(val)
-			if lowKey == "sortby" {
-				idxParams.SortBy = lowVal
-			}
-			if lowKey == "order" && lowVal == "asc" {
-				idxParams.Ascending = true
-			}
-			if lowKey == "order" && lowVal == "desc" {
-				idxParams.Ascending = false
-			}
-			if lowKey == "filter" {
-				idxParams.Filter = parseFilterString(val)
+	url, err := decodeURL(r.URL.Path)
+	if err == nil {
+		params := r.URL.Query()
+		for key, values := range params {
+			lowKey := strings.ToLower(key)
+			for _, val := range values {
+				val, err = decodeURL(val)
+				if err == nil {
+					lowVal := strings.ToLower(val)
+					if lowKey == "sortby" {
+						idxParams.SortBy = lowVal
+					}
+					if lowKey == "order" && lowVal == "asc" {
+						idxParams.Ascending = true
+					}
+					if lowKey == "order" && lowVal == "desc" {
+						idxParams.Ascending = false
+					}
+					if lowKey == "filter" {
+						idxParams.Filter = parseFilterString(val)
+					}
+				}
 			}
 		}
 	}
@@ -85,30 +91,24 @@ func serveContent(w http.ResponseWriter, r *http.Request) {
 }
 
 func parseFilterString(s string) (fil tIDXParamsFilter) {
-	url, err := decodeURL(s)
-	if err != nil {
+	fil.Prefix = rxFind("^[a-z0-9_\\-\\. ]+", s)
+	fil.Operator = rxFind("^[^a-z0-9_\\-\\. ]+", strings.TrimPrefix(s, fil.Prefix))
+	fil.Suffix = strings.Split(strings.TrimPrefix(s, fil.Prefix+fil.Operator), ",")
+	sort.Strings(fil.Suffix)
+	if fil.Prefix == "" {
 		fil.Errors = append(
-			fil.Errors, errors.New("can not decode url: "+s),
+			fil.Errors, errors.New("error parsed filter: no match for prefix"),
 		)
-	} else {
-		fil.Prefix = rxFind("^[a-z0-9_\\-\\. ]+", url)
-		fil.Operator = rxFind("^[^a-z0-9_\\-\\. ]+", strings.TrimPrefix(url, fil.Prefix))
-		fil.Suffix = strings.TrimPrefix(url, fil.Prefix+fil.Operator)
-		if fil.Prefix == "" {
-			fil.Errors = append(
-				fil.Errors, errors.New("error parsed filter: no match for prefix"),
-			)
-		}
-		if fil.Operator == "" {
-			fil.Errors = append(
-				fil.Errors, errors.New("error parsed filter: no match for operator"),
-			)
-		}
-		if fil.Prefix == "" {
-			fil.Errors = append(
-				fil.Errors, errors.New("error parsed filter: no match for suffix"),
-			)
-		}
+	}
+	if fil.Operator == "" {
+		fil.Errors = append(
+			fil.Errors, errors.New("error parsed filter: no match for operator"),
+		)
+	}
+	if fil.Prefix == "" {
+		fil.Errors = append(
+			fil.Errors, errors.New("error parsed filter: no match for suffix"),
+		)
 	}
 	if len(fil.Errors) > 0 {
 		for _, el := range fil.Errors {
@@ -120,6 +120,7 @@ func parseFilterString(s string) (fil tIDXParamsFilter) {
 
 func decodeURL(s string) (t string, err error) {
 	t, err = url.QueryUnescape(s)
+	lg.IfErrError("can not decode url: %s, error: %s", s, err)
 	return
 }
 

@@ -112,15 +112,29 @@ func sortJoinerIndex(arr tJoinerIndex, params tIDXParams) tJoinerIndex {
 	return arr
 }
 
-func filterJoinerIndex(arr tJoinerIndex, params tIDXParams) tJoinerIndex {
-	// fmt.Printf("%+v\n", params.Filter)
-	// for _, el := range arr {
-	// if getMapVal(params.Filter.Prefix, el.Content) {
-	// 	fmt.Printf("%+v\n", "YEP")
-	// }
-	// fmt.Printf("%+v\n", el.Content["front_matter"])
-	// }
-	return arr
+func filterJoinerIndex(arr tJoinerIndex, params tIDXParams) (newArr tJoinerIndex) {
+	for _, el := range arr {
+		val := getMapVal(params.Filter.Prefix, el.Content)
+		match := false
+		if len(val) > 0 {
+			switch params.Filter.Operator {
+			case "==":
+				match = equalSlices(params.Filter.Suffix, val)
+			case "!=":
+				match = notEqualSlices(params.Filter.Suffix, val)
+			case "=*":
+				fmt.Println("to be implemented")
+			case "!=*":
+				fmt.Println("to be implemented")
+			case "=~":
+				fmt.Println("to be implemented")
+			}
+			if match {
+				newArr = append(newArr, el)
+			}
+		}
+	}
+	return
 }
 
 func getMapVal(key string, dict map[string]interface{}) (s []string) {

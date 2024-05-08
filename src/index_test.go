@@ -13,7 +13,6 @@ import (
 
 var (
 	tempFolder     = filepath.Join(os.TempDir(), "tyson_tap_testdata")
-	testFolder     = "../testdata"
 	dummyTestFiles []string
 )
 
@@ -28,16 +27,16 @@ func TestMakeJoinerIndex(t *testing.T) {
 	validateMakeJoinerIndex(tempFolder, "lastmod", true, dummyTestFiles, t)
 	validateMakeJoinerIndex(tempFolder, "lastmod", false, dummyTestFiles, t)
 	validateMakeJoinerIndex(
-		nf("dump/yaml"), "size", true, loadSortJSONValidtor("size.json"), t,
+		fromTestFolder("dump/yaml"), "size", true, loadSortJSONValidtor("size.json"), t,
 	)
 	validateMakeJoinerIndex(
-		nf("dump/yaml"), "size", false, loadSortJSONValidtor("size.json"), t,
+		fromTestFolder("dump/yaml"), "size", false, loadSortJSONValidtor("size.json"), t,
 	)
 	validateMakeJoinerIndex(
-		nf("dump/yaml"), "path", true, loadSortJSONValidtor("path.json"), t,
+		fromTestFolder("dump/yaml"), "path", true, loadSortJSONValidtor("path.json"), t,
 	)
 	validateMakeJoinerIndex(
-		nf("dump/yaml"), "path", false, loadSortJSONValidtor("path.json"), t,
+		fromTestFolder("dump/yaml"), "path", false, loadSortJSONValidtor("path.json"), t,
 	)
 }
 
@@ -88,7 +87,7 @@ func newTestParams(folder, sortBy string, ascending bool) (p tIDXParams) {
 }
 
 func loadSortJSONValidtor(s string) (arr []string) {
-	file := filepath.Join(testFolder, "validate_sort", s)
+	file := fromTestFolder("validate_sort/" + s)
 	by, _, err := readFile(file)
 	if err == nil {
 		err := json.Unmarshal(by, &arr)
@@ -97,10 +96,6 @@ func loadSortJSONValidtor(s string) (arr []string) {
 		}
 	}
 	return
-}
-
-func nf(s string) string {
-	return filepath.Join(testFolder, s)
 }
 
 func shortprintJI(ji tJoinerIndex) (s string) {
@@ -131,7 +126,7 @@ func createDummyFiles() (arr []string) {
 func TestGetMapVal(t *testing.T) {
 	ep := newTestEndpoint()
 	content := readFileContent(
-		filepath.Join(testFolder, "dump/markdown/1.md"), ep,
+		fromTestFolder("dump/markdown/1.md"), ep,
 	)
 	validateGetMapVal(
 		"front_matter.title", content, []string{"title1"}, t,
