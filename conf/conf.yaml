@@ -1,12 +1,6 @@
 ---
-# bool values are by default false, if not mentioned in the config
-# all return values have to be explicitely enabled
-
-# port to listen at
-port: 17777
-
-# list of api endpoints
-api:
+port: 17777 # port to listen at
+api: # list of api endpoints
   # url where to endpoint is reachable
   all.json:
 
@@ -22,6 +16,7 @@ api:
     max_return_size: 10KB
 
     # set of return values to add to the final json
+    # bool values are by default false and have to be enabled explicitely
     return_values:
       # an array of the file path split at the path separator
       split_path: false

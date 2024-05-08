@@ -1,7 +1,14 @@
 # Tyson Tap ![example workflow](https://github.com/triole/tyson-tap/actions/workflows/build.yaml/badge.svg) ![example workflow](https://github.com/triole/tyson-tap/actions/workflows/test.yaml/badge.svg)
 
+<!-- toc -->
+
 - [Synopsis](#synopsis)
 - [Configuration](#configuration)
+- [URL Parameters](#url-parameters)
+- [Filters](#filters)
+  - [Logical Operators](#logical-operators)
+
+<!-- /toc -->
 
 ## Synopsis
 
@@ -11,16 +18,9 @@ Tyson Tap offers an http api that serves json objects containing information abo
 
 A configuration file is required and defines the listening port and the api endpoint definitions. A simple example can be found below and another in the `testdata` folder.
 
-```go mdox-exec="cat conf/conf.yaml | cat"
----
-# bool values are by default false, if not mentioned in the config
-# all return values have to be explicitely enabled
-
-# port to listen at
-port: 17777
-
-# list of api endpoints
-api:
+```go mdox-exec="tail -n +2 conf/conf.yaml"
+port: 17777 # port to listen at
+api: # list of api endpoints
   # url where to endpoint is reachable
   all.json:
 
@@ -36,6 +36,7 @@ api:
     max_return_size: 10KB
 
     # set of return values to add to the final json
+    # bool values are by default false and have to be enabled explicitely
     return_values:
       # an array of the file path split at the path separator
       split_path: false
