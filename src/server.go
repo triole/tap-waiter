@@ -85,35 +85,41 @@ func serveContent(w http.ResponseWriter, r *http.Request) {
 }
 
 func parseFilterString(s string) (fil tIDXParamsFilter) {
-	fil.Prefix = decodeURL(rxFind("^[a-z0-9_\\-\\. ]+", s))
-	fil.Operator = decodeURL(
-		rxFind("^[^a-z0-9_\\-\\. ]+", strings.TrimPrefix(s, fil.Prefix)),
-	)
-	fil.Suffix = decodeURL(strings.TrimPrefix(s, fil.Prefix+fil.Operator))
-	if fil.Prefix == "" {
+	url, err := decodeURL(s)
+	if err != nil {
 		fil.Errors = append(
-			fil.Errors, errors.New("error parsed filter: prefix empty"),
+			fil.Errors, errors.New("can not decode url: "+s),
 		)
+	} else {
+		fil.Prefix = rxFind("^[a-z0-9_\\-\\. ]+", url)
+		fil.Operator = rxFind("^[^a-z0-9_\\-\\. ]+", strings.TrimPrefix(url, fil.Prefix))
+		fil.Suffix = strings.TrimPrefix(url, fil.Prefix+fil.Operator)
+		if fil.Prefix == "" {
+			fil.Errors = append(
+				fil.Errors, errors.New("error parsed filter: no match for prefix"),
+			)
+		}
+		if fil.Operator == "" {
+			fil.Errors = append(
+				fil.Errors, errors.New("error parsed filter: no match for operator"),
+			)
+		}
+		if fil.Prefix == "" {
+			fil.Errors = append(
+				fil.Errors, errors.New("error parsed filter: no match for suffix"),
+			)
+		}
 	}
-	if fil.Operator == "" {
-		fil.Errors = append(
-			fil.Errors, errors.New("error parsed filter: operator empty"),
-		)
-	}
-	if fil.Prefix == "" {
-		fil.Errors = append(
-			fil.Errors, errors.New("error parsed filter: suffix empty"),
-		)
+	if len(fil.Errors) > 0 {
+		for _, el := range fil.Errors {
+			lg.Error(el)
+		}
 	}
 	return
 }
 
-func decodeURL(s string) (t string) {
-	t, _ = url.QueryUnescape(s)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// 	return
-	// }
+func decodeURL(s string) (t string, err error) {
+	t, err = url.QueryUnescape(s)
 	return
 }
 
