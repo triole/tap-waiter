@@ -44,10 +44,10 @@ api:
       size: false
 
       # file created date
-      file_created: false
+      created: false
 
       # file modified date
-      file_lastmod: false
+      lastmod: false
 
       # display file content, note max_return_size
       content: false
@@ -62,8 +62,34 @@ api:
 
 Here are a few URL parameter examples which are hopefully self explanatory.
 
-```
-?sortby=created
-?sortby=lastmod&order=asc
-?sortby=size&order=desc
-```
+| parameter(s)                          |
+|---------------------------------------|
+| ?order=asc                            |
+| ?order=desc                           |
+| ?sortby=created                       |
+| ?sortby=lastmod                       |
+| ?sortby=size                          |
+|                                       |
+| ?filter=front_matter.title===title    |
+| ?filter=front_matter.tags===tag1,tag2 |
+| ?filter=front_matter.tags==tag1,tag2  |
+| ?filter=front_matter.tags!==tag1,tag2 |
+| ?filter=front_matter.tags!=tag1,tag2  |
+|                                       |
+| ?sortby=size&order=asc                |
+
+# Filters
+
+Filters supporting different logical operators are applied by url parameter. A filter contains of a `prefix` defining the part of the document to consider, an `operator` specifying the logical operation and a `suffix` which resembles the filter criterion. The content to be considered can be an array. For example when a markdown file has a list of tags. Therefore the filter criterion can be a comma separated list as well (see above).
+
+## Logical Operators
+
+| op               | returns a document if...                                               |
+|------------------|------------------------------------------------------------------------|
+| ===              | ...prefix and suffix are exactly equal                                 |
+| !==              | ...prefix and suffix are not exactly equal                             |
+| ==               | ...prefix contains suffix                                              |
+| !=               | ...prefix does not contain suffix                                      |
+|                  |                                                                        |
+| ** exactly equal | equal regarding size and every single entry                            |
+| ** contains      | equal regarding every element of the suffix can be found in the prefix |
