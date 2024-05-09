@@ -8,6 +8,7 @@ import (
 
 func equalSlices(content, filter []string) (r bool) {
 	sort.Strings(content)
+	sort.Strings(filter)
 	r = false
 	if len(filter) == len(content) {
 		r = true
@@ -22,8 +23,9 @@ func equalSlices(content, filter []string) (r bool) {
 }
 
 func notEqualSlices(content, filter []string) (r bool) {
+	r = !equalSlices(content, filter)
 	appliedFilterTraceMessage("not equal slices", content, filter, r)
-	return !equalSlices(content, filter)
+	return
 }
 
 func containsSlice(content, filter []string) (r bool) {
