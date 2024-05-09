@@ -61,7 +61,7 @@ api: # list of api endpoints
 
 # URL Parameters
 
-Here are a few URL parameter examples which are hopefully self explanatory.
+Here are a few URL parameter examples which are hopefully self explanatory. Please keep in mind that special characters have to be url encoded.
 
 | parameter(s)                          |
 |---------------------------------------|
@@ -91,8 +91,8 @@ Filters supporting different logical operators are applied by url parameter. A f
 | !==              | ...prefix and suffix are not exactly equal                             |
 | ==               | ...prefix contains suffix                                              |
 | !=               | ...prefix does not contain suffix                                      |
-| ==~              | ...if every suffix matches every prefix                                |
-| =~               | ...if every suffix matches at least one prefix                         |
+| ==~              | ...if every regex suffix matches every prefix                          |
+| =~               | ...if every regex suffix matches at least one prefix                   |
 |                  |                                                                        |
 | ** exactly equal | equal regarding size and every single entry                            |
 | ** contains      | equal regarding every element of the suffix can be found in the prefix |
