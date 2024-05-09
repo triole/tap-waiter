@@ -116,7 +116,7 @@ func createDummyFiles() (arr []string) {
 				log.Fatal(err)
 			}
 			defer f.Close()
-			time.Sleep(time.Duration(1000) * time.Millisecond)
+			time.Sleep(time.Duration(2) * time.Second)
 		}
 		arr = append(arr, filepath.Base(name))
 	}
