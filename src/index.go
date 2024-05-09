@@ -126,10 +126,10 @@ func filterJoinerIndex(arr tJoinerIndex, params tIDXParams) (newArr tJoinerIndex
 				match = containsSlice(val, params.Filter.Suffix)
 			case "!=":
 				match = notContainsSlice(val, params.Filter.Suffix)
-				// case "=*":
-				// 	fmt.Println("to be implemented")
-				// case "!=*":
-				// 	fmt.Println("to be implemented")
+			case "==~":
+				match = rxMatchSliceCompletely(val, params.Filter.Suffix)
+			case "=~":
+				match = rxMatchSliceOnce(val, params.Filter.Suffix)
 			}
 			if match {
 				newArr = append(newArr, el)

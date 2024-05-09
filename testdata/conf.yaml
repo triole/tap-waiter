@@ -44,7 +44,7 @@ api:
       content: true
       split_markdown_front_matter: false
 
-  md_frontmatter_only.json:
+  md_front_matter_only.json:
     folder: ../testdata/dump
     rxfilter: "\\.(md)$"
     max_return_size: 10K

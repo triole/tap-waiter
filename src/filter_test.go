@@ -96,3 +96,81 @@ func validateNotContainsSlice(s1, s2 []string, exp bool, t *testing.T) {
 		)
 	}
 }
+
+func TestRxMatchSliceCompletely(t *testing.T) {
+	validateRxMatchSliceCompletely(
+		[]string{"tag1", "tag2", "tag3", "tag4", "tag5"},
+		[]string{".+"},
+		true, t,
+	)
+	validateRxMatchSliceCompletely(
+		[]string{"tag1", "tag2", "tag3", "tag4", "tag5"},
+		[]string{"t[a-z]+[0-9]"},
+		true, t,
+	)
+	validateRxMatchSliceCompletely(
+		[]string{"tag1", "tag2", "tag3", "tag4", "tag5"},
+		[]string{"tag[0-9]", "tag.+"},
+		true, t,
+	)
+	validateRxMatchSliceCompletely(
+		[]string{"tag1", "tag2", "tag3", "tag4", "tag5"},
+		[]string{"tag[0-9]", "tag2"},
+		false, t,
+	)
+	validateRxMatchSliceCompletely(
+		[]string{"tag1", "tag2"},
+		[]string{"tag2", "tag4"},
+		false, t,
+	)
+
+}
+
+func validateRxMatchSliceCompletely(s1, s2 []string, exp bool, t *testing.T) {
+	res := rxMatchSliceCompletely(s1, s2)
+	if exp != res {
+		t.Errorf(
+			"error rx match slice completely, slices: %+v %+v, exp: %v, got: %v",
+			s1, s2, exp, res,
+		)
+	}
+}
+
+func TestRxMatchSliceOnce(t *testing.T) {
+	validateRxMatchSliceOnce(
+		[]string{"tag1", "tag2", "tag3", "tag4", "tag5"},
+		[]string{".+"},
+		true, t,
+	)
+	validateRxMatchSliceOnce(
+		[]string{"tag1", "tag2", "tag3", "tag4", "tag5"},
+		[]string{"t[a-z]+[0-9]"},
+		true, t,
+	)
+	validateRxMatchSliceOnce(
+		[]string{"tag1", "tag2", "tag3", "tag4", "tag5"},
+		[]string{"tag[0-9]", "tag2", "tag3"},
+		true, t,
+	)
+	validateRxMatchSliceOnce(
+		[]string{"tag1", "tag2", "tag3", "tag4", "tag5"},
+		[]string{"tag[0-9]", "none"},
+		false, t,
+	)
+	validateRxMatchSliceOnce(
+		[]string{"tag1", "tag2"},
+		[]string{"hello", "world", ".*"},
+		false, t,
+	)
+
+}
+
+func validateRxMatchSliceOnce(s1, s2 []string, exp bool, t *testing.T) {
+	res := rxMatchSliceOnce(s1, s2)
+	if exp != res {
+		t.Errorf(
+			"error rx match slice once, slices: %+v %+v, exp: %v, got: %v",
+			s1, s2, exp, res,
+		)
+	}
+}
