@@ -71,6 +71,9 @@ Here are a few URL parameter examples which are hopefully self explanatory. Plea
 | ?sortby=lastmod                       |
 | ?sortby=size                          |
 |                                       |
+| ?sortby=description                   |
+| ?sortby=front_matter.title            |
+|                                       |
 | ?filter=front_matter.title===title    |
 | ?filter=front_matter.tags===tag1,tag2 |
 | ?filter=front_matter.tags==tag1,tag2  |
