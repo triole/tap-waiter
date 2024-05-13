@@ -70,3 +70,33 @@ func rxMatch(rx string, content string) bool {
 	temp, _ := regexp.Compile(rx)
 	return temp.MatchString(content)
 }
+
+func toFloat(inp interface{}) (fl float64) {
+	switch val := inp.(type) {
+	case float32:
+		fl = float64(val)
+	case float64:
+		fl = val
+	case int:
+		fl = float64(val)
+	case int8:
+		fl = float64(val)
+	case int16:
+		fl = float64(val)
+	case int32:
+		fl = float64(val)
+	case int64:
+		fl = float64(val)
+	case uint:
+		fl = float64(val)
+	case uint8:
+		fl = float64(val)
+	case uint16:
+		fl = float64(val)
+	case uint32:
+		fl = float64(val)
+	case uint64:
+		fl = float64(val)
+	}
+	return
+}

@@ -27,8 +27,9 @@ func (arr tJoinerIndex) Len() int {
 
 func (arr tJoinerIndex) Less(i, j int) bool {
 	switch arr[i].SortIndex.(type) {
-	case int:
-		return arr[i].SortIndex.(int) < arr[j].SortIndex.(int)
+	case float32, float64,
+		int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
+		return toFloat(arr[i].SortIndex) < toFloat(arr[j].SortIndex)
 	default:
 		return arr[i].SortIndex.(string) < arr[j].SortIndex.(string)
 	}
@@ -75,7 +76,6 @@ func makeJoinerIndex(params tIDXParams) (joinerIndex tJoinerIndex) {
 			case "size":
 				li.SortIndex = li.Size
 			default:
-				fmt.Printf("%+v\n", params.SortBy)
 				val := getMapVal(params.SortBy, li.Content)
 				if len(val) > 0 {
 					li.SortIndex = strings.Join(val, ".")
