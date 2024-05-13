@@ -16,6 +16,7 @@ type tJoinerEntry struct {
 	LastMod   int64                  `json:"lastmod,omitempty"`
 	Created   int64                  `json:"created,omitempty"`
 	Content   map[string]interface{} `json:"content,omitempty"`
+	SortIndex interface{}            `json:"-"`
 }
 
 type tJoinerIndex []tJoinerEntry
@@ -24,18 +25,21 @@ func (arr tJoinerIndex) Len() int {
 	return len(arr)
 }
 
-func getDepth(pth string) int {
-	return len(strings.Split(pth, string(filepath.Separator))) - 1
-}
-
 func (arr tJoinerIndex) Less(i, j int) bool {
-	si1 := fmt.Sprintf("%05d_%s", getDepth(arr[i].Path), arr[i].Path)
-	si2 := fmt.Sprintf("%05d_%s", getDepth(arr[j].Path), arr[j].Path)
-	return si1 < si2
+	switch arr[i].SortIndex.(type) {
+	case int:
+		return arr[i].SortIndex.(int) < arr[j].SortIndex.(int)
+	default:
+		return arr[i].SortIndex.(string) < arr[j].SortIndex.(string)
+	}
 }
 
 func (arr tJoinerIndex) Swap(i, j int) {
 	arr[i], arr[j] = arr[j], arr[i]
+}
+
+func getDepth(pth string) int {
+	return len(strings.Split(pth, string(filepath.Separator))) - 1
 }
 
 func makeJoinerIndex(params tIDXParams) (joinerIndex tJoinerIndex) {
@@ -63,6 +67,26 @@ func makeJoinerIndex(params tIDXParams) (joinerIndex tJoinerIndex) {
 
 		c := 0
 		for li := range chout {
+			switch params.SortBy {
+			case "created":
+				li.SortIndex = li.Created
+			case "lastmod":
+				li.SortIndex = li.LastMod
+			case "size":
+				li.SortIndex = li.Size
+			default:
+				fmt.Printf("%+v\n", params.SortBy)
+				val := getMapVal(params.SortBy, li.Content)
+				if len(val) > 0 {
+					li.SortIndex = strings.Join(val, ".")
+				} else {
+					prefix := ""
+					if params.SortBy != "" {
+						prefix = "zzzzz_"
+					}
+					li.SortIndex = fmt.Sprintf("%s%05d_%s", prefix, getDepth(li.Path), li.Path)
+				}
+			}
 			joinerIndex = append(joinerIndex, li)
 			c++
 			if c >= ln {
@@ -71,45 +95,16 @@ func makeJoinerIndex(params tIDXParams) (joinerIndex tJoinerIndex) {
 				break
 			}
 		}
-		joinerIndex = sortJoinerIndex(joinerIndex, params)
 		if params.Filter.Enabled {
 			joinerIndex = filterJoinerIndex(joinerIndex, params)
 		}
-	}
-	return
-}
-
-func sortJoinerIndex(arr tJoinerIndex, params tIDXParams) tJoinerIndex {
-	switch params.SortBy {
-	case "created":
-		sort.Slice(arr, func(i, j int) bool {
-			if !params.Ascending {
-				return arr[i].Created > arr[j].Created
-			}
-			return arr[i].Created < arr[j].Created
-		})
-	case "lastmod":
-		sort.Slice(arr, func(i, j int) bool {
-			if !params.Ascending {
-				return arr[i].LastMod > arr[j].LastMod
-			}
-			return arr[i].LastMod < arr[j].LastMod
-		})
-	case "size":
-		sort.Slice(arr, func(i, j int) bool {
-			if !params.Ascending {
-				return arr[i].Size > arr[j].Size
-			}
-			return arr[i].Size < arr[j].Size
-		})
-	default:
 		if params.Ascending {
-			sort.Sort(tJoinerIndex(arr))
+			sort.Sort(tJoinerIndex(joinerIndex))
 		} else {
-			sort.Sort(sort.Reverse(tJoinerIndex(arr)))
+			sort.Sort(sort.Reverse(tJoinerIndex(joinerIndex)))
 		}
 	}
-	return arr
+	return
 }
 
 func filterJoinerIndex(arr tJoinerIndex, params tIDXParams) (newArr tJoinerIndex) {

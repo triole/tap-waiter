@@ -43,7 +43,6 @@ func runServer(conf tConf) {
 func serveContent(w http.ResponseWriter, r *http.Request) {
 	lg.Info("got request", logseal.F{"url": r.URL})
 	idxParams := tIDXParams{
-		SortBy:    "path",
 		Ascending: true,
 		Threads:   CLI.Threads,
 		Filter:    tIDXParamsFilter{Enabled: false},

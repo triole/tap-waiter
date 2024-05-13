@@ -6,7 +6,7 @@ import (
 
 	"github.com/c2h5oh/datasize"
 	"github.com/triole/logseal"
-	"gopkg.in/yaml.v3"
+	yaml "gopkg.in/yaml.v3"
 )
 
 type tConf struct {
