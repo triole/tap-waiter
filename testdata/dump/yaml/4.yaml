@@ -12,3 +12,8 @@ body: Lorem Ipsum is simply dummy text of the printing and typesetting
   in the 1960s with the release of Letraset sheets containing
   Lorem Ipsum passages, and more recently with desktop publishing
   software like Aldus PageMaker including versions of Lorem Ipsum.
+metadata:
+  meta1: metadata1
+  meta2: more stuff
+  meta3: 1234567890
+
