@@ -137,16 +137,25 @@ func filterJoinerIndex(arr tJoinerIndex, params tIDXParams) (newArr tJoinerIndex
 
 func getMapVal(key string, dict map[string]interface{}) (s []string) {
 	pth := strings.Split(key, ".")
-	if val, ok := dict[pth[0]]; ok {
-		switch vl := val.(type) {
+	for key, val := range dict {
+		delete(dict, key)
+		dict[strings.ToLower(key)] = val
+	}
+	if dictval, ok := dict[pth[0]]; ok {
+		switch val1 := dictval.(type) {
 		case map[string]interface{}:
-			s = getMapVal(strings.Join(pth[1:], "."), vl)
+			s = getMapVal(strings.Join(pth[1:], "."), val1)
 		case []interface{}:
-			for _, x := range vl {
-				s = append(s, x.(string))
+			for _, x := range val1 {
+				switch val2 := x.(type) {
+				case map[string]interface{}:
+					s = getMapVal(strings.Join(pth[1:], "."), val2)
+				default:
+					s = append(s, x.(string))
+				}
 			}
 		default:
-			s = []string{vl.(string)}
+			s = []string{val1.(string)}
 		}
 	}
 	return
