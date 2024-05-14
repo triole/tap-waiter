@@ -132,7 +132,6 @@ func filterJoinerIndex(arr tJoinerIndex, params tIDXParams) (newArr tJoinerIndex
 			}
 		}
 	}
-	fmt.Printf("%+v\n", newArr)
 	return
 }
 
