@@ -108,6 +108,7 @@ func makeJoinerIndex(params tIDXParams) (joinerIndex tJoinerIndex) {
 }
 
 func filterJoinerIndex(arr tJoinerIndex, params tIDXParams) (newArr tJoinerIndex) {
+	newArr = []tJoinerEntry{}
 	for _, el := range arr {
 		val := getMapVal(params.Filter.Prefix, el.Content)
 		match := false
@@ -131,6 +132,7 @@ func filterJoinerIndex(arr tJoinerIndex, params tIDXParams) (newArr tJoinerIndex
 			}
 		}
 	}
+	fmt.Printf("%+v\n", newArr)
 	return
 }
 
