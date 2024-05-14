@@ -2,11 +2,14 @@ package main
 
 import (
 	"sort"
+	"strings"
 
 	"github.com/triole/logseal"
 )
 
 func equalSlices(content, filter []string) (r bool) {
+	content = listToLower(content)
+	filter = listToLower(filter)
 	sort.Strings(content)
 	r = false
 	if len(filter) == len(content) {
@@ -29,6 +32,8 @@ func notEqualSlices(content, filter []string) (r bool) {
 }
 
 func containsSlice(content, filter []string) (r bool) {
+	content = listToLower(content)
+	filter = listToLower(filter)
 	r = true
 	for _, fil := range filter {
 		if !contains(content, fil) {
@@ -41,6 +46,8 @@ func containsSlice(content, filter []string) (r bool) {
 }
 
 func notContainsSlice(content, filter []string) (r bool) {
+	content = listToLower(content)
+	filter = listToLower(filter)
 	r = true
 	if len(content) >= len(filter) {
 		for _, fil := range filter {
@@ -55,6 +62,7 @@ func notContainsSlice(content, filter []string) (r bool) {
 }
 
 func rxMatchSliceCompletely(content, filter []string) (r bool) {
+	content = listToLower(content)
 	r = true
 	for _, fil := range filter {
 		for _, con := range content {
@@ -69,6 +77,7 @@ func rxMatchSliceCompletely(content, filter []string) (r bool) {
 }
 
 func rxMatchSliceOnce(content, filter []string) (r bool) {
+	content = listToLower(content)
 	r = true
 	for _, fil := range filter {
 		if !rxContains(content, fil) {
@@ -102,4 +111,11 @@ func appliedFilterTraceMessage(name string, content, filter []string, r bool) {
 	lg.Trace("applied filter: "+name,
 		logseal.F{"content": content, "filter": filter, "result": r},
 	)
+}
+
+func listToLower(arr []string) (newArr []string) {
+	for _, el := range arr {
+		newArr = append(newArr, strings.ToLower(el))
+	}
+	return
 }
