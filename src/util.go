@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"syscall"
 
 	"github.com/triole/logseal"
 )
@@ -34,15 +33,6 @@ func getFileSize(filename string) (siz uint64) {
 			siz = uint64(stat.Size())
 		}
 	}
-	return
-}
-
-func getFileCreated(filename string) (uts int64) {
-	var scs syscall.Stat_t
-	if err := syscall.Stat(filename, &scs); err != nil {
-		lg.Error("syscall stat failed", logseal.F{"path": filename, "error": err})
-	}
-	uts = int64(scs.Ctim.Sec)
 	return
 }
 
