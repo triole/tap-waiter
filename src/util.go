@@ -42,7 +42,7 @@ func getFileCreated(filename string) (uts int64) {
 	if err := syscall.Stat(filename, &scs); err != nil {
 		lg.Error("syscall stat failed", logseal.F{"path": filename, "error": err})
 	}
-	uts = scs.Ctim.Sec
+	uts = int64(scs.Ctim.Sec)
 	return
 }
 
