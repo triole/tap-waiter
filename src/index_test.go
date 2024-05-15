@@ -27,16 +27,16 @@ func TestMakeJoinerIndex(t *testing.T) {
 	validateMakeJoinerIndex(tempFolder, "lastmod", true, dummyTestFiles, t)
 	validateMakeJoinerIndex(tempFolder, "lastmod", false, dummyTestFiles, t)
 	validateMakeJoinerIndex(
-		fromTestFolder("dump/yaml"), "size", true, loadSortJSONValidtor("size.json"), t,
+		fromTestFolder("dump/yaml"), "size", true, loadJSONArr("validate/sort/size.json"), t,
 	)
 	validateMakeJoinerIndex(
-		fromTestFolder("dump/yaml"), "size", false, loadSortJSONValidtor("size.json"), t,
+		fromTestFolder("dump/yaml"), "size", false, loadJSONArr("validate/sort/size.json"), t,
 	)
 	validateMakeJoinerIndex(
-		fromTestFolder("dump/yaml"), "path", true, loadSortJSONValidtor("path.json"), t,
+		fromTestFolder("dump/yaml"), "path", true, loadJSONArr("validate/sort/path.json"), t,
 	)
 	validateMakeJoinerIndex(
-		fromTestFolder("dump/yaml"), "path", false, loadSortJSONValidtor("path.json"), t,
+		fromTestFolder("dump/yaml"), "path", false, loadJSONArr("validate/sort/path.json"), t,
 	)
 }
 
@@ -86,8 +86,8 @@ func newTestParams(folder, sortBy string, ascending bool) (p tIDXParams) {
 	return
 }
 
-func loadSortJSONValidtor(s string) (arr []string) {
-	file := fromTestFolder("validate_sort/" + s)
+func loadJSONArr(s string) (arr []string) {
+	file := fromTestFolder(s)
 	by, _, err := readFile(file)
 	if err == nil {
 		err := json.Unmarshal(by, &arr)
