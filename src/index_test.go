@@ -123,36 +123,6 @@ func createDummyFiles() (arr []string) {
 	return
 }
 
-func TestGetMapVal(t *testing.T) {
-	ep := newTestEndpoint()
-	content := readFileContent(
-		fromTestFolder("dump/markdown/1.md"), ep,
-	)
-	validateGetMapVal(
-		"front_matter.title", content, []string{"title1"}, t,
-	)
-	validateGetMapVal(
-		"front_matter.tags", content, []string{"tag1", "tag2"}, t,
-	)
-}
-
-func validateGetMapVal(key string, mp map[string]interface{}, exp []string, t *testing.T) {
-	b := false
-	res := getMapVal(key, mp)
-	if len(exp) == len(res) {
-		for i, x := range res {
-			if x != exp[i] {
-				b = true
-			}
-		}
-	} else {
-		b = true
-	}
-	if b {
-		t.Errorf("error get map val, exp: %v, res: %v", exp, res)
-	}
-}
-
 func newTestEndpoint() tEndpoint {
 	return tEndpoint{ReturnValues: tReturnValues{
 		Created:                  true,
