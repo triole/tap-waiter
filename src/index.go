@@ -29,8 +29,14 @@ func (arr tJoinerIndex) Less(i, j int) bool {
 	switch arr[i].SortIndex.(type) {
 	case float32, float64,
 		int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
+		if arr[i].SortIndex == arr[j].SortIndex {
+			return arr[i].Path > arr[j].Path
+		}
 		return toFloat(arr[i].SortIndex) < toFloat(arr[j].SortIndex)
 	default:
+		if arr[i].SortIndex.(string) == arr[j].SortIndex.(string) {
+			return arr[i].Path > arr[j].Path
+		}
 		return arr[i].SortIndex.(string) < arr[j].SortIndex.(string)
 	}
 }

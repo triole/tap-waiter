@@ -47,8 +47,18 @@ func getFileLastMod(filename string) (uts int64) {
 }
 
 func pprint(i interface{}) {
-	s, _ := json.MarshalIndent(i, "", "  ")
+	s := pprintr(i)
 	fmt.Println(string(s))
+}
+
+func pprintr(i interface{}) (r string) {
+	s, err := json.MarshalIndent(i, "", "  ")
+	if err != nil {
+		lg.Error("prety print failed, can not marshal json", logseal.F{"error": err})
+	} else {
+		r = string(s)
+	}
+	return
 }
 
 func rxFind(rx string, content string) string {

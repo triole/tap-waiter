@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -64,10 +65,11 @@ func validateParseFilter(filter string, exp tIDXParamsFilter, t *testing.T) {
 }
 
 func TestServeContent(t *testing.T) {
-	validateServeContent("/all.json", loadJSONArr("validate/server/all.json"), t)
+	validateServeContent("/all.json", "validate/server/all.json", t)
+	validateServeContent("/all.json?sortby=size&order=desc", "validate/server/all_sortby_size.json", t)
 }
 
-func validateServeContent(url string, exp []string, t *testing.T) {
+func validateServeContent(url, expFile string, t *testing.T) {
 	CLI.LogLevel = "trace"
 	CLI.Threads = 16
 	conf = readConfig(fromTestFolder("conf.yaml"))
@@ -95,24 +97,33 @@ func validateServeContent(url string, exp []string, t *testing.T) {
 				"test joiner index failed, can not unmarshal server response: %+v", err,
 			)
 		}
-		validateJoinerIndex(ji, exp, t)
+		validateJoinerIndex(ji, expFile, t)
 	}
 }
 
-func validateJoinerIndex(ji tJoinerIndex, exp []string, t *testing.T) {
-	if len(ji) != len(exp) {
+func validateJoinerIndex(ji tJoinerIndex, expFile string, t *testing.T) {
+	failed := false
+	expArr := loadJSONArr(expFile)
+	if len(ji) != len(expArr) {
 		t.Errorf(
 			"validate joiner index failed, lengths do not match: exp: %+v, res: %+v",
-			len(exp), len(ji),
+			len(expArr), len(ji),
 		)
 	} else {
 		for i := 1; i < len(ji)-1; i++ {
-			if ji[i].Path != exp[i] {
-				t.Errorf(
-					"validate joiner index failed: exp: %+v, res: %+v", exp[i], ji[i],
-				)
+			if ji[i].Path != expArr[i] {
+				failed = true
+				break
 			}
 		}
+	}
+	if failed {
+		t.Errorf(
+			"validate joiner index failed: %q\n"+
+				"exp, len: %d\n %+v,\n"+
+				"got, len: %d\n%+v\n",
+			expFile, len(expArr), pprintr(expArr), len(ji), pprintr(getJoinerIndexPaths(ji)),
+		)
 	}
 }
 
@@ -122,4 +133,11 @@ type Client struct {
 
 func NewClient(url string) Client {
 	return Client{url}
+}
+
+func getJoinerIndexPaths(ji tJoinerIndex) (arr []string) {
+	for _, el := range ji {
+		arr = append(arr, fmt.Sprintf("%s === %v", el.Path, el.Size))
+	}
+	return
 }
