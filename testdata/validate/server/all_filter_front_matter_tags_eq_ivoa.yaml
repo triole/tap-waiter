@@ -1,0 +1,5 @@
+---
+urls:
+  - /all.json?filter=metadata.tags==ivoa
+expectation:
+  - yaml/cpx/data_aip.yaml

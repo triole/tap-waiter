@@ -1,0 +1,9 @@
+---
+urls:
+  - /all.json?filter=front_matter.tags==tag1
+expectation:
+  - markdown/1.md
+  - markdown/subfolder1/1.md
+  - markdown/subfolder1/2.md
+  - markdown/subfolder1/3.md
+  - markdown/subfolder1/4.md

@@ -2,11 +2,12 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	yaml "gopkg.in/yaml.v3"
 )
 
 func TestParseFilter(t *testing.T) {
@@ -65,53 +66,73 @@ func validateParseFilter(filter string, exp tIDXParamsFilter, t *testing.T) {
 }
 
 func TestServeContent(t *testing.T) {
-	validateServeContent("/all.json", "validate/server/all.json", t)
-	validateServeContent("/all.json?sortby=size&order=desc", "validate/server/all_sortby_size.json", t)
+	testSpecs := find(fromTestFolder("validate/server"), "yaml$")
+	for _, specFile := range testSpecs {
+		validateServeContent(specFile, t)
+	}
 }
 
-func validateServeContent(url, expFile string, t *testing.T) {
+func validateServeContent(specFile string, t *testing.T) {
 	CLI.LogLevel = "trace"
 	CLI.Threads = 16
+
+	var urls []string
+	var exp []string
+	var spec map[string][]string
 	conf = readConfig(fromTestFolder("conf.yaml"))
+
+	by, _, err := readFile(specFile)
+	if err != nil {
+		t.Errorf("can not read spec file: %q", specFile)
+	} else {
+		err = yaml.Unmarshal(by, &spec)
+		if err != nil {
+			t.Errorf("can not unmarshal spec file: %q, %s", specFile, err)
+		}
+		urls = spec["urls"]
+		exp = spec["expectation"]
+	}
+
 	svr := httptest.NewServer(http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			serveContent(w, r)
 		}))
 	defer svr.Close()
 
-	c := NewClient(svr.URL)
-	res, err := http.Get(c.url + url)
-	if err != nil {
-		t.Errorf("test serve content, request failed: %s, %s", url, err)
-	}
-	defer res.Body.Close()
-
-	bodyBytes, err := io.ReadAll(res.Body)
-	if err != nil {
-		t.Errorf("test serve content failed, can not read body: %+v", err)
-	} else {
-		var ji tJoinerIndex
-		err = json.Unmarshal([]byte(bodyBytes), &ji)
+	for _, url := range urls {
+		c := NewClient(svr.URL)
+		res, err := http.Get(c.url + url)
 		if err != nil {
-			t.Errorf(
-				"test joiner index failed, can not unmarshal server response: %+v", err,
-			)
+			t.Errorf("test serve content, request failed: %s, %s", url, err)
 		}
-		validateJoinerIndex(ji, expFile, t)
+		defer res.Body.Close()
+
+		bodyBytes, err := io.ReadAll(res.Body)
+		if err != nil {
+			t.Errorf("test serve content failed, can not read body: %+v", err)
+		} else {
+			var ji tJoinerIndex
+			err = json.Unmarshal([]byte(bodyBytes), &ji)
+			if err != nil {
+				t.Errorf(
+					"test joiner index failed, can not unmarshal server response: %+v", err,
+				)
+			}
+			validateJoinerIndex(ji, url, exp, t)
+		}
 	}
 }
 
-func validateJoinerIndex(ji tJoinerIndex, expFile string, t *testing.T) {
+func validateJoinerIndex(ji tJoinerIndex, url string, exp []string, t *testing.T) {
 	failed := false
-	expArr := loadJSONArr(expFile)
-	if len(ji) != len(expArr) {
+	if len(ji) != len(exp) {
 		t.Errorf(
-			"validate joiner index failed, lengths do not match: exp: %+v, res: %+v",
-			len(expArr), len(ji),
+			"validate joiner index failed: %q, lengths do not match: exp: %+v, got: %+v",
+			url, len(exp), len(ji),
 		)
 	} else {
-		for i := 1; i < len(ji)-1; i++ {
-			if ji[i].Path != expArr[i] {
+		for i := 0; i < len(ji); i++ {
+			if ji[i].Path != exp[i] {
 				failed = true
 				break
 			}
@@ -122,7 +143,7 @@ func validateJoinerIndex(ji tJoinerIndex, expFile string, t *testing.T) {
 			"validate joiner index failed: %q\n"+
 				"exp, len: %d\n %+v,\n"+
 				"got, len: %d\n%+v\n",
-			expFile, len(expArr), pprintr(expArr), len(ji), pprintr(getJoinerIndexPaths(ji)),
+			url, len(exp), pprintr(exp), len(ji), pprintr(getJoinerIndexPaths(ji)),
 		)
 	}
 }
@@ -137,7 +158,7 @@ func NewClient(url string) Client {
 
 func getJoinerIndexPaths(ji tJoinerIndex) (arr []string) {
 	for _, el := range ji {
-		arr = append(arr, fmt.Sprintf("%s === %v", el.Path, el.Size))
+		arr = append(arr, el.Path)
 	}
 	return
 }
