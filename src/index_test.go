@@ -28,7 +28,7 @@ func TestMakeJoinerIndex(t *testing.T) {
 
 	testSpecs := find(fromTestFolder("specs/index"), "\\.yaml$")
 	for _, el := range testSpecs {
-		specs := readYAMLGeneric(el)
+		specs := readYAMLFile(el)
 		folder := fromTestFolder(specs["folder"].(string))
 		sortby := specs["sortby"].(string)
 		expectation := itfArrTostrArr(specs["expectation"].([]interface{}))

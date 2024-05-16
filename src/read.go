@@ -9,12 +9,12 @@ import (
 	"unicode/utf8"
 
 	"github.com/c2h5oh/datasize"
-	"github.com/pelletier/go-toml/v2"
+	toml "github.com/pelletier/go-toml/v2"
 	"github.com/triole/logseal"
 	"github.com/yuin/goldmark"
 	goldmarkmeta "github.com/yuin/goldmark-meta"
 	"github.com/yuin/goldmark/parser"
-	"gopkg.in/yaml.v3"
+	yaml "gopkg.in/yaml.v3"
 )
 
 func readDataFile(filename string, ps tEndpoint, chin chan string, chout chan tJoinerEntry) {
@@ -62,11 +62,11 @@ func readFileContent(filename string, ps tEndpoint) (content map[string]interfac
 		if err == nil {
 			switch filepath.Ext(filename) {
 			case ".json":
-				content, err = readJson(by)
+				content, err = unmarshalJSON(by)
 			case ".toml":
-				content, err = readToml(by)
+				content, err = unmarshalTOML(by)
 			case ".yaml", ".yml":
-				content, err = readYaml(by)
+				content, err = unmarshalYAML(by)
 			case ".md":
 				content, err = readMarkdown(by, ps.ReturnValues)
 			default:
@@ -103,17 +103,17 @@ func readFile(filename string) (by []byte, isTextfile bool, err error) {
 	return
 }
 
-func readJson(by []byte) (content map[string]interface{}, err error) {
+func unmarshalJSON(by []byte) (content map[string]interface{}, err error) {
 	err = json.Unmarshal(by, &content)
 	return content, err
 }
 
-func readToml(by []byte) (content map[string]interface{}, err error) {
+func unmarshalTOML(by []byte) (content map[string]interface{}, err error) {
 	err = toml.Unmarshal(by, &content)
 	return content, err
 }
 
-func readYaml(by []byte) (content map[string]interface{}, err error) {
+func unmarshalYAML(by []byte) (content map[string]interface{}, err error) {
 	err = yaml.Unmarshal(by, &content)
 	return content, err
 }

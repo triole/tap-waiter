@@ -3,8 +3,6 @@ package main
 import (
 	"path/filepath"
 	"testing"
-
-	yaml "gopkg.in/yaml.v3"
 )
 
 var (
@@ -64,15 +62,12 @@ func validateTestRxMatch(rx, str string, exp bool, t *testing.T) {
 	}
 }
 
-func readYAMLGeneric(filepath string) (r map[string]interface{}) {
+func readYAMLFile(filepath string) (r map[string]interface{}) {
 	by, _, err := readFile(filepath)
 	if err != nil {
-		lg.Error("can not read spec file: %q", filepath)
+		return
 	} else {
-		err = yaml.Unmarshal(by, &r)
-		if err != nil {
-			lg.Error("can not unmarshal spec file: %q, %s", filepath, err)
-		}
+		r, _ = unmarshalYAML(by)
 	}
 	return
 }
