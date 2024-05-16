@@ -1,36 +1,39 @@
 package main
 
-import "testing"
+import (
+	"testing"
+
+	yaml "gopkg.in/yaml.v3"
+)
+
+type tSpecGetMapValTest struct {
+	ContentFile string `yaml:"content_file"`
+	Content     map[string]interface{}
+	Key         string   `yaml:"key"`
+	Exp         []string `yaml:"exp"`
+	Res         string   `yaml:"res"`
+	Ep          tEndpoint
+}
+
+func readGetMapValSpecs(t *testing.T) (specs []tSpecGetMapValTest) {
+	filename := fromTestFolder("specs/mapval/spec.yaml")
+	by, _, _ := readFile(filename)
+	err := yaml.Unmarshal(by, &specs)
+	if err != nil {
+		t.Errorf("reading specs file failed: %q", filename)
+	}
+	return
+}
 
 func TestGetMapVal(t *testing.T) {
 	ep := newTestEndpoint()
-
-	content := readFileContent(
-		fromTestFolder("dump/markdown/1.md"), ep,
-	)
-	validateGetMapVal(
-		"front_matter.title", content, []string{"title1"}, t,
-	)
-	validateGetMapVal(
-		"front_matter.tags", content, []string{"tag1", "tag2"}, t,
-	)
-
-	content = readFileContent(
-		fromTestFolder("dump/yaml/cpx/data_aip.yaml"), ep,
-	)
-	validateGetMapVal(
-		"title", content, []string{"Data Services @ AIP"}, t,
-	)
-	validateGetMapVal(
-		"metadata.access", content, []string{"open"}, t,
-	)
-	validateGetMapVal(
-		"metadata.tags", content, []string{"vo", "IVOA", "Daiquiri"}, t,
-	)
-	validateGetMapVal(
-		"metadata.url", content, []string{"https://data.aip.de"}, t,
-	)
-
+	specs := readGetMapValSpecs(t)
+	for _, spec := range specs {
+		spec.Content = readFileContent(
+			fromTestFolder(spec.ContentFile), ep,
+		)
+		validateGetMapVal(spec.Key, spec.Content, spec.Exp, t)
+	}
 }
 
 func validateGetMapVal(key string, mp map[string]interface{}, exp []string, t *testing.T) {

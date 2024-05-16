@@ -1,15 +1,15 @@
 ---
-slice_equals1:
+- name: slice_equals1
   pre: [tag1, tag2]
   suf: [tag1, tag2]
   exp: true
 
-slice_equals2:
+- name: slice_equals2
   pre: [tag2, tag1]
   suf: [tag1, tag2]
   exp: true
 
-slice_equals3:
+- name: slice_equals3
   pre: [tag1, tag2]
   suf: [tag2, tag4]
   exp: false

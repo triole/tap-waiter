@@ -1,25 +1,25 @@
 ---
-slice_not_contains1:
+- name: slice_not_contains1
   pre: [tag1, tag2, tag3]
   suf: [tag1]
   exp: false
 
-slice_not_contains2:
+- name: slice_not_contains2
   pre: [tag1, tag2, tag3]
   suf: [tag9]
   exp: true
 
-slice_not_contains3:
+- name: slice_not_contains3
   pre: [tag1, tag2, tag3]
   suf: [tag1, tag2, tag3, tag4]
   exp: true
 
-slice_not_contains4:
+- name: slice_not_contains4
   pre: [tag1, tag2, tag3]
   suf: [tag1]
   exp: false
 
-slice_not_contains5:
+- name: slice_not_contains5
   pre: [tag1, tag2, tag3]
   suf: [tag1, tag2]
   exp: false

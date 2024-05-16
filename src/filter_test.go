@@ -3,6 +3,8 @@ package main
 import (
 	"path/filepath"
 	"testing"
+
+	yaml "gopkg.in/yaml.v3"
 )
 
 type tSpecFilterTest struct {
@@ -13,31 +15,20 @@ type tSpecFilterTest struct {
 	Res  bool
 }
 
-func readFilterSpecs(filename string, t *testing.T) (r []tSpecFilterTest) {
-	specs := readYAMLFile(
+func readFilterSpecs(filename string, t *testing.T) (specs []tSpecFilterTest) {
+	by, _, _ := readFile(
 		filepath.Join(fromTestFolder("specs/filter"), filename),
 	)
-	if len(specs) == 0 {
+	err := yaml.Unmarshal(by, &specs)
+	if err != nil {
 		t.Errorf("reading specs file failed: %q", filename)
-	}
-	for name, val := range specs {
-		spec := val.(map[string]interface{})
-		pre := itfArrTostrArr(spec["pre"].([]interface{}))
-		suf := itfArrTostrArr(spec["suf"].([]interface{}))
-		exp := spec["exp"].(bool)
-		r = append(r, tSpecFilterTest{
-			Name: name,
-			Pre:  pre,
-			Suf:  suf,
-			Exp:  exp,
-		})
 	}
 	return
 }
 
 func printTestFilterResult(spec tSpecFilterTest, t *testing.T) {
 	if spec.Exp != spec.Res {
-		t.Errorf("error filter test: %v", spec)
+		t.Errorf("error filter test: %+v", spec)
 	}
 }
 

@@ -1,0 +1,24 @@
+---
+- content_file: dump/markdown/1.md
+  key: front_matter.title
+  exp: [title1]
+
+- content_file: dump/markdown/1.md
+  key: front_matter.tags
+  exp: [tag1, tag2]
+
+- content_file: dump/yaml/cpx/data_aip.yaml
+  key: title
+  exp: [Data Services @ AIP]
+
+- content_file: dump/yaml/cpx/data_aip.yaml
+  key: metadata.access
+  exp: [open]
+
+- content_file: dump/yaml/cpx/data_aip.yaml
+  key: metadata.tags
+  exp: [vo, IVOA, Daiquiri]
+
+- content_file: dump/yaml/cpx/data_aip.yaml
+  key: metadata.url
+  exp: ['https://data.aip.de']
