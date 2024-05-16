@@ -1,0 +1,20 @@
+---
+slice_contains1:
+  pre: [tag1, tag2, tag3, tag4, tag5]
+  suf: [tag3]
+  exp: true
+
+slice_contains2:
+  pre: [tag1, tag2, tag3, tag4, tag5]
+  suf: [tag3, tag5]
+  exp: true
+
+slice_contains3:
+  pre: [tag1, tag2, tag3]
+  suf: [tag5]
+  exp: false
+
+slice_contains4:
+  pre: [tag1, tag2, tag3, tag4, tag5]
+  suf: [tag7, tag5]
+  exp: false

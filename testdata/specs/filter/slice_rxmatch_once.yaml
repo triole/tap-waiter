@@ -1,0 +1,25 @@
+---
+slice_rxmatch_once1:
+  pre: [tag1, tag2, tag3, tag4, tag5]
+  suf: [.+]
+  exp: true
+
+slice_rxmatch_once2:
+  pre: [tag1, tag2, tag3, tag4, tag5]
+  suf: ["t[a-z]+[0-9]"]
+  exp: true
+
+slice_rxmatch_once3:
+  pre: [tag1, tag2, tag3, tag4, tag5]
+  suf: ["tag[0-9]", tag2, tag3]
+  exp: true
+
+slice_rxmatch_once4:
+  pre: [tag1, tag2, tag3, tag4, tag5]
+  suf: ["tag[0-9]", none]
+  exp: false
+
+slice_rxmatch_once5:
+  pre: [tag1, tag2]
+  suf: [hello, world, .*]
+  exp: false

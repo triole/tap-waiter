@@ -1,176 +1,82 @@
 package main
 
-import "testing"
+import (
+	"path/filepath"
+	"testing"
+)
 
-func TestEqualSlices(t *testing.T) {
-	validateEqualSlices(
-		[]string{"tag1", "tag2"},
-		[]string{"tag1", "tag2"},
-		true, t,
-	)
-	validateEqualSlices(
-		[]string{"tag2", "tag1"},
-		[]string{"tag1", "tag2"},
-		true, t,
-	)
-	validateEqualSlices(
-		[]string{"tag1", "tag2"},
-		[]string{"tag2", "tag4"},
-		false, t,
-	)
-
+type tSpecFilter struct {
+	Name string
+	Pre  []string
+	Suf  []string
+	Exp  bool
+	Res  bool
 }
 
-func validateEqualSlices(s1, s2 []string, exp bool, t *testing.T) {
-	res := equalSlices(s1, s2)
-	if exp != res {
-		t.Errorf(
-			"error equal slices, slices: %+v %+v, exp: %v, got: %v",
-			s1, s2, exp, res,
-		)
+func readFilterSpecs(filename string, t *testing.T) (r []tSpecFilter) {
+	specs := readYAMLFile(
+		filepath.Join(fromTestFolder("specs/filter"), filename),
+	)
+	if len(specs) == 0 {
+		t.Errorf("reading specs file failed: %q", filename)
+	}
+	for name, val := range specs {
+		spec := val.(map[string]interface{})
+		pre := itfArrTostrArr(spec["pre"].([]interface{}))
+		suf := itfArrTostrArr(spec["suf"].([]interface{}))
+		exp := spec["exp"].(bool)
+		r = append(r, tSpecFilter{
+			Name: name,
+			Pre:  pre,
+			Suf:  suf,
+			Exp:  exp,
+		})
+	}
+	return
+}
+
+func printTestFilterResult(spec tSpecFilter, t *testing.T) {
+	if spec.Exp != spec.Res {
+		t.Errorf("error filter test: %v", spec)
+	}
+}
+
+func TestEqualSlices(t *testing.T) {
+	specs := readFilterSpecs("slice_equals.yaml", t)
+	for _, spec := range specs {
+		spec.Res = equalSlices(spec.Pre, spec.Suf)
+		printTestFilterResult(spec, t)
 	}
 }
 
 func TestContainsSlice(t *testing.T) {
-	validateContainsSlice(
-		[]string{"tag1", "tag2", "tag3", "tag4", "tag5"},
-		[]string{"tag3"},
-		true, t,
-	)
-	validateContainsSlice(
-		[]string{"tag1", "tag2", "tag3", "tag4", "tag5"},
-		[]string{"tag3", "tag5"},
-		true, t,
-	)
-	validateContainsSlice(
-		[]string{"tag1", "tag2", "tag3"},
-		[]string{"tag5"},
-		false, t,
-	)
-	validateContainsSlice(
-		[]string{"tag1", "tag2", "tag3", "tag4", "tag5"},
-		[]string{"tag7", "tag5"},
-		false, t,
-	)
-}
-
-func validateContainsSlice(s1, s2 []string, exp bool, t *testing.T) {
-	res := containsSlice(s1, s2)
-	if exp != res {
-		t.Errorf(
-			"error contains slice, slices: %+v %+v, exp: %v, got: %v",
-			s1, s2, exp, res,
-		)
+	specs := readFilterSpecs("slice_contains.yaml", t)
+	for _, spec := range specs {
+		spec.Res = containsSlice(spec.Pre, spec.Suf)
+		printTestFilterResult(spec, t)
 	}
 }
 
 func TestNotContainsSlice(t *testing.T) {
-	validateNotContainsSlice(
-		[]string{"tag1", "tag2", "tag3"},
-		[]string{"tag9"},
-		true, t,
-	)
-	validateNotContainsSlice(
-		[]string{"tag1", "tag2", "tag3"},
-		[]string{"tag1", "tag2", "tag3", "tag4"},
-		true, t,
-	)
-	validateNotContainsSlice(
-		[]string{"tag1", "tag2", "tag3"},
-		[]string{"tag1"},
-		false, t,
-	)
-	validateNotContainsSlice(
-		[]string{"tag1", "tag2", "tag3"},
-		[]string{"tag1", "tag2"},
-		false, t,
-	)
-}
-
-func validateNotContainsSlice(s1, s2 []string, exp bool, t *testing.T) {
-	res := notContainsSlice(s1, s2)
-	if exp != res {
-		t.Errorf(
-			"error not contains slice, slices: %+v %+v, exp: %v, got: %v",
-			s1, s2, exp, res,
-		)
+	specs := readFilterSpecs("slice_not_contains.yaml", t)
+	for _, spec := range specs {
+		spec.Res = notContainsSlice(spec.Pre, spec.Suf)
+		printTestFilterResult(spec, t)
 	}
 }
 
 func TestRxMatchSliceCompletely(t *testing.T) {
-	validateRxMatchSliceCompletely(
-		[]string{"tag1", "tag2", "tag3", "tag4", "tag5"},
-		[]string{".+"},
-		true, t,
-	)
-	validateRxMatchSliceCompletely(
-		[]string{"tag1", "tag2", "tag3", "tag4", "tag5"},
-		[]string{"t[a-z]+[0-9]"},
-		true, t,
-	)
-	validateRxMatchSliceCompletely(
-		[]string{"tag1", "tag2", "tag3", "tag4", "tag5"},
-		[]string{"tag[0-9]", "tag.+"},
-		true, t,
-	)
-	validateRxMatchSliceCompletely(
-		[]string{"tag1", "tag2", "tag3", "tag4", "tag5"},
-		[]string{"tag[0-9]", "tag2"},
-		false, t,
-	)
-	validateRxMatchSliceCompletely(
-		[]string{"tag1", "tag2"},
-		[]string{"tag2", "tag4"},
-		false, t,
-	)
-
-}
-
-func validateRxMatchSliceCompletely(s1, s2 []string, exp bool, t *testing.T) {
-	res := rxMatchSliceCompletely(s1, s2)
-	if exp != res {
-		t.Errorf(
-			"error rx match slice completely, slices: %+v %+v, exp: %v, got: %v",
-			s1, s2, exp, res,
-		)
+	specs := readFilterSpecs("slice_rxmatch_all.yaml", t)
+	for _, spec := range specs {
+		spec.Res = rxMatchSliceAll(spec.Pre, spec.Suf)
+		printTestFilterResult(spec, t)
 	}
 }
 
 func TestRxMatchSliceOnce(t *testing.T) {
-	validateRxMatchSliceOnce(
-		[]string{"tag1", "tag2", "tag3", "tag4", "tag5"},
-		[]string{".+"},
-		true, t,
-	)
-	validateRxMatchSliceOnce(
-		[]string{"tag1", "tag2", "tag3", "tag4", "tag5"},
-		[]string{"t[a-z]+[0-9]"},
-		true, t,
-	)
-	validateRxMatchSliceOnce(
-		[]string{"tag1", "tag2", "tag3", "tag4", "tag5"},
-		[]string{"tag[0-9]", "tag2", "tag3"},
-		true, t,
-	)
-	validateRxMatchSliceOnce(
-		[]string{"tag1", "tag2", "tag3", "tag4", "tag5"},
-		[]string{"tag[0-9]", "none"},
-		false, t,
-	)
-	validateRxMatchSliceOnce(
-		[]string{"tag1", "tag2"},
-		[]string{"hello", "world", ".*"},
-		false, t,
-	)
-
-}
-
-func validateRxMatchSliceOnce(s1, s2 []string, exp bool, t *testing.T) {
-	res := rxMatchSliceOnce(s1, s2)
-	if exp != res {
-		t.Errorf(
-			"error rx match slice once, slices: %+v %+v, exp: %v, got: %v",
-			s1, s2, exp, res,
-		)
+	specs := readFilterSpecs("slice_rxmatch_once.yaml", t)
+	for _, spec := range specs {
+		spec.Res = rxMatchSliceOnce(spec.Pre, spec.Suf)
+		printTestFilterResult(spec, t)
 	}
 }

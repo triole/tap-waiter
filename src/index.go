@@ -129,7 +129,7 @@ func filterJoinerIndex(arr tJoinerIndex, params tIDXParams) (newArr tJoinerIndex
 			case "!=":
 				match = notContainsSlice(val, params.Filter.Suffix)
 			case "==~":
-				match = rxMatchSliceCompletely(val, params.Filter.Suffix)
+				match = rxMatchSliceAll(val, params.Filter.Suffix)
 			case "=~":
 				match = rxMatchSliceOnce(val, params.Filter.Suffix)
 			}

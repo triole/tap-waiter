@@ -1,0 +1,31 @@
+---
+slice_rxmatch_completely1:
+  pre: [tag1, tag2, tag3, tag4, tag5]
+  suf: [.+]
+  exp: true
+
+slice_rxmatch_completely2:
+  pre: [tag1, tag2, tag3, tag4, tag5]
+  suf: ["t[a-z]+[0-9]"]
+  exp: true
+
+slice_rxmatch_completely3:
+  pre: [tag1, tag2, tag3, tag4, tag5]
+  suf: ["tag[0-9]", tag.+]
+  exp: true
+
+slice_rxmatch_completely4:
+  pre: [tag1, tag2, tag3, tag4, tag5]
+  suf: ["abc"]
+  exp: false
+
+slice_rxmatch_completely5:
+  pre: [tag1, tag2, tag3, tag4, tag5]
+  suf: ["tag[0-9]", tag2]
+  exp: false
+
+slice_rxmatch_completely6:
+  pre: [tag1, tag2]
+  suf: [tag2, tag4]
+  exp: false
+

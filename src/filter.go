@@ -61,7 +61,7 @@ func notContainsSlice(content, filter []string) (r bool) {
 	return
 }
 
-func rxMatchSliceCompletely(content, filter []string) (r bool) {
+func rxMatchSliceAll(content, filter []string) (r bool) {
 	content = listToLower(content)
 	r = true
 	for _, fil := range filter {
