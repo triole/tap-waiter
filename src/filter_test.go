@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-type tSpecFilter struct {
+type tSpecFilterTest struct {
 	Name string
 	Pre  []string
 	Suf  []string
@@ -13,7 +13,7 @@ type tSpecFilter struct {
 	Res  bool
 }
 
-func readFilterSpecs(filename string, t *testing.T) (r []tSpecFilter) {
+func readFilterSpecs(filename string, t *testing.T) (r []tSpecFilterTest) {
 	specs := readYAMLFile(
 		filepath.Join(fromTestFolder("specs/filter"), filename),
 	)
@@ -25,7 +25,7 @@ func readFilterSpecs(filename string, t *testing.T) (r []tSpecFilter) {
 		pre := itfArrTostrArr(spec["pre"].([]interface{}))
 		suf := itfArrTostrArr(spec["suf"].([]interface{}))
 		exp := spec["exp"].(bool)
-		r = append(r, tSpecFilter{
+		r = append(r, tSpecFilterTest{
 			Name: name,
 			Pre:  pre,
 			Suf:  suf,
@@ -35,7 +35,7 @@ func readFilterSpecs(filename string, t *testing.T) (r []tSpecFilter) {
 	return
 }
 
-func printTestFilterResult(spec tSpecFilter, t *testing.T) {
+func printTestFilterResult(spec tSpecFilterTest, t *testing.T) {
 	if spec.Exp != spec.Res {
 		t.Errorf("error filter test: %v", spec)
 	}
