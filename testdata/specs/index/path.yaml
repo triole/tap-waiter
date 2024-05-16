@@ -1,0 +1,11 @@
+---
+folder: dump/yaml
+sortby: path
+
+expectation:
+  - 1.yaml
+  - 2.yaml
+  - 3.yaml
+  - 4.yaml
+  - more_than_10k.yaml
+  - cpx/data_aip.yaml

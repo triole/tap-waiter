@@ -66,7 +66,7 @@ func validateParseFilter(filter string, exp tIDXParamsFilter, t *testing.T) {
 }
 
 func TestServeContent(t *testing.T) {
-	testSpecs := find(fromTestFolder("validate/server"), "yaml$")
+	testSpecs := find(fromTestFolder("specs/server"), "\\.yaml$")
 	for _, specFile := range testSpecs {
 		validateServeContent(specFile, t)
 	}

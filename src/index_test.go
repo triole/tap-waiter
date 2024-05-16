@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -21,49 +20,47 @@ func init() {
 }
 
 func TestMakeJoinerIndex(t *testing.T) {
-	validateMakeJoinerIndex(tempFolder, "created", true, dummyTestFiles, t)
-	validateMakeJoinerIndex(tempFolder, "created", false, dummyTestFiles, t)
+	validateMakeJoinerIndex(tempFolder, "created", dummyTestFiles, t)
+	validateMakeJoinerIndex(tempFolder, "created", dummyTestFiles, t)
 	sort.Strings(dummyTestFiles)
-	validateMakeJoinerIndex(tempFolder, "lastmod", true, dummyTestFiles, t)
-	validateMakeJoinerIndex(tempFolder, "lastmod", false, dummyTestFiles, t)
-	validateMakeJoinerIndex(
-		fromTestFolder("dump/yaml"), "size", true, loadJSONArr("validate/sort/size.json"), t,
-	)
-	validateMakeJoinerIndex(
-		fromTestFolder("dump/yaml"), "size", false, loadJSONArr("validate/sort/size.json"), t,
-	)
-	validateMakeJoinerIndex(
-		fromTestFolder("dump/yaml"), "path", true, loadJSONArr("validate/sort/path.json"), t,
-	)
-	validateMakeJoinerIndex(
-		fromTestFolder("dump/yaml"), "path", false, loadJSONArr("validate/sort/path.json"), t,
-	)
+	validateMakeJoinerIndex(tempFolder, "lastmod", dummyTestFiles, t)
+	validateMakeJoinerIndex(tempFolder, "lastmod", dummyTestFiles, t)
+
+	testSpecs := find(fromTestFolder("specs/index"), "\\.yaml$")
+	for _, el := range testSpecs {
+		specs := readYAMLGeneric(el)
+		folder := fromTestFolder(specs["folder"].(string))
+		sortby := specs["sortby"].(string)
+		expectation := itfArrTostrArr(specs["expectation"].([]interface{}))
+		validateMakeJoinerIndex(folder, sortby, expectation, t)
+		validateMakeJoinerIndex(folder, sortby, expectation, t)
+	}
 }
 
-func validateMakeJoinerIndex(folder, sortBy string, ascending bool, exp []string, t *testing.T) {
-	idx := makeJoinerIndex(newTestParams(folder, sortBy, ascending))
-	if !ascending {
+func validateMakeJoinerIndex(folder, sortBy string, exp []string, t *testing.T) {
+	ascending := []bool{true, false}
+	for _, asc := range ascending {
 		exp = reverseArr(exp)
-	}
-	if !orderOK(idx, exp) {
-		order := "asc"
-		if ascending == false {
-			order = "desc"
+		idx := makeJoinerIndex(newTestParams(folder, sortBy, asc))
+		if !orderNotOK(idx, exp, t) {
+			t.Errorf(
+				"sort failed: %s, asc: %v,\nexp: %v, got: %v",
+				sortBy, asc, pprintr(exp), getJoinerIndexPaths(idx),
+			)
 		}
-		t.Errorf(
-			"sort failed: %s %s, exp: %v, got: %v",
-			sortBy, order, fmt.Sprintf("%v", exp), shortprintJI(idx),
-		)
 	}
 }
 
-func orderOK(idx tJoinerIndex, exp []string) bool {
+func orderNotOK(idx tJoinerIndex, exp []string, t *testing.T) bool {
+	if len(idx) != len(exp) {
+		t.Errorf("sort failed, lengths differ: %-4d != %-4d", len(idx), len(exp))
+	}
 	for i, el := range idx {
 		if el.Path != exp[i] {
-			return false
+			return true
 		}
 	}
-	return true
+	return false
 }
 
 func reverseArr(arr []string) []string {
@@ -83,25 +80,6 @@ func newTestParams(folder, sortBy string, ascending bool) (p tIDXParams) {
 	p.Threads = 8
 	p.Ascending = ascending
 	p.SortBy = sortBy
-	return
-}
-
-func loadJSONArr(s string) (arr []string) {
-	file := fromTestFolder(s)
-	by, _, err := readFile(file)
-	if err == nil {
-		err := json.Unmarshal(by, &arr)
-		if err == nil {
-			return
-		}
-	}
-	return
-}
-
-func shortprintJI(ji tJoinerIndex) (s string) {
-	for _, el := range ji {
-		s += fmt.Sprintf("%s ", el.Path)
-	}
 	return
 }
 

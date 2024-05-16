@@ -46,7 +46,6 @@ func readConfig(filename string) (conf tConf) {
 	lg.IfErrFatal(
 		"can not read file", logseal.F{"path": filename, "error": err},
 	)
-
 	err = yaml.Unmarshal(by, &tempconf)
 	lg.IfErrFatal(
 		"can not unmarshal config", logseal.F{"path": filename, "error": err},
