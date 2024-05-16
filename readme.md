@@ -4,7 +4,6 @@
 
 - [Synopsis](#synopsis)
 - [Configuration](#configuration)
-- [URL Parameters](#url-parameters)
 - [Filters](#filters)
   - [Logical Operators](#logical-operators)
 
@@ -63,24 +62,14 @@ api: # list of api endpoints
 
 Here are a few URL parameter examples which are hopefully self explanatory. Please keep in mind that special characters have to be url encoded.
 
-| parameter(s)                          |
-|---------------------------------------|
-| ?order=asc                            |
-| ?order=desc                           |
-| ?sortby=created                       |
-| ?sortby=lastmod                       |
-| ?sortby=size                          |
-|                                       |
-| ?sortby=description                   |
-| ?sortby=front_matter.title            |
-|                                       |
-| ?filter=front_matter.title===title    |
-| ?filter=front_matter.tags===tag1,tag2 |
-| ?filter=front_matter.tags==tag1,tag2  |
-| ?filter=front_matter.tags!==tag1,tag2 |
-| ?filter=front_matter.tags!=tag1,tag2  |
-|                                       |
-| ?sortby=size&order=asc                |
+```go mdox-exec="sh/display_test_urls.sh"
+?filter=front_matter.tags===tag1
+?filter=front_matter.tags==tag1
+?filter=front_matter.tags!==tag1&order=desc
+?filter=metadata.tags==ivoa
+?sortby=size&order=desc
+?sortby=size&sortby=front_matter.title
+```
 
 # Filters
 
