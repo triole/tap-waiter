@@ -1,0 +1,5 @@
+---
+urls:
+  - /all.json?filter=tags!==ivoa&order=desc
+expectation:
+  - yaml/4.yaml

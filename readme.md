@@ -63,10 +63,12 @@ api: # list of api endpoints
 Here are a few URL parameter examples which are hopefully self explanatory. Please keep in mind that special characters have to be url encoded.
 
 ```go mdox-exec="sh/display_test_urls.sh"
+?filter=front_matter.tags!=tag1
 ?filter=front_matter.tags===tag1
 ?filter=front_matter.tags==tag1
 ?filter=front_matter.tags!==tag1&order=desc
 ?filter=metadata.tags==ivoa
+?filter=tags!==ivoa&order=desc
 ?sortby=size&order=desc
 ?sortby=size&sortby=front_matter.title
 ```
