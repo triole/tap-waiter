@@ -1,12 +1,12 @@
 ---
-url:
+urls:
   - /all.json
 expectation:
-  - validate/server/all.json
   - binary/binary_1k.file
   - binary/binary_5k.file
   - html/1.html
   - html/more_than_10k.html
+  - json/list.json
   - markdown/1.md
   - markdown/no_front_matter.md
   - yaml/1.yaml

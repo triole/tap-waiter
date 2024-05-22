@@ -21,4 +21,4 @@ expectation:
   - markdown/subfolder2/3.md
   - markdown/subfolder1/1.md
   - markdown/no_front_matter.md
-
+  - json/list.json
