@@ -121,11 +121,7 @@ func unmarshalYAML(by []byte) (content map[string]interface{}, err error) {
 func readMarkdown(by []byte, rv tReturnValues) (content map[string]interface{}, err error) {
 	content = make(map[string]interface{})
 	var buf bytes.Buffer
-	markdown := goldmark.New(
-		goldmark.WithExtensions(
-			goldmarkmeta.Meta,
-		),
-	)
+	markdown := goldmark.New(goldmark.WithExtensions(goldmarkmeta.Meta))
 	context := parser.NewContext()
 	err = markdown.Convert(by, &buf, parser.WithContext(context))
 	if err == nil {
