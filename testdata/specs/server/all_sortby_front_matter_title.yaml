@@ -1,6 +1,6 @@
 ---
 urls:
-  - /all.json?sortby=size&sortby=front_matter.title
+  - /all.json?sortby=front_matter.title
 expectation:
   - markdown/subfolder2/1.md
   - markdown/subfolder1/1.md
