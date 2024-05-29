@@ -69,8 +69,8 @@ Here are a few URL parameter examples which are hopefully self explanatory. Plea
 ?filter=front_matter.tags!==tag1&order=desc
 ?filter=metadata.tags==ivoa
 ?filter=tags!==ivoa&order=desc
+?sortby=front_matter.title
 ?sortby=size&order=desc
-?sortby=size&sortby=front_matter.title
 ```
 
 # Filters
