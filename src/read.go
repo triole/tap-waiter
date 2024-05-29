@@ -17,6 +17,12 @@ import (
 	yaml "gopkg.in/yaml.v3"
 )
 
+type tContent struct {
+	Body        interface{} `json:"body,omitempty"`
+	FrontMatter interface{} `json:"front_matter,omitempty"`
+	Error       error       `json:"-"`
+}
+
 func readDataFile(filename string, ps tEndpoint, chin chan string, chout chan tJoinerEntry) {
 	chin <- filename
 	pth := strings.TrimPrefix(
@@ -56,19 +62,19 @@ func readDataFile(filename string, ps tEndpoint, chin chan string, chout chan tJ
 	<-chin
 }
 
-func readFileContent(filename string, ps tEndpoint) (content map[string]interface{}) {
+func readFileContent(filename string, ps tEndpoint) (content tContent) {
 	by, isTextfile, err := readFile(filename)
 	if isTextfile {
 		if err == nil {
 			switch filepath.Ext(filename) {
 			case ".json":
-				content, err = unmarshalJSON(by)
+				content = unmarshalJSON(by)
 			case ".toml":
-				content, err = unmarshalTOML(by)
+				content = unmarshalTOML(by)
 			case ".yaml", ".yml":
-				content, err = unmarshalYAML(by)
+				content = unmarshalYAML(by)
 			case ".md":
-				content, err = readMarkdown(by, ps.ReturnValues)
+				content = readMarkdown(by, ps.ReturnValues)
 			default:
 				content = byteToBody(by)
 			}
@@ -88,9 +94,8 @@ func readFileContent(filename string, ps tEndpoint) (content map[string]interfac
 	return
 }
 
-func byteToBody(by []byte) (m map[string]interface{}) {
-	m = make(map[string]interface{})
-	m["body"] = string(by)
+func byteToBody(by []byte) (content tContent) {
+	content.Body = string(by)
 	return
 }
 
@@ -103,33 +108,38 @@ func readFile(filename string) (by []byte, isTextfile bool, err error) {
 	return
 }
 
-func unmarshalJSON(by []byte) (content map[string]interface{}, err error) {
-	err = json.Unmarshal(by, &content)
-	return content, err
+func unmarshalJSON(by []byte) (content tContent) {
+	var unmarsh interface{}
+	content.Error = json.Unmarshal(by, &unmarsh)
+	content.Body = unmarsh
+	return content
 }
 
-func unmarshalTOML(by []byte) (content map[string]interface{}, err error) {
-	err = toml.Unmarshal(by, &content)
-	return content, err
+func unmarshalTOML(by []byte) (content tContent) {
+	var unmarsh interface{}
+	content.Error = toml.Unmarshal(by, &unmarsh)
+	content.Body = unmarsh
+	return content
 }
 
-func unmarshalYAML(by []byte) (content map[string]interface{}, err error) {
-	err = yaml.Unmarshal(by, &content)
-	return content, err
+func unmarshalYAML(by []byte) (content tContent) {
+	var unmarsh interface{}
+	content.Error = yaml.Unmarshal(by, &unmarsh)
+	content.Body = unmarsh
+	return content
 }
 
-func readMarkdown(by []byte, rv tReturnValues) (content map[string]interface{}, err error) {
-	content = make(map[string]interface{})
+func readMarkdown(by []byte, rv tReturnValues) (content tContent) {
 	var buf bytes.Buffer
 	markdown := goldmark.New(goldmark.WithExtensions(goldmarkmeta.Meta))
 	context := parser.NewContext()
-	err = markdown.Convert(by, &buf, parser.WithContext(context))
-	if err == nil {
+	content.Error = markdown.Convert(by, &buf, parser.WithContext(context))
+	if content.Error == nil {
 		if rv.Content {
-			content["body"] = string(by)
+			content.Body = string(by)
 		}
 		if rv.SplitMarkdownFrontMatter {
-			content["front_matter"] = goldmarkmeta.Get(context)
+			content.FrontMatter = goldmarkmeta.Get(context)
 		}
 	}
 	return

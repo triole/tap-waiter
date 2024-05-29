@@ -6,16 +6,16 @@ import (
 	yaml "gopkg.in/yaml.v3"
 )
 
-type tSpecGetMapValTest struct {
+type tSpecGetContentValTest struct {
 	ContentFile string `yaml:"content_file"`
-	Content     map[string]interface{}
+	Content     tContent
 	Key         string   `yaml:"key"`
 	Exp         []string `yaml:"exp"`
 	Res         string   `yaml:"res"`
 	Ep          tEndpoint
 }
 
-func readGetMapValSpecs(t *testing.T) (specs []tSpecGetMapValTest) {
+func readGetContentValSpecs(t *testing.T) (specs []tSpecGetContentValTest) {
 	filename := fromTestFolder("specs/mapval/spec.yaml")
 	by, _, _ := readFile(filename)
 	err := yaml.Unmarshal(by, &specs)
@@ -25,20 +25,18 @@ func readGetMapValSpecs(t *testing.T) (specs []tSpecGetMapValTest) {
 	return
 }
 
-func TestGetMapVal(t *testing.T) {
+func TestGetContentVal(t *testing.T) {
 	ep := newTestEndpoint()
-	specs := readGetMapValSpecs(t)
+	specs := readGetContentValSpecs(t)
 	for _, spec := range specs {
-		spec.Content = readFileContent(
-			fromTestFolder(spec.ContentFile), ep,
-		)
-		validateGetMapVal(spec.Key, spec.Content, spec.Exp, t)
+		spec.Content = readFileContent(fromTestFolder(spec.ContentFile), ep)
+		validateGetContentVal(spec.Key, spec.Content, spec.Exp, t)
 	}
 }
 
-func validateGetMapVal(key string, mp map[string]interface{}, exp []string, t *testing.T) {
+func validateGetContentVal(key string, mp tContent, exp []string, t *testing.T) {
 	b := false
-	res := getMapVal(key, mp)
+	res := getContentVal(key, mp)
 	if len(exp) == len(res) {
 		for i, x := range res {
 			if x != exp[i] {
@@ -50,7 +48,7 @@ func validateGetMapVal(key string, mp map[string]interface{}, exp []string, t *t
 	}
 	if b {
 		t.Errorf(
-			"error get map val,\nkey: %+v,\nmap: %+v,\nexp: %v,\nres: %v\n\n",
+			"test fail get content val,\nkey: %+v,\nmap: %+v,\nexp: %v,\nres: %v\n\n",
 			key, mp, exp, res,
 		)
 	}

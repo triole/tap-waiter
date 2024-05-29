@@ -73,7 +73,6 @@ func serveContent(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-
 	if val, ok := conf.API[url]; ok {
 		idxParams.Endpoint = val
 		start := time.Now()

@@ -10,13 +10,13 @@ import (
 )
 
 type tJoinerEntry struct {
-	Path      string                 `json:"path"`
-	SplitPath []string               `json:"split_path,omitempty"`
-	Size      uint64                 `json:"size,omitempty"`
-	LastMod   int64                  `json:"lastmod,omitempty"`
-	Created   int64                  `json:"created,omitempty"`
-	Content   map[string]interface{} `json:"content,omitempty"`
-	SortIndex interface{}            `json:"-"`
+	Path      string      `json:"path"`
+	SplitPath []string    `json:"split_path,omitempty"`
+	Size      uint64      `json:"size,omitempty"`
+	LastMod   int64       `json:"lastmod,omitempty"`
+	Created   int64       `json:"created,omitempty"`
+	Content   tContent    `json:"content,omitempty"`
+	SortIndex interface{} `json:"-"`
 }
 
 type tJoinerIndex []tJoinerEntry
@@ -82,7 +82,10 @@ func makeJoinerIndex(params tIDXParams) (joinerIndex tJoinerIndex) {
 			case "size":
 				li.SortIndex = li.Size
 			default:
-				val := getMapVal(params.SortBy, li.Content)
+				var val []string
+				if params.SortBy != "" {
+					val = getContentVal(params.SortBy, li.Content)
+				}
 				if len(val) > 0 {
 					li.SortIndex = strings.Join(val, ".")
 				} else {
@@ -90,7 +93,9 @@ func makeJoinerIndex(params tIDXParams) (joinerIndex tJoinerIndex) {
 					if params.SortBy != "" {
 						prefix = "zzzzz_"
 					}
-					li.SortIndex = fmt.Sprintf("%s%05d_%s", prefix, getDepth(li.Path), li.Path)
+					li.SortIndex = fmt.Sprintf(
+						"%s%05d_%s", prefix, getDepth(li.Path), li.Path,
+					)
 				}
 			}
 			joinerIndex = append(joinerIndex, li)
@@ -101,13 +106,13 @@ func makeJoinerIndex(params tIDXParams) (joinerIndex tJoinerIndex) {
 				break
 			}
 		}
-		if params.Filter.Enabled {
-			joinerIndex = filterJoinerIndex(joinerIndex, params)
-		}
 		if params.Ascending {
 			sort.Sort(tJoinerIndex(joinerIndex))
 		} else {
 			sort.Sort(sort.Reverse(tJoinerIndex(joinerIndex)))
+		}
+		if params.Filter.Enabled {
+			joinerIndex = filterJoinerIndex(joinerIndex, params)
 		}
 	}
 	return
@@ -116,7 +121,7 @@ func makeJoinerIndex(params tIDXParams) (joinerIndex tJoinerIndex) {
 func filterJoinerIndex(arr tJoinerIndex, params tIDXParams) (newArr tJoinerIndex) {
 	newArr = []tJoinerEntry{}
 	for _, el := range arr {
-		val := getMapVal(params.Filter.Prefix, el.Content)
+		val := getContentVal(params.Filter.Prefix, el.Content)
 		match := false
 		if len(val) > 0 {
 			switch params.Filter.Operator {

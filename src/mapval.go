@@ -2,36 +2,49 @@ package main
 
 import (
 	"strings"
-
-	"github.com/triole/logseal"
 )
 
-func getMapVal(key interface{}, dict map[string]interface{}) (s []string) {
+func getContentVal(key interface{}, content tContent) (s []string) {
 	keypath := splitKey(key)
-	dict = keyToLower(dict)
 	if len(keypath) > 0 {
-		if dictval, ok := dict[keypath[0]]; ok {
-			switch val1 := dictval.(type) {
-			case map[string]interface{}:
-				s = getMapVal(keypath[1:], val1)
-			case []interface{}:
-				for _, x := range val1 {
-					switch val2 := x.(type) {
-					case map[string]interface{}:
-						t := getMapVal(keypath[1:], val2)
-						if len(t) > 0 {
-							s = t
-						}
-					default:
-						s = append(s, x.(string))
-					}
-				}
-			default:
-				s = []string{val1.(string)}
+		if keypath[0] == "front_matter" {
+			s = getMapVal(keypath[1:], content.FrontMatter)
+		} else if keypath[0] == "body" {
+			s = getMapVal(keypath[1:], content.Body)
+		} else {
+			s = getMapVal(keypath, content.Body)
+		}
+	}
+	return
+}
+
+func getMapVal(keypath []string, itf interface{}) (s []string) {
+	switch val := itf.(type) {
+	case map[string]interface{}:
+		val = keyToLower(val)
+		if len(keypath) > 0 {
+			if dictval, ok := val[keypath[0]]; ok {
+				s = getMapVal(keypath[1:], dictval)
 			}
 		}
-	} else {
-		lg.Warn("can not parse given map key", logseal.F{"key": key})
+	case []interface{}:
+		for _, x := range val {
+			switch val2 := x.(type) {
+			case map[string]interface{}:
+				t := getMapVal(keypath, val2)
+				if len(t) > 0 {
+					s = t
+				}
+			default:
+				s = append(s, x.(string))
+			}
+		}
+	default:
+		if val != nil {
+			s = []string{val.(string)}
+		} else {
+			s = []string{}
+		}
 	}
 	return
 }

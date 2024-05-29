@@ -3,6 +3,8 @@ package main
 import (
 	"path/filepath"
 	"testing"
+
+	yaml "gopkg.in/yaml.v3"
 )
 
 var (
@@ -67,7 +69,7 @@ func readYAMLFile(filepath string) (r map[string]interface{}) {
 	if err != nil {
 		return
 	} else {
-		r, _ = unmarshalYAML(by)
+		_ = yaml.Unmarshal(by, &r)
 	}
 	return
 }
