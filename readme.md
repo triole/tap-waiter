@@ -29,6 +29,11 @@ api: # list of api endpoints
     # only detect files which fit the regex filter
     rxfilter: ".+"
 
+    # sort and filter file in yaml format, contains a list of document paths
+    # if given, only documents matching that list will be returned in
+    # exactly the same order, any other document will not be in the json output
+    saf_file: ../test/data/saf_list.yaml
+
     # maximum file size up to which file content will appear in json
     # default is 10K to avoid too big json outputs
     # only relevant if content return is enabled
