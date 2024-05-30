@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/triole/logseal"
+	yaml "gopkg.in/yaml.v3"
 )
 
 type tJoinerEntry struct {
@@ -106,13 +107,19 @@ func makeJoinerIndex(params tIDXParams) (joinerIndex tJoinerIndex) {
 				break
 			}
 		}
-		if params.Ascending {
-			sort.Sort(tJoinerIndex(joinerIndex))
-		} else {
-			sort.Sort(sort.Reverse(tJoinerIndex(joinerIndex)))
+		var err error
+		if params.Endpoint.SafFile != "" {
+			joinerIndex, err = applySafFile(joinerIndex, params.Endpoint.SafFile)
 		}
-		if params.Filter.Enabled {
-			joinerIndex = filterJoinerIndex(joinerIndex, params)
+		if params.Endpoint.SafFile == "" || err != nil {
+			if params.Ascending {
+				sort.Sort(tJoinerIndex(joinerIndex))
+			} else {
+				sort.Sort(sort.Reverse(tJoinerIndex(joinerIndex)))
+			}
+			if params.Filter.Enabled {
+				joinerIndex = filterJoinerIndex(joinerIndex, params)
+			}
 		}
 	}
 	return
@@ -142,6 +149,36 @@ func filterJoinerIndex(arr tJoinerIndex, params tIDXParams) (newArr tJoinerIndex
 				newArr = append(newArr, el)
 			}
 		}
+	}
+	return
+}
+
+func applySafFile(ji tJoinerIndex, safPath string) (rji tJoinerIndex, err error) {
+	var safList []string
+	safList, err = readSafFile(safPath)
+	if err == nil {
+		for _, safEntry := range safList {
+			for _, jiEntry := range ji {
+				if safEntry == jiEntry.Path {
+					rji = append(rji, jiEntry)
+				}
+			}
+		}
+	} else {
+		lg.Error(
+			"saf file reading failed, do not apply any sort or filter",
+			logseal.F{"saf_file": safPath, "error": err})
+		rji = ji
+	}
+	return
+}
+
+func readSafFile(filename string) (r []string, err error) {
+	var by []byte
+	var isTextfile bool
+	by, isTextfile, err = readFile(filename)
+	if err == nil && isTextfile {
+		err = yaml.Unmarshal(by, &r)
 	}
 	return
 }

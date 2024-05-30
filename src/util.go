@@ -16,6 +16,13 @@ func absPath(str string) string {
 	return p
 }
 
+func exists(str string) bool {
+	if _, err := os.Stat(str); os.IsNotExist(err) {
+		return false
+	}
+	return true
+}
+
 func find(basedir string, rxFilter string) []string {
 	inf, err := os.Stat(basedir)
 	if err != nil {

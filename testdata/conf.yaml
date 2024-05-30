@@ -32,6 +32,11 @@ api:
       created: true
       lastmod: true
 
+  saf.json:
+    folder: ../testdata/dump
+    rxfilter: ".+"
+    saf_file: ../testdata/saf_list.yaml
+
   md_body_only.json:
     folder: ../testdata/dump
     rxfilter: "\\.(md)$"
