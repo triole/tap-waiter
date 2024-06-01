@@ -8,7 +8,6 @@ on:
 
 jobs:
   release:
-    needs: test
     name: make release
     permissions: write-all
     runs-on: ubuntu-latest
