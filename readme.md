@@ -1,4 +1,4 @@
-# Tyson Tap ![example workflow](https://github.com/triole/tyson-tap/actions/workflows/build.yaml/badge.svg) ![example workflow](https://github.com/triole/tyson-tap/actions/workflows/test.yaml/badge.svg)
+# Tyson Tap ![build](https://github.com/triole/tyson-tap/actions/workflows/build.yaml/badge.svg) ![test](https://github.com/triole/tyson-tap/actions/workflows/test.yaml/badge.svg)
 
 <!-- toc -->
 
@@ -85,7 +85,7 @@ Filters supporting different logical operators are applied by url parameter. A f
 ## Logical Operators
 
 | op               | returns a document if...                                               |
-|------------------|------------------------------------------------------------------------|
+| ---------------- | ---------------------------------------------------------------------- |
 | ===              | ...prefix and suffix are exactly equal                                 |
 | !==              | ...prefix and suffix are not exactly equal                             |
 | ==               | ...prefix contains suffix                                              |
