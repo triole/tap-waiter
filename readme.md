@@ -85,7 +85,7 @@ Filters supporting different logical operators are applied by url parameter. A f
 ## Logical Operators
 
 | op               | returns a document if...                                               |
-| ---------------- | ---------------------------------------------------------------------- |
+|------------------|------------------------------------------------------------------------|
 | ===              | ...prefix and suffix are exactly equal                                 |
 | !==              | ...prefix and suffix are not exactly equal                             |
 | ==               | ...prefix contains suffix                                              |
