@@ -1,0 +1,6 @@
+---
+exclusive: true
+order:
+  - filter
+  - dump
+  - markdown/subfolder2/1.md

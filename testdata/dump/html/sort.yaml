@@ -1,0 +1,4 @@
+---
+exclusive: true
+order:
+  - front_matter_tags/3.yaml

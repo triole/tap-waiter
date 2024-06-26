@@ -11,6 +11,8 @@ expectation:
   - yaml/2.yaml
   - yaml/3.yaml
   - yaml/cpx/data_aip.yaml
+  - html/3.html
+  - html/2.html
   - html/1.html
   - markdown/subfolder1/3.md
   - markdown/subfolder2/1.md
@@ -22,3 +24,5 @@ expectation:
   - markdown/subfolder1/1.md
   - markdown/no_front_matter.md
   - json/list.json
+  - html/sort.yaml
+  - sort.yaml

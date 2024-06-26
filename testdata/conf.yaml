@@ -25,17 +25,13 @@ api:
       split_markdown_front_matter: false
 
   sort.json:
-    folder: ../testdata/dump/yaml
+    folder: ../testdata
+    sort_files: sort.yaml
     rxfilter: ".+"
     return_values:
       size: true
       created: true
       lastmod: true
-
-  saf.json:
-    folder: ../testdata/dump
-    rxfilter: ".+"
-    saf_file: ../testdata/saf_list.yaml
 
   md_body_only.json:
     folder: ../testdata/dump

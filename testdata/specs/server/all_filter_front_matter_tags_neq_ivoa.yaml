@@ -13,4 +13,6 @@ expectation:
   - markdown/no_front_matter.md
   - markdown/1.md
   - json/list.json
+  - html/3.html
+  - html/2.html
   - html/1.html
