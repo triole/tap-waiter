@@ -37,9 +37,9 @@ func TestSort(t *testing.T) {
 		exclusive := false
 		if sortFile.Exclusive {
 			exclusive = true
-			idx = sortExclusive(idx, sortFile)
+			idx.sortExclusive(sortFile)
 		} else {
-			idx = sortNonExclusive(idx, sortFile)
+			idx.sortNonExclusive(sortFile)
 		}
 		t.Errorf("validate sort, exclusive: %v", exclusive)
 		if !orderNotOK(idx, spec.Expectation, t) {

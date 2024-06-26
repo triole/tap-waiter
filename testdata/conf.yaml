@@ -26,8 +26,10 @@ api:
 
   sort.json:
     folder: ../testdata
-    sort_files: sort.yaml
     rxfilter: ".+"
+    sort_file_name: sort.yaml
+    ignore_files:
+      - sort.yaml
     return_values:
       size: true
       created: true

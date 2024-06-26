@@ -14,43 +14,31 @@ type tSortFile struct {
 	Folder    string   `yaml:"-"`
 }
 
-func applySortFilesOrder(ji tJoinerIndex, params tIDXParams) (rji tJoinerIndex, err error) {
-	for _, el := range ji {
-		if strings.HasSuffix(el.Path, params.Endpoint.SortFiles) {
+func (arr tJoinerIndex) applySortFileOrder(params tIDXParams) {
+	for _, el := range arr {
+		if strings.HasSuffix(el.Path, params.Endpoint.SortFileName) {
 			sortFile, err := readSortFile(
 				filepath.Join(params.Endpoint.Folder, el.Path),
 			)
 			fmt.Printf("%+v\n", sortFile)
 			if err == nil {
 				if sortFile.Exclusive {
-					rji = sortExclusive(ji, sortFile)
+					arr = arr.sortExclusive(sortFile)
 				} else {
-					rji = sortNonExclusive(ji, sortFile)
+					arr = arr.sortNonExclusive(sortFile)
 				}
 			}
 		}
 	}
+}
+
+func (arr tJoinerIndex) sortExclusive(sf tSortFile) (rji tJoinerIndex) {
+	rji = arr
 	return
 }
 
-func sortExclusive(ji tJoinerIndex, sf tSortFile) (rji tJoinerIndex) {
-	rji = ji
-	return
-}
-
-func sortNonExclusive(ji tJoinerIndex, sf tSortFile) (rji tJoinerIndex) {
-	rji = ji
-	return
-}
-
-func readSortFile(filename string) (sf tSortFile, err error) {
-	var by []byte
-	var isTextfile bool
-	by, isTextfile, err = readFile(filename)
-	if err == nil && isTextfile {
-		err = yaml.Unmarshal(by, &sf)
-	}
-	sf.Folder = filepath.Dir(filename)
+func (arr tJoinerIndex) sortNonExclusive(sf tSortFile) (rji tJoinerIndex) {
+	rji = arr
 	return
 }
 
@@ -94,5 +82,16 @@ func (arr tJoinerIndex) sortByOtherParams(params tIDXParams) {
 		}
 		arr[idx] = el
 	}
+	return
+}
+
+func readSortFile(filename string) (sf tSortFile, err error) {
+	var by []byte
+	var isTextfile bool
+	by, isTextfile, err = readFile(filename)
+	if err == nil && isTextfile {
+		err = yaml.Unmarshal(by, &sf)
+	}
+	sf.Folder = filepath.Dir(filename)
 	return
 }

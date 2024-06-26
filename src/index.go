@@ -92,9 +92,9 @@ func makeJoinerIndex(params tIDXParams) (joinerIndex tJoinerIndex) {
 		sort.Sort(tJoinerIndex(joinerIndex))
 
 		// apply sort
-		// if params.Endpoint.SortFiles != "" {
-		// 	joinerIndex, _ = applySortFilesOrder(joinerIndex, params)
-		// }
+		if params.Endpoint.SortFileName != "" {
+			joinerIndex.applySortFileOrder(params)
+		}
 
 		switch params.SortBy {
 		case "created":
