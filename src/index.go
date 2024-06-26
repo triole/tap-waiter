@@ -2,12 +2,9 @@ package main
 
 import (
 	"fmt"
-	"path/filepath"
 	"sort"
-	"strings"
 
 	"github.com/triole/logseal"
-	yaml "gopkg.in/yaml.v3"
 )
 
 type tJoinerEntry struct {
@@ -46,8 +43,14 @@ func (arr tJoinerIndex) Swap(i, j int) {
 	arr[i], arr[j] = arr[j], arr[i]
 }
 
-func getDepth(pth string) int {
-	return len(strings.Split(pth, string(filepath.Separator))) - 1
+func (arr tJoinerIndex) getByPath(p string) (e tJoinerEntry) {
+	for _, el := range arr {
+		if el.Path == p {
+			e = el
+			break
+		}
+	}
+	return
 }
 
 func makeJoinerIndex(params tIDXParams) (joinerIndex tJoinerIndex) {
@@ -75,30 +78,9 @@ func makeJoinerIndex(params tIDXParams) (joinerIndex tJoinerIndex) {
 
 		c := 0
 		for li := range chout {
-			switch params.SortBy {
-			case "created":
-				li.SortIndex = li.Created
-			case "lastmod":
-				li.SortIndex = li.LastMod
-			case "size":
-				li.SortIndex = li.Size
-			default:
-				var val []string
-				if params.SortBy != "" {
-					val = getContentVal(params.SortBy, li.Content)
-				}
-				if len(val) > 0 {
-					li.SortIndex = strings.Join(val, ".")
-				} else {
-					prefix := ""
-					if params.SortBy != "" {
-						prefix = "zzzzz_"
-					}
-					li.SortIndex = fmt.Sprintf(
-						"%s%05d_%s", prefix, getDepth(li.Path), li.Path,
-					)
-				}
-			}
+			li.SortIndex = fmt.Sprintf(
+				"%06d_%s", getDepth(li.Path), li.Path,
+			)
 			joinerIndex = append(joinerIndex, li)
 			c++
 			if c >= ln {
@@ -107,19 +89,32 @@ func makeJoinerIndex(params tIDXParams) (joinerIndex tJoinerIndex) {
 				break
 			}
 		}
-		var err error
-		if params.Endpoint.SafFile != "" {
-			joinerIndex, err = applySafFile(joinerIndex, params.Endpoint.SafFile)
+		sort.Sort(tJoinerIndex(joinerIndex))
+
+		// apply sort
+		// if params.Endpoint.SortFiles != "" {
+		// 	joinerIndex, _ = applySortFilesOrder(joinerIndex, params)
+		// }
+
+		switch params.SortBy {
+		case "created":
+			joinerIndex.sortByCreated()
+		case "lastmod":
+			joinerIndex.sortByLastMod()
+		case "size":
+			joinerIndex.sortBySize()
+		default:
+			joinerIndex.sortByOtherParams(params)
 		}
-		if params.Endpoint.SafFile == "" || err != nil {
-			if params.Ascending {
-				sort.Sort(tJoinerIndex(joinerIndex))
-			} else {
-				sort.Sort(sort.Reverse(tJoinerIndex(joinerIndex)))
-			}
-			if params.Filter.Enabled {
-				joinerIndex = filterJoinerIndex(joinerIndex, params)
-			}
+
+		if params.Filter.Enabled {
+			joinerIndex = filterJoinerIndex(joinerIndex, params)
+		}
+
+		if params.Ascending {
+			sort.Sort(tJoinerIndex(joinerIndex))
+		} else {
+			sort.Sort(sort.Reverse(tJoinerIndex(joinerIndex)))
 		}
 	}
 	return
@@ -149,36 +144,6 @@ func filterJoinerIndex(arr tJoinerIndex, params tIDXParams) (newArr tJoinerIndex
 				newArr = append(newArr, el)
 			}
 		}
-	}
-	return
-}
-
-func applySafFile(ji tJoinerIndex, safPath string) (rji tJoinerIndex, err error) {
-	var safList []string
-	safList, err = readSafFile(safPath)
-	if err == nil {
-		for _, safEntry := range safList {
-			for _, jiEntry := range ji {
-				if safEntry == jiEntry.Path {
-					rji = append(rji, jiEntry)
-				}
-			}
-		}
-	} else {
-		lg.Error(
-			"saf file reading failed, do not apply any sort or filter",
-			logseal.F{"saf_file": safPath, "error": err})
-		rji = ji
-	}
-	return
-}
-
-func readSafFile(filename string) (r []string, err error) {
-	var by []byte
-	var isTextfile bool
-	by, isTextfile, err = readFile(filename)
-	if err == nil && isTextfile {
-		err = yaml.Unmarshal(by, &r)
 	}
 	return
 }

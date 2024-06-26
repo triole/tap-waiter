@@ -17,7 +17,7 @@ type tConf struct {
 type tEndpoint struct {
 	Folder             string `yaml:"folder"`
 	RxFilter           string `yaml:"rxfilter"`
-	SafFile            string `yaml:"saf_file"`
+	SortFiles          string `yaml:"sort_files"`
 	MaxReturnSize      string `yaml:"max_return_size"`
 	MaxReturnSizeBytes uint64
 	ReturnValues       tReturnValues `yaml:"return_values"`
@@ -55,16 +55,7 @@ func readConfig(filename string) (conf tConf) {
 	conf.Port = tempconf.Port
 	for key, val := range tempconf.API {
 		key = "/" + path.Clean(key)
-		val.Folder = absPath(val.Folder)
-		if val.SafFile != "" {
-			val.SafFile = absPath(val.SafFile)
-			if !exists(val.SafFile) {
-				lg.Error(
-					"saf file does not exist",
-					logseal.F{"content_folder": val.Folder, "saf_file": val.SafFile},
-				)
-			}
-		}
+		val.Folder, _ = absPath(val.Folder)
 		var v datasize.ByteSize
 		if val.MaxReturnSize == "" {
 			val.MaxReturnSize = "10K"

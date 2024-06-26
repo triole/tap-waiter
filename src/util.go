@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/triole/logseal"
 )
@@ -14,6 +15,10 @@ func absPath(str string) (p string, err error) {
 	p, err = filepath.Abs(str)
 	lg.IfErrFatal("invalid file path", logseal.F{"path": str, "error": err})
 	return p, err
+}
+
+func getDepth(pth string) int {
+	return len(strings.Split(pth, string(filepath.Separator))) - 1
 }
 
 func exists(str string) bool {

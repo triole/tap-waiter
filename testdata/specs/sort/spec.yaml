@@ -1,0 +1,6 @@
+---
+- content_folder: dump/html
+  sort_file: sort.yaml
+  expectation:
+    - 3.html
+    - 1.html
