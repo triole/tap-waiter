@@ -100,11 +100,14 @@ func byteToBody(by []byte) (content tContent) {
 }
 
 func readFile(filename string) (by []byte, isTextfile bool, err error) {
-	by, err = os.ReadFile(filename)
-	isTextfile = utf8.ValidString(string(by))
-	lg.IfErrError(
-		"can not read file", logseal.F{"path": filename, "error": err},
-	)
+	fn, err := absPath(filename)
+	if err == nil {
+		by, err = os.ReadFile(fn)
+		isTextfile = utf8.ValidString(string(by))
+		lg.IfErrError(
+			"can not read file", logseal.F{"path": filename, "error": err},
+		)
+	}
 	return
 }
 
