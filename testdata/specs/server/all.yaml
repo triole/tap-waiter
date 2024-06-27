@@ -13,6 +13,7 @@ expectation:
   - json/list.json
   - markdown/1.md
   - markdown/no_front_matter.md
+  - markdown/sort.yaml
   - yaml/1.yaml
   - yaml/2.yaml
   - yaml/3.yaml

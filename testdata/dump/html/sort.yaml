@@ -1,5 +1,5 @@
 ---
-exclusive: true
+exclusive: false
 order:
   - 3.html
   - 1.html

@@ -42,7 +42,7 @@ func validateMakeJoinerIndex(folder, sortBy string, exp []string, t *testing.T) 
 	for _, asc := range ascending {
 		exp = reverseArr(exp)
 		idx := makeJoinerIndex(newTestParams(folder, sortBy, asc))
-		if !orderNotOK(idx, exp, t) {
+		if !orderOK(idx, exp, t) {
 			t.Errorf(
 				"sort failed: %s, asc: %v,\nexp: %v, got: %v",
 				sortBy, asc, pprintr(exp), getJoinerIndexPaths(idx),
@@ -51,16 +51,22 @@ func validateMakeJoinerIndex(folder, sortBy string, exp []string, t *testing.T) 
 	}
 }
 
-func orderNotOK(idx tJoinerIndex, exp []string, t *testing.T) bool {
+func orderOK(idx tJoinerIndex, exp []string, t *testing.T) bool {
 	if len(idx) != len(exp) {
 		t.Errorf("sort failed, lengths differ: %-4d != %-4d", len(idx), len(exp))
 	}
-	for i, el := range idx {
-		if el.Path != exp[i] {
-			return true
+	for i := 0; i <= len(exp)-1; i++ {
+		fmt.Printf("%s === %+v\n", idx[i].Path, exp[i])
+		if idx[i].Path != exp[i] {
+			return false
 		}
 	}
-	return false
+	// for i, el := range idx {
+	// 	if el.Path != exp[i] {
+	// 		return true
+	// 	}
+	// }
+	return true
 }
 
 func reverseArr(arr []string) []string {

@@ -28,7 +28,7 @@ api:
     folder: ../testdata
     rxfilter: ".+"
     sort_file_name: sort.yaml
-    ignore_files:
+    ignore_list:
       - sort.yaml
     return_values:
       size: true

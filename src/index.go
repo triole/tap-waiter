@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 
@@ -19,39 +20,52 @@ type tJoinerEntry struct {
 
 type tJoinerIndex []tJoinerEntry
 
-func (arr tJoinerIndex) Len() int {
-	return len(arr)
+func (ji tJoinerIndex) Len() int {
+	return len(ji)
 }
 
-func (arr tJoinerIndex) Less(i, j int) bool {
-	switch arr[i].SortIndex.(type) {
+func (ji tJoinerIndex) Less(i, j int) bool {
+	switch ji[i].SortIndex.(type) {
 	case float32, float64,
 		int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
-		if arr[i].SortIndex == arr[j].SortIndex {
-			return arr[i].Path > arr[j].Path
+		if ji[i].SortIndex == ji[j].SortIndex {
+			return ji[i].Path > ji[j].Path
 		}
-		return toFloat(arr[i].SortIndex) < toFloat(arr[j].SortIndex)
+		return toFloat(ji[i].SortIndex) < toFloat(ji[j].SortIndex)
 	default:
-		if arr[i].SortIndex.(string) == arr[j].SortIndex.(string) {
-			return arr[i].Path > arr[j].Path
+		if ji[i].SortIndex.(string) == ji[j].SortIndex.(string) {
+			return ji[i].Path > ji[j].Path
 		}
-		return arr[i].SortIndex.(string) < arr[j].SortIndex.(string)
+		return ji[i].SortIndex.(string) < ji[j].SortIndex.(string)
 	}
 }
 
-func (arr tJoinerIndex) Swap(i, j int) {
-	arr[i], arr[j] = arr[j], arr[i]
+func (ji tJoinerIndex) Swap(i, j int) {
+	ji[i], ji[j] = ji[j], ji[i]
 }
 
-func (arr tJoinerIndex) getByPath(p string) (e tJoinerEntry) {
-	for _, el := range arr {
+func (ji tJoinerIndex) getByPath(p string) (je tJoinerEntry, idx int, err error) {
+	for i, el := range ji {
 		if el.Path == p {
-			e = el
+			je = el
+			idx = i
 			break
 		}
 	}
+	if je.Path == "" {
+		err = errors.New("index does not contain path " + p)
+	}
 	return
 }
+
+// func (arr tJoinerIndex) removeByIndex(idx int) {
+// 	_ = append(arr[:idx], arr[idx+1:]...)
+// }
+
+// func (arr tJoinerIndex) moveToIndex(el tJoinerEntry, idx int) {
+// 	arr = append(arr[:idx], el)
+// 	arr = append(arr, arr[idx+1:]...)
+// }
 
 func makeJoinerIndex(params tIDXParams) (joinerIndex tJoinerIndex) {
 	lg.Debug(
@@ -78,8 +92,8 @@ func makeJoinerIndex(params tIDXParams) (joinerIndex tJoinerIndex) {
 
 		c := 0
 		for li := range chout {
-			li.SortIndex = fmt.Sprintf(
-				"%06d_%s", getDepth(li.Path), li.Path,
+			li.SortIndex = joinerIndex.stringifySortIndex(
+				[]interface{}{getDepth(li.Path), li.Path},
 			)
 			joinerIndex = append(joinerIndex, li)
 			c++
@@ -108,7 +122,7 @@ func makeJoinerIndex(params tIDXParams) (joinerIndex tJoinerIndex) {
 		}
 
 		if params.Filter.Enabled {
-			joinerIndex = filterJoinerIndex(joinerIndex, params)
+			joinerIndex = joinerIndex.filterIndex(params)
 		}
 
 		if params.Ascending {
@@ -120,9 +134,9 @@ func makeJoinerIndex(params tIDXParams) (joinerIndex tJoinerIndex) {
 	return
 }
 
-func filterJoinerIndex(arr tJoinerIndex, params tIDXParams) (newArr tJoinerIndex) {
-	newArr = []tJoinerEntry{}
-	for _, el := range arr {
+func (ji tJoinerIndex) filterIndex(params tIDXParams) tJoinerIndex {
+	var temp tJoinerIndex
+	for _, el := range ji {
 		val := getContentVal(params.Filter.Prefix, el.Content)
 		match := false
 		if len(val) > 0 {
@@ -141,9 +155,10 @@ func filterJoinerIndex(arr tJoinerIndex, params tIDXParams) (newArr tJoinerIndex
 				match = rxMatchSliceOnce(val, params.Filter.Suffix)
 			}
 			if match {
-				newArr = append(newArr, el)
+				temp = append(temp, el)
 			}
 		}
 	}
-	return
+	ji = temp
+	return temp
 }

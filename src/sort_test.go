@@ -1,7 +1,6 @@
 package main
 
 import (
-	"path/filepath"
 	"testing"
 
 	yaml "gopkg.in/yaml.v3"
@@ -11,6 +10,7 @@ type tSpecSortTest struct {
 	ContentFolder string   `yaml:"content_folder"`
 	SortFile      string   `yaml:"sort_file"`
 	Expectation   []string `yaml:"expectation"`
+	IgnoreList    []string `yaml:"ignore_list"`
 }
 
 func readSortTestSpecs(t *testing.T) (specs []tSpecSortTest) {
@@ -26,26 +26,17 @@ func readSortTestSpecs(t *testing.T) (specs []tSpecSortTest) {
 func TestSort(t *testing.T) {
 	specs := readSortTestSpecs(t)
 	for _, spec := range specs {
-		sortFile, _ := readSortFile(
-			filepath.Join(fromTestFolder(spec.ContentFolder), spec.SortFile),
-		)
 		sortBy := "default"
 		asc := true
-		idx := makeJoinerIndex(
-			newTestParams(fromTestFolder(spec.ContentFolder), sortBy, asc),
-		)
-		exclusive := false
-		if sortFile.Exclusive {
-			exclusive = true
-			idx.sortExclusive(sortFile)
-		} else {
-			idx.sortNonExclusive(sortFile)
-		}
-		t.Errorf("validate sort, exclusive: %v", exclusive)
-		if !orderNotOK(idx, spec.Expectation, t) {
+		params := newTestParams(fromTestFolder(spec.ContentFolder), sortBy, asc)
+		params.Endpoint.SortFileName = spec.SortFile
+		params.Endpoint.IgnoreList = spec.IgnoreList
+		idx := makeJoinerIndex(params)
+		idx.applySortFileOrder(params)
+		if !orderOK(idx, spec.Expectation, t) {
 			t.Errorf(
-				"sort failed: %s, asc: %v, exclusive: %v,\nexp: %v, got: %v",
-				sortBy, asc, exclusive, pprintr(spec.Expectation), getJoinerIndexPaths(idx),
+				"sort failed: %s, asc: %v, \nexp: %v, got: %v",
+				sortBy, asc, pprintr(spec.Expectation), getJoinerIndexPaths(idx),
 			)
 		}
 	}

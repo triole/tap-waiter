@@ -1,6 +1,27 @@
 ---
 - content_folder: dump/html
   sort_file: sort.yaml
+  ignore_list:
+    - sort.yaml
   expectation:
     - 3.html
     - 1.html
+    - sort.html
+    - 2.html
+    - more_than_10k.html
+
+- content_folder: dump/markdown
+  sort_file: sort.yaml
+  ignore_list:
+    - sort.yaml
+  expectation:
+    - subfolder2/3.md
+    - subfolder1/3.md
+    - subfolder2/1.md
+    - subfolder1/1.md
+    - 1.md
+    - sort.yaml
+    - no_front_matter.md
+    - subfolder1/4.md
+    - subfolder1/2.md
+    - subfolder2/2.md

@@ -18,7 +18,7 @@ type tEndpoint struct {
 	Folder             string   `yaml:"folder"`
 	RxFilter           string   `yaml:"rxfilter"`
 	SortFileName       string   `yaml:"sort_file_name"`
-	IgnoreFiles        []string `yaml:"ignore_files"`
+	IgnoreList         []string `yaml:"ignore_list"`
 	MaxReturnSize      string   `yaml:"max_return_size"`
 	MaxReturnSizeBytes uint64
 	ReturnValues       tReturnValues `yaml:"return_values"`
