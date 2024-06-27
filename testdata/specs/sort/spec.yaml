@@ -6,9 +6,9 @@
   expectation:
     - 3.html
     - 1.html
-    - sort.html
     - 2.html
     - more_than_10k.html
+    - sort.yaml
 
 - content_folder: dump/markdown
   sort_file: sort.yaml
@@ -20,8 +20,8 @@
     - subfolder2/1.md
     - subfolder1/1.md
     - 1.md
-    - sort.yaml
     - no_front_matter.md
-    - subfolder1/4.md
+    - sort.yaml
     - subfolder1/2.md
+    - subfolder1/4.md
     - subfolder2/2.md

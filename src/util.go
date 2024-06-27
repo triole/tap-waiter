@@ -21,13 +21,6 @@ func getDepth(pth string) int {
 	return len(strings.Split(pth, string(filepath.Separator))) - 1
 }
 
-func exists(str string) bool {
-	if _, err := os.Stat(str); os.IsNotExist(err) {
-		return false
-	}
-	return true
-}
-
 func find(basedir string, rxFilter string) []string {
 	inf, err := os.Stat(basedir)
 	if err != nil {
@@ -147,13 +140,4 @@ func toFloat(inp interface{}) (fl float64) {
 		fl = float64(val)
 	}
 	return
-}
-
-func stringInSlice(a string, list []string) bool {
-	for _, b := range list {
-		if b == a {
-			return true
-		}
-	}
-	return false
 }

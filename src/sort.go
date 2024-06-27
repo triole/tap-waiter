@@ -64,30 +64,6 @@ func (ji tJoinerIndex) applySortFileOrder(params tIDXParams) {
 		)
 	}
 	sort.Sort(tJoinerIndex(ji))
-
-	fmt.Printf("\n\n\n%+v\n", "DONE DONE DONE")
-	for _, el := range ji {
-		fmt.Printf("%20s --- %40s\n", el.Path, el.SortIndex)
-	}
-}
-
-func (ji tJoinerIndex) fileOnIgnoreList(str string, list []string) bool {
-	for _, el := range list {
-		fmt.Printf("%+v %+v\n", el, str)
-		if strings.HasSuffix(str, el) {
-			return true
-		}
-	}
-	return false
-}
-
-func (ji tJoinerIndex) applyExclusions(ignoreList []string) (newji tJoinerIndex) {
-	for _, el := range ji {
-		if strings.HasSuffix(el.SortIndex.(string), "|000000") && !ji.fileOnIgnoreList(el.Path, ignoreList) {
-			newji = append(newji, el)
-		}
-	}
-	return
 }
 
 func (ji tJoinerIndex) getRelevantSortFile(folder string, sfs tSortFiles) (sf tSortFile) {

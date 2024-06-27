@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"sort"
 
@@ -43,29 +42,6 @@ func (ji tJoinerIndex) Less(i, j int) bool {
 func (ji tJoinerIndex) Swap(i, j int) {
 	ji[i], ji[j] = ji[j], ji[i]
 }
-
-func (ji tJoinerIndex) getByPath(p string) (je tJoinerEntry, idx int, err error) {
-	for i, el := range ji {
-		if el.Path == p {
-			je = el
-			idx = i
-			break
-		}
-	}
-	if je.Path == "" {
-		err = errors.New("index does not contain path " + p)
-	}
-	return
-}
-
-// func (arr tJoinerIndex) removeByIndex(idx int) {
-// 	_ = append(arr[:idx], arr[idx+1:]...)
-// }
-
-// func (arr tJoinerIndex) moveToIndex(el tJoinerEntry, idx int) {
-// 	arr = append(arr[:idx], el)
-// 	arr = append(arr, arr[idx+1:]...)
-// }
 
 func makeJoinerIndex(params tIDXParams) (joinerIndex tJoinerIndex) {
 	lg.Debug(

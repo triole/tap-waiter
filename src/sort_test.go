@@ -35,8 +35,8 @@ func TestSort(t *testing.T) {
 		idx.applySortFileOrder(params)
 		if !orderOK(idx, spec.Expectation, t) {
 			t.Errorf(
-				"sort failed: %s, asc: %v, \nexp: %v, got: %v",
-				sortBy, asc, pprintr(spec.Expectation), getJoinerIndexPaths(idx),
+				"sort failed: %s, asc: %v, \n  exp: %v\n, got: %v",
+				sortBy, asc, spec.Expectation, getJoinerIndexPaths(idx),
 			)
 		}
 	}
