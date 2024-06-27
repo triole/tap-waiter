@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"testing"
 	"time"
 
@@ -12,19 +13,19 @@ import (
 )
 
 var (
-	tempFolder     = filepath.Join(os.TempDir(), "tyson_tap_testdata")
-	dummyTestFiles []string
+	tempFolder           = filepath.Join(os.TempDir(), "tyson_tap_testdata")
+	globalDummyTestFiles []string
 )
-
-func init() {
-	dummyTestFiles = createDummyFiles()
-}
 
 type tSpecIndexTest struct {
 	Folder      string   `yaml:"folder"`
 	SortBy      string   `yaml:"sort_by"`
 	Expectation []string `yaml:"expectation"`
 	Ascending   bool
+}
+
+func init() {
+	globalDummyTestFiles = createDummyFiles()
 }
 
 func readIndexTestSpecs(filename string, t *testing.T) (specs tSpecIndexTest) {
@@ -36,11 +37,22 @@ func readIndexTestSpecs(filename string, t *testing.T) (specs tSpecIndexTest) {
 	return
 }
 func TestMakeJoinerIndex(t *testing.T) {
-	// validateMakeJoinerIndex(tempFolder, "created", dummyTestFiles, t)
-	// validateMakeJoinerIndex(tempFolder, "created", dummyTestFiles, t)
-	// sort.Strings(dummyTestFiles)
-	// validateMakeJoinerIndex(tempFolder, "lastmod", dummyTestFiles, t)
-	// validateMakeJoinerIndex(tempFolder, "lastmod", dummyTestFiles, t)
+	specsArr := []string{"created", "lastmod"}
+	for _, el := range specsArr {
+		var spec tSpecIndexTest
+		spec.Folder = tempFolder
+		spec.SortBy = el
+		ascending := []bool{true, false}
+		for _, asc := range ascending {
+			spec.Expectation = globalDummyTestFiles
+			spec.Ascending = asc
+			if !spec.Ascending {
+				spec.Expectation = reverseArr(spec.Expectation)
+			}
+			validateMakeJoinerIndex(spec, t)
+		}
+		sort.Strings(globalDummyTestFiles)
+	}
 
 	testSpecs := find(fromTestFolder("specs/index"), "\\.yaml$")
 	ascending := []bool{true, false}
@@ -49,7 +61,7 @@ func TestMakeJoinerIndex(t *testing.T) {
 		spec.Folder = fromTestFolder(spec.Folder)
 		for _, asc := range ascending {
 			spec.Ascending = asc
-			if !asc {
+			if !spec.Ascending {
 				spec.Expectation = reverseArr(spec.Expectation)
 			}
 			validateMakeJoinerIndex(spec, t)
