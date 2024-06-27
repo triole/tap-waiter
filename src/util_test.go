@@ -74,7 +74,7 @@ func readYAMLFile(filepath string) (r map[string]interface{}) {
 	return
 }
 
-func itfArrTostrArr(itf []interface{}) (r []string) {
+func itfArrToStrArr(itf []interface{}) (r []string) {
 	for _, el := range itf {
 		r = append(r, el.(string))
 	}

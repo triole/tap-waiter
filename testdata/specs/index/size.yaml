@@ -1,6 +1,6 @@
 ---
 folder: dump/yaml
-sortby: size
+sort_by: size
 
 expectation:
   - cpx/data_aip.yaml

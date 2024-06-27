@@ -1,6 +1,6 @@
 ---
 folder: dump/yaml
-sortby: path
+sort_by: path
 
 expectation:
   - 1.yaml
