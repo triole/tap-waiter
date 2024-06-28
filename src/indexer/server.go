@@ -1,4 +1,4 @@
-package main
+package indexer
 
 import (
 	"encoding/json"
@@ -14,70 +14,54 @@ import (
 	"github.com/triole/logseal"
 )
 
-type tIDXParams struct {
-	Endpoint  tEndpoint
-	Filter    tIDXParamsFilter
-	SortBy    string
-	Ascending bool
-	Threads   int
-}
-
-type tIDXParamsFilter struct {
-	Prefix   string
-	Operator string
-	Suffix   []string
-	Errors   []error
-	Enabled  bool
-}
-
-func runServer(conf tConf) {
-	http.HandleFunc("/", serveContent)
-	portstr := strconv.Itoa(conf.Port)
-	lg.Info("run server, listen at :" + portstr + "/")
+func (ind Indexer) RunServer() {
+	http.HandleFunc("/", ind.ServeContent)
+	portstr := strconv.Itoa(ind.Conf.Port)
+	ind.Lg.Info("run server, listen at :" + portstr + "/")
 	err := http.ListenAndServe(":"+portstr, nil)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func serveContent(w http.ResponseWriter, r *http.Request) {
-	lg.Info("got request", logseal.F{"url": r.URL})
-	idxParams := tIDXParams{
+func (ind Indexer) ServeContent(w http.ResponseWriter, r *http.Request) {
+	ind.Lg.Info("got request", logseal.F{"url": r.URL})
+	params := Params{
 		Ascending: true,
-		Threads:   CLI.Threads,
-		Filter:    tIDXParamsFilter{Enabled: false},
+		Threads:   ind.Conf.Threads,
+		Filter:    FilterParams{Enabled: false},
 	}
 
-	url, err := decodeURL(r.URL.Path)
+	url, err := ind.decodeURL(r.URL.Path)
 	if err == nil {
-		params := r.URL.Query()
-		for key, values := range params {
+		queryParams := r.URL.Query()
+		for key, values := range queryParams {
 			lowKey := strings.ToLower(key)
 			for _, val := range values {
-				val, err = decodeURL(val)
+				val, err = ind.decodeURL(val)
 				if err == nil {
 					lowVal := strings.ToLower(val)
 					if lowKey == "sortby" {
-						idxParams.SortBy = lowVal
+						params.SortBy = lowVal
 					}
 					if lowKey == "order" && lowVal == "asc" {
-						idxParams.Ascending = true
+						params.Ascending = true
 					}
 					if lowKey == "order" && lowVal == "desc" {
-						idxParams.Ascending = false
+						params.Ascending = false
 					}
 					if lowKey == "filter" {
-						idxParams.Filter = parseFilterString(val)
+						params.Filter = ind.parseFilterString(val)
 					}
 				}
 			}
 		}
 	}
-	if val, ok := conf.API[url]; ok {
-		idxParams.Endpoint = val
+	if val, ok := ind.Conf.API[url]; ok {
+		params.Endpoint = val
 		start := time.Now()
-		ji := makeJoinerIndex(idxParams)
-		lg.Debug(
+		ji := ind.MakeJoinerIndex(params)
+		ind.Lg.Debug(
 			"serve json",
 			logseal.F{
 				"url": url, "path": val.Folder, "rxfilter": val.RxFilter, "duration": time.Since(start),
@@ -86,13 +70,13 @@ func serveContent(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content Type", "application/json")
 		json.NewEncoder(w).Encode(ji)
 	} else {
-		return404(w)
+		ind.return404(w)
 	}
 }
 
-func parseFilterString(s string) (fil tIDXParamsFilter) {
-	fil.Prefix = rxFind("^[a-z0-9_\\-\\. ]+", s)
-	fil.Operator = rxFind("^[^a-z0-9_\\-\\. ]+", strings.TrimPrefix(s, fil.Prefix))
+func (ind Indexer) parseFilterString(s string) (fil FilterParams) {
+	fil.Prefix = ind.Util.RxFind("^[a-z0-9_\\-\\. ]+", s)
+	fil.Operator = ind.Util.RxFind("^[^a-z0-9_\\-\\. ]+", strings.TrimPrefix(s, fil.Prefix))
 	fil.Suffix = strings.Split(strings.TrimPrefix(s, fil.Prefix+fil.Operator), ",")
 	sort.Strings(fil.Suffix)
 	if fil.Prefix == "" {
@@ -112,7 +96,7 @@ func parseFilterString(s string) (fil tIDXParamsFilter) {
 	}
 	if len(fil.Errors) > 0 {
 		for _, el := range fil.Errors {
-			lg.Error(el)
+			ind.Lg.Error(el)
 		}
 	} else {
 		fil.Enabled = true
@@ -120,13 +104,13 @@ func parseFilterString(s string) (fil tIDXParamsFilter) {
 	return
 }
 
-func decodeURL(s string) (t string, err error) {
+func (ind Indexer) decodeURL(s string) (t string, err error) {
 	t, err = url.QueryUnescape(s)
-	lg.IfErrError("can not decode url: %s, error: %s", s, err)
+	ind.Lg.IfErrError("can not decode url: %s, error: %s", s, err)
 	return
 }
 
-func return404(w http.ResponseWriter) {
+func (ind Indexer) return404(w http.ResponseWriter) {
 	w.WriteHeader(404)
 	w.Write([]byte(
 		fmt.Sprintf("[ \"404 - %s\" ]", http.StatusText(404)),

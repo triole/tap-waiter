@@ -1,4 +1,4 @@
-package main
+package indexer
 
 import (
 	"fmt"
@@ -25,7 +25,7 @@ type tSortFileContent struct {
 	Folder    string   `yaml:"-"`
 }
 
-func (ji tJoinerIndex) collectSortFiles(params tIDXParams) (sfs tSortFiles) {
+func (ji JoinerIndex) collectSortFiles(params Params) (sfs tSortFiles) {
 	for _, el := range ji {
 		sortFile := ji.readSortFile(
 			filepath.Join(params.Endpoint.Folder, el.Path),
@@ -38,7 +38,7 @@ func (ji tJoinerIndex) collectSortFiles(params tIDXParams) (sfs tSortFiles) {
 	return
 }
 
-func (ji tJoinerIndex) applySortFileOrder(params tIDXParams) {
+func (ji JoinerIndex) applySortFileOrder(params Params) {
 	sortFiles := ji.collectSortFiles(params)
 	var sortIndex int
 	var exclude bool
@@ -57,16 +57,16 @@ func (ji tJoinerIndex) applySortFileOrder(params tIDXParams) {
 		ji[idx].SortIndex = ji.stringifySortIndex(
 			[]interface{}{
 				sortIndex,
-				getDepth(indexEl.Path),
+				ut.GetPathDepth(indexEl.Path),
 				indexEl.Path,
 				exclude,
 			},
 		)
 	}
-	sort.Sort(tJoinerIndex(ji))
+	sort.Sort(JoinerIndex(ji))
 }
 
-func (ji tJoinerIndex) getRelevantSortFile(folder string, sfs tSortFiles) (sf tSortFile) {
+func (ji JoinerIndex) getRelevantSortFile(folder string, sfs tSortFiles) (sf tSortFile) {
 	for _, el := range sfs {
 		if strings.HasPrefix(folder, el.Folder) {
 			sf = el
@@ -75,7 +75,7 @@ func (ji tJoinerIndex) getRelevantSortFile(folder string, sfs tSortFiles) (sf tS
 	return
 }
 
-func (ji tJoinerIndex) stringifySortIndex(li []interface{}) (r string) {
+func (ji JoinerIndex) stringifySortIndex(li []interface{}) (r string) {
 	sep := "|"
 	for _, itf := range li {
 		switch val := itf.(type) {
@@ -97,32 +97,32 @@ func (ji tJoinerIndex) stringifySortIndex(li []interface{}) (r string) {
 	return
 }
 
-func (ji tJoinerIndex) sortByCreated() {
+func (ji JoinerIndex) sortByCreated() {
 	for idx, el := range ji {
 		el.SortIndex = el.Created
 		ji[idx] = el
 	}
 }
 
-func (ji tJoinerIndex) sortByLastMod() {
+func (ji JoinerIndex) sortByLastMod() {
 	for idx, el := range ji {
 		el.SortIndex = el.LastMod
 		ji[idx] = el
 	}
 }
 
-func (ji tJoinerIndex) sortBySize() {
+func (ji JoinerIndex) sortBySize() {
 	for idx, el := range ji {
 		el.SortIndex = el.Size
 		ji[idx] = el
 	}
 }
 
-func (ji tJoinerIndex) sortByOtherParams(params tIDXParams) {
+func (ji JoinerIndex) sortByOtherParams(params Params) {
 	for idx, el := range ji {
 		var val []string
 		if params.SortBy != "" {
-			val = getContentVal(params.SortBy, el.Content)
+			val = ji.getContentVal(params.SortBy, el.Content)
 		}
 		if len(val) > 0 {
 			el.SortIndex = strings.Join(val, ".")
@@ -132,14 +132,14 @@ func (ji tJoinerIndex) sortByOtherParams(params tIDXParams) {
 				prefix = "zzzzz_"
 			}
 			el.SortIndex = fmt.Sprintf(
-				"%s%05d_%s", prefix, getDepth(el.Path), el.Path,
+				"%s%05d_%s", prefix, ut.GetPathDepth(el.Path), el.Path,
 			)
 		}
 		ji[idx] = el
 	}
 }
 
-func (ji tJoinerIndex) readSortFile(filename, sortFileName string) (sf tSortFile) {
+func (ji JoinerIndex) readSortFile(filename, sortFileName string) (sf tSortFile) {
 	sf.IsSortFile = strings.HasSuffix(filename, sortFileName)
 	if !sf.IsSortFile {
 		return
@@ -148,7 +148,7 @@ func (ji tJoinerIndex) readSortFile(filename, sortFileName string) (sf tSortFile
 	sf.Folder = filepath.Dir(sf.Path)
 	var by []byte
 	var isTextfile bool
-	by, isTextfile, sf.Error = readFile(sf.Path)
+	by, isTextfile, sf.Error = ut.ReadFile(sf.Path)
 	if sf.Error != nil && isTextfile {
 		return
 	} else {

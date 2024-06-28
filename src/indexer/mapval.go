@@ -1,37 +1,37 @@
-package main
+package indexer
 
 import (
 	"strings"
 )
 
-func getContentVal(key interface{}, content tContent) (s []string) {
-	keypath := splitKey(key)
+func (ji JoinerIndex) getContentVal(key interface{}, content FileContent) (s []string) {
+	keypath := ji.splitKey(key)
 	if len(keypath) > 0 {
 		if keypath[0] == "front_matter" {
-			s = getMapVal(keypath[1:], content.FrontMatter)
+			s = ji.getMapVal(keypath[1:], content.FrontMatter)
 		} else if keypath[0] == "body" {
-			s = getMapVal(keypath[1:], content.Body)
+			s = ji.getMapVal(keypath[1:], content.Body)
 		} else {
-			s = getMapVal(keypath, content.Body)
+			s = ji.getMapVal(keypath, content.Body)
 		}
 	}
 	return
 }
 
-func getMapVal(keypath []string, itf interface{}) (s []string) {
+func (ji JoinerIndex) getMapVal(keypath []string, itf interface{}) (s []string) {
 	switch val := itf.(type) {
 	case map[string]interface{}:
-		val = keyToLower(val)
+		val = ji.keyToLower(val)
 		if len(keypath) > 0 {
 			if dictval, ok := val[keypath[0]]; ok {
-				s = getMapVal(keypath[1:], dictval)
+				s = ji.getMapVal(keypath[1:], dictval)
 			}
 		}
 	case []interface{}:
 		for _, x := range val {
 			switch val2 := x.(type) {
 			case map[string]interface{}:
-				t := getMapVal(keypath, val2)
+				t := ji.getMapVal(keypath, val2)
 				if len(t) > 0 {
 					s = t
 				}
@@ -49,7 +49,7 @@ func getMapVal(keypath []string, itf interface{}) (s []string) {
 	return
 }
 
-func keyToLower(dict map[string]interface{}) (r map[string]interface{}) {
+func (ji JoinerIndex) keyToLower(dict map[string]interface{}) (r map[string]interface{}) {
 	r = make(map[string]interface{})
 	for key, val := range dict {
 		r[strings.ToLower(key)] = val
@@ -57,7 +57,7 @@ func keyToLower(dict map[string]interface{}) (r map[string]interface{}) {
 	return
 }
 
-func splitKey(key interface{}) (arr []string) {
+func (ji JoinerIndex) splitKey(key interface{}) (arr []string) {
 	var tmp []string
 	switch val := key.(type) {
 	case string:

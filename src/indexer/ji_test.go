@@ -1,4 +1,4 @@
-package main
+package indexer
 
 import (
 	"fmt"
@@ -8,12 +8,13 @@ import (
 	"sort"
 	"testing"
 	"time"
+	"tyson-tap/src/conf"
 
 	yaml "gopkg.in/yaml.v3"
 )
 
 var (
-	tempFolder           = filepath.Join(os.TempDir(), "tyson_tap_testdata")
+	tempFolder           = filepath.Join(os.TempDir(), "tyson-tap-testdata")
 	globalDummyTestFiles []string
 )
 
@@ -24,12 +25,9 @@ type tSpecIndexTest struct {
 	Ascending   bool
 }
 
-func init() {
-	globalDummyTestFiles = createDummyFiles()
-}
-
 func readIndexTestSpecs(filename string, t *testing.T) (specs tSpecIndexTest) {
-	by, _, _ := readFile(filename)
+	ind, _, _ := prepareTests("", "", true)
+	by, _, _ := ind.Util.ReadFile(filename)
 	err := yaml.Unmarshal(by, &specs)
 	if err != nil {
 		t.Errorf("reading specs file failed: %q", filename)
@@ -37,6 +35,8 @@ func readIndexTestSpecs(filename string, t *testing.T) (specs tSpecIndexTest) {
 	return
 }
 func TestMakeJoinerIndex(t *testing.T) {
+	ind, _, _ := prepareTests("", "", true)
+	globalDummyTestFiles = createDummyFiles()
 	specsArr := []string{"created", "lastmod"}
 	for _, el := range specsArr {
 		var spec tSpecIndexTest
@@ -54,11 +54,11 @@ func TestMakeJoinerIndex(t *testing.T) {
 		sort.Strings(globalDummyTestFiles)
 	}
 
-	testSpecs := find(fromTestFolder("specs/index"), "\\.yaml$")
+	testSpecs := ind.Util.Find(ind.Util.FromTestFolder("specs/index"), "\\.yaml$")
 	ascending := []bool{true, false}
 	for _, el := range testSpecs {
 		spec := readIndexTestSpecs(el, t)
-		spec.Folder = fromTestFolder(spec.Folder)
+		spec.Folder = ind.Util.FromTestFolder(spec.Folder)
 		for _, asc := range ascending {
 			spec.Ascending = asc
 			if !spec.Ascending {
@@ -70,20 +70,19 @@ func TestMakeJoinerIndex(t *testing.T) {
 }
 
 func validateMakeJoinerIndex(spec tSpecIndexTest, t *testing.T) {
-	params := newTestParams(spec.Folder, spec.SortBy, spec.Ascending)
-	idx := makeJoinerIndex(params)
-	if !orderOK(idx, spec.Expectation, t) {
+	_, ji, params := prepareTests("", "", true)
+	if !orderOK(ji, spec.Expectation, t) {
 		t.Errorf(
 			"sort failed: %s, by: %s, asc: %v,\n  exp: %v\n, got: %v",
 			params.Endpoint.Folder,
 			params.SortBy,
 			params.Ascending,
-			spec.Expectation, getJoinerIndexPaths(idx),
+			spec.Expectation, idx,
 		)
 	}
 }
 
-func orderOK(idx tJoinerIndex, exp []string, t *testing.T) bool {
+func orderOK(idx JoinerIndex, exp []string, t *testing.T) bool {
 	if len(idx) != len(exp) {
 		t.Errorf("sort failed, lengths differ: %-4d != %-4d", len(idx), len(exp))
 	}
@@ -102,7 +101,7 @@ func reverseArr(arr []string) []string {
 	return arr
 }
 
-func newTestParams(folder, sortBy string, ascending bool) (p tIDXParams) {
+func newTestParams(folder, sortBy string, ascending bool) (p Params) {
 	p.Endpoint.Folder = folder
 	p.Endpoint.ReturnValues.Content = true
 	p.Endpoint.ReturnValues.Created = true
@@ -133,8 +132,8 @@ func createDummyFiles() (arr []string) {
 	return
 }
 
-func newTestEndpoint() tEndpoint {
-	return tEndpoint{ReturnValues: tReturnValues{
+func newTestEndpoint() conf.Endpoint {
+	return conf.Endpoint{ReturnValues: conf.ReturnValues{
 		Created:                  true,
 		LastMod:                  true,
 		Content:                  true,

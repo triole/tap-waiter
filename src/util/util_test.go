@@ -2,13 +2,7 @@ package util
 
 import (
 	"testing"
-
-	"github.com/triole/logseal"
 )
-
-func init() {
-	lg = logseal.Init("debug", "stdout", true, false)
-}
 
 func TestGetFileSize(t *testing.T) {
 	ut := Init(lg)
