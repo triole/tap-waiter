@@ -6,10 +6,6 @@ import (
 	"github.com/triole/logseal"
 )
 
-var (
-	lg logseal.Logseal
-)
-
 func init() {
 	lg = logseal.Init("debug", "stdout", true, false)
 }

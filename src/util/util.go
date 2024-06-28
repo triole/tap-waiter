@@ -13,27 +13,27 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-func (util Util) AbsPath(str string) (p string, err error) {
+func (ut Util) AbsPath(str string) (p string, err error) {
 	p, err = filepath.Abs(str)
-	util.Lg.IfErrFatal("invalid file path", logseal.F{"path": str, "error": err})
+	ut.Lg.IfErrFatal("invalid file path", logseal.F{"path": str, "error": err})
 	return p, err
 }
 
-func (util Util) GetPathDepth(pth string) int {
+func (ut Util) GetPathDepth(pth string) int {
 	return len(strings.Split(pth, string(filepath.Separator))) - 1
 }
 
-func (util Util) Find(basedir string, rxFilter string) []string {
+func (ut Util) Find(basedir string, rxFilter string) []string {
 	inf, err := os.Stat(basedir)
 	if err != nil {
-		util.Lg.IfErrFatal(
+		ut.Lg.IfErrFatal(
 			"unable to access md folder", logseal.F{
 				"path": basedir, "error": err,
 			},
 		)
 	}
 	if !inf.IsDir() {
-		util.Lg.Fatal(
+		ut.Lg.Fatal(
 			"not a folder, please provide a directory to look for md files.",
 			logseal.F{"path": basedir},
 		)
@@ -50,25 +50,25 @@ func (util Util) Find(basedir string, rxFilter string) []string {
 					filelist = append(filelist, path)
 				}
 			} else {
-				util.Lg.IfErrInfo("stat file failed", logseal.F{"path": path})
+				ut.Lg.IfErrInfo("stat file failed", logseal.F{"path": path})
 			}
 		}
 		return nil
 	})
-	util.Lg.IfErrFatal("find files failed", logseal.F{"path": basedir, "error": err})
+	ut.Lg.IfErrFatal("find files failed", logseal.F{"path": basedir, "error": err})
 	return filelist
 }
 
-func (util Util) GetFileSize(filename string) (siz uint64) {
+func (ut Util) GetFileSize(filename string) (siz uint64) {
 	file, err := os.Open(filename)
-	util.Lg.IfErrError(
+	ut.Lg.IfErrError(
 		"can not open file to get file size",
 		logseal.F{"path": filename, "error": err},
 	)
 	if err == nil {
 		defer file.Close()
 		stat, err := file.Stat()
-		util.Lg.IfErrError(
+		ut.Lg.IfErrError(
 			"can not stat file to get file size",
 			logseal.F{"path": filename, "error": err},
 		)
@@ -79,10 +79,10 @@ func (util Util) GetFileSize(filename string) (siz uint64) {
 	return
 }
 
-func (util Util) GetFileLastMod(filename string) (uts int64) {
+func (ut Util) GetFileLastMod(filename string) (uts int64) {
 	fil, err := os.Stat(filename)
 	if err != nil {
-		util.Lg.Error("can not stat file", logseal.F{"path": filename, "error": err})
+		ut.Lg.Error("can not stat file", logseal.F{"path": filename, "error": err})
 		return
 	}
 	uts = fil.ModTime().Unix()
@@ -111,24 +111,24 @@ func (ut Util) ReadYAMLFile(filepath string) (r map[string]interface{}) {
 	return
 }
 
-func (util Util) RxFind(rx string, content string) string {
+func (ut Util) RxFind(rx string, content string) string {
 	temp, _ := regexp.Compile(rx)
 	return temp.FindString(content)
 }
 
-func (util Util) RxMatch(rx string, content string) bool {
+func (ut Util) RxMatch(rx string, content string) bool {
 	temp, _ := regexp.Compile(rx)
 	return temp.MatchString(content)
 }
 
-func (util Util) StringifySliceOfInterfaces(itf []interface{}) (r []string) {
+func (ut Util) StringifySliceOfInterfaces(itf []interface{}) (r []string) {
 	for _, el := range itf {
 		r = append(r, el.(string))
 	}
 	return
 }
 
-func (util Util) ToFloat(inp interface{}) (fl float64) {
+func (ut Util) ToFloat(inp interface{}) (fl float64) {
 	switch val := inp.(type) {
 	case float32:
 		fl = float64(val)
@@ -162,15 +162,15 @@ func (util Util) ToString(inp interface{}) string {
 	return fmt.Sprintf("%s", inp)
 }
 
-func (util Util) Trace() (r string) {
+func (ut Util) Trace() (r string) {
 	pc, fullfile, line, _ := runtime.Caller(1)
 	fn := runtime.FuncForPC(pc)
-	file := util.RxFind("src.*", fullfile)
+	file := ut.RxFind("src.*", fullfile)
 	r = fmt.Sprintf("%s:%d %s", file, line, fn.Name())
 	return
 }
 
-func (util Util) FromTestFolder(s string) (r string) {
+func (ut Util) FromTestFolder(s string) (r string) {
 	t, err := filepath.Abs("../../testdata")
 	if err == nil {
 		r = filepath.Join(t, s)
