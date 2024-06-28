@@ -1,6 +1,6 @@
 //go:build !windows && !freebsd && !darwin
 
-package main
+package util
 
 import (
 	"syscall"
@@ -8,10 +8,10 @@ import (
 	"github.com/triole/logseal"
 )
 
-func getFileCreated(filename string) (uts int64) {
+func (util Util) GetFileCreated(filename string) (uts int64) {
 	var scs syscall.Stat_t
 	if err := syscall.Stat(filename, &scs); err != nil {
-		lg.Error(
+		util.Lg.Error(
 			"syscall stat failed", logseal.F{"path": filename, "error": err},
 		)
 	}
