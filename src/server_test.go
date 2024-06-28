@@ -2,9 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"runtime"
 	"testing"
 
 	yaml "gopkg.in/yaml.v3"
@@ -160,5 +162,28 @@ func getJoinerIndexPaths(ji tJoinerIndex) (arr []string) {
 	for _, el := range ji {
 		arr = append(arr, el.Path)
 	}
+	return
+}
+
+func BenchmarkServer(b *testing.B) {
+	pos := trace()
+	conf = readConfig(fromTestFolder("conf.yaml"))
+	svr := httptest.NewServer(http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			serveContent(w, r)
+		}))
+	defer svr.Close()
+	for url := range conf.API {
+		c := NewClient(svr.URL)
+		http.Get(c.url + url)
+	}
+	fmt.Printf("%s took %s with b.N = %d\n", pos, b.Elapsed(), b.N)
+}
+
+func trace() (r string) {
+	pc, fullfile, line, _ := runtime.Caller(1)
+	fn := runtime.FuncForPC(pc)
+	file := rxFind("src.*", fullfile)
+	r = fmt.Sprintf("%s:%d %s", file, line, fn.Name())
 	return
 }
