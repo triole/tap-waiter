@@ -1,30 +1,17 @@
-package main
+package util
 
 import (
-	"path/filepath"
 	"testing"
-
-	yaml "gopkg.in/yaml.v3"
 )
-
-var (
-	testFolder = "../testdata"
-)
-
-func fromTestFolder(s string) (r string) {
-	t, err := filepath.Abs(testFolder)
-	if err == nil {
-		r = filepath.Join(t, s)
-	}
-	return
-}
 
 func TestGetFileSize(t *testing.T) {
-	validateGetFileSize(fromTestFolder("dump/yaml/1.yaml"), 1009, t)
+	ut := Init(lg)
+	validateGetFileSize(ut.FromTestFolder("dump/yaml/1.yaml"), 1009, t)
 }
 
 func validateGetFileSize(fil string, exp uint64, t *testing.T) {
-	res := getFileSize(fil)
+	ut := Init(lg)
+	res := ut.GetFileSize(fil)
 	if res != exp {
 		t.Errorf(
 			"error get file size, file: %s, exp: %d, got: %d", fil, exp, res,
@@ -45,7 +32,8 @@ func TestRegex(t *testing.T) {
 }
 
 func validateTestRxFind(rx, str, exp string, t *testing.T) {
-	res := rxFind(rx, str)
+	ut := Init(lg)
+	res := ut.RxFind(rx, str)
 	if res != exp {
 		t.Errorf(
 			"error rx find, rx: %s, str: %s, exp: %s, got: %s",
@@ -55,28 +43,12 @@ func validateTestRxFind(rx, str, exp string, t *testing.T) {
 }
 
 func validateTestRxMatch(rx, str string, exp bool, t *testing.T) {
-	res := rxMatch(rx, str)
+	ut := Init(lg)
+	res := ut.RxMatch(rx, str)
 	if res != exp {
 		t.Errorf(
 			"error rx match, rx: %s, str: %s, exp: %v, got: %v",
 			rx, str, exp, res,
 		)
 	}
-}
-
-func readYAMLFile(filepath string) (r map[string]interface{}) {
-	by, _, err := readFile(filepath)
-	if err != nil {
-		return
-	} else {
-		_ = yaml.Unmarshal(by, &r)
-	}
-	return
-}
-
-func itfArrToStrArr(itf []interface{}) (r []string) {
-	for _, el := range itf {
-		r = append(r, el.(string))
-	}
-	return
 }

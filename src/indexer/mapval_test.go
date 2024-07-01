@@ -1,23 +1,25 @@
-package main
+package indexer
 
 import (
 	"testing"
+	"tyson-tap/src/conf"
 
 	yaml "gopkg.in/yaml.v3"
 )
 
 type tSpecGetContentValTest struct {
 	ContentFile string `yaml:"content_file"`
-	Content     tContent
+	Content     FileContent
 	Key         string   `yaml:"key"`
 	Exp         []string `yaml:"exp"`
 	Res         string   `yaml:"res"`
-	Ep          tEndpoint
+	Ep          conf.Endpoint
 }
 
 func readGetContentValSpecs(t *testing.T) (specs []tSpecGetContentValTest) {
-	filename := fromTestFolder("specs/mapval/spec.yaml")
-	by, _, _ := readFile(filename)
+	ind, _, _ := prepareTests("", "", true)
+	filename := ind.Util.FromTestFolder("specs/mapval/spec.yaml")
+	by, _, _ := ind.Util.ReadFile(filename)
 	err := yaml.Unmarshal(by, &specs)
 	if err != nil {
 		t.Errorf("reading specs file failed: %q", filename)
@@ -26,17 +28,19 @@ func readGetContentValSpecs(t *testing.T) (specs []tSpecGetContentValTest) {
 }
 
 func TestGetContentVal(t *testing.T) {
+	ind, _, _ := prepareTests("", "", true)
 	ep := newTestEndpoint()
 	specs := readGetContentValSpecs(t)
 	for _, spec := range specs {
-		spec.Content = readFileContent(fromTestFolder(spec.ContentFile), ep)
+		spec.Content = ind.readFileContent(ind.Util.FromTestFolder(spec.ContentFile), ep)
 		validateGetContentVal(spec.Key, spec.Content, spec.Exp, t)
 	}
 }
 
-func validateGetContentVal(key string, mp tContent, exp []string, t *testing.T) {
+func validateGetContentVal(key string, mp FileContent, exp []string, t *testing.T) {
+	_, ji, _ := prepareTests("", "", true)
 	b := false
-	res := getContentVal(key, mp)
+	res := ji.getContentVal(key, mp)
 	if len(exp) == len(res) {
 		for i, x := range res {
 			if x != exp[i] {

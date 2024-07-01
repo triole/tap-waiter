@@ -1,4 +1,4 @@
-package main
+package indexer
 
 import (
 	"encoding/json"
@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"runtime"
 	"testing"
 
 	yaml "gopkg.in/yaml.v3"
@@ -15,44 +14,45 @@ import (
 func TestParseFilter(t *testing.T) {
 	validateParseFilter(
 		"front_matter.title==this+is+a+title",
-		tIDXParamsFilter{
+		FilterParams{
 			Prefix: "front_matter.title", Operator: "==", Suffix: []string{"this+is+a+title"},
 		}, t,
 	)
 	validateParseFilter(
 		"front_matter.title!=not+the+title",
-		tIDXParamsFilter{
+		FilterParams{
 			Prefix: "front_matter.title", Operator: "!=", Suffix: []string{"not+the+title"},
 		}, t,
 	)
 	validateParseFilter(
 		"front_matter.tags=*title2",
-		tIDXParamsFilter{
+		FilterParams{
 			Prefix: "front_matter.tags", Operator: "=*", Suffix: []string{"title2"},
 		}, t,
 	)
 	validateParseFilter(
 		"front_matter.tags!=*title",
-		tIDXParamsFilter{
+		FilterParams{
 			Prefix: "front_matter.tags", Operator: "!=*", Suffix: []string{"title"},
 		}, t,
 	)
 	validateParseFilter(
 		"front_matter.tags!==tag1,tag2",
-		tIDXParamsFilter{
+		FilterParams{
 			Prefix: "front_matter.tags", Operator: "!==", Suffix: []string{"tag1", "tag2"},
 		}, t,
 	)
 	validateParseFilter(
 		"front_matter.title=~title[0-9]{1,2}",
-		tIDXParamsFilter{
+		FilterParams{
 			Prefix: "front_matter.title", Operator: "=~", Suffix: []string{"title[0-9]{1,2}"},
 		}, t,
 	)
 }
 
-func validateParseFilter(filter string, exp tIDXParamsFilter, t *testing.T) {
-	res := parseFilterString(filter)
+func validateParseFilter(filter string, exp FilterParams, t *testing.T) {
+	ind, _, _ := prepareTests("", "", true)
+	res := ind.parseFilterString(filter)
 	r := true
 	if res.Prefix != exp.Prefix || res.Operator != exp.Operator {
 		r = false
@@ -68,22 +68,19 @@ func validateParseFilter(filter string, exp tIDXParamsFilter, t *testing.T) {
 }
 
 func TestServeContent(t *testing.T) {
-	testSpecs := find(fromTestFolder("specs/server"), "\\.yaml$")
+	testSpecs := ut.Find(ut.FromTestFolder("specs/server"), "\\.yaml$")
 	for _, specFile := range testSpecs {
 		validateServeContent(specFile, t)
 	}
 }
 
 func validateServeContent(specFile string, t *testing.T) {
-	CLI.LogLevel = "trace"
-	CLI.Threads = 16
-
+	ind, _, _ := prepareTests("", "", true)
 	var urls []string
 	var exp []string
 	var spec map[string][]string
-	conf = readConfig(fromTestFolder("conf.yaml"))
 
-	by, _, err := readFile(specFile)
+	by, _, err := ut.ReadFile(specFile)
 	if err != nil {
 		t.Errorf("can not read spec file: %q", specFile)
 	} else {
@@ -95,14 +92,14 @@ func validateServeContent(specFile string, t *testing.T) {
 		exp = spec["expectation"]
 	}
 
-	svr := httptest.NewServer(http.HandlerFunc(
+	testsrv := httptest.NewServer(http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			serveContent(w, r)
+			ind.ServeContent(w, r)
 		}))
-	defer svr.Close()
+	defer testsrv.Close()
 
 	for _, url := range urls {
-		c := NewClient(svr.URL)
+		c := NewClient(testsrv.URL)
 		res, err := http.Get(c.url + url)
 		if err != nil {
 			t.Errorf("test serve content, request failed: %s, %s", url, err)
@@ -113,7 +110,7 @@ func validateServeContent(specFile string, t *testing.T) {
 		if err != nil {
 			t.Errorf("test serve content failed, can not read body: %+v", err)
 		} else {
-			var ji tJoinerIndex
+			var ji JoinerIndex
 			err = json.Unmarshal([]byte(bodyBytes), &ji)
 			if err != nil {
 				t.Errorf(
@@ -125,7 +122,7 @@ func validateServeContent(specFile string, t *testing.T) {
 	}
 }
 
-func validateJoinerIndex(ji tJoinerIndex, url string, exp []string, t *testing.T) {
+func validateJoinerIndex(ji JoinerIndex, url string, exp []string, t *testing.T) {
 	failed := false
 	if len(ji) != len(exp) {
 		t.Errorf(
@@ -145,7 +142,7 @@ func validateJoinerIndex(ji tJoinerIndex, url string, exp []string, t *testing.T
 			"validate joiner index failed: %q\n"+
 				"exp, len: %d\n %+v,\n"+
 				"got, len: %d\n%+v\n",
-			url, len(exp), pprintr(exp), len(ji), pprintr(getJoinerIndexPaths(ji)),
+			url, len(exp), exp, len(ji), getJoinerIndexPaths(ji),
 		)
 	}
 }
@@ -158,7 +155,7 @@ func NewClient(url string) Client {
 	return Client{url}
 }
 
-func getJoinerIndexPaths(ji tJoinerIndex) (arr []string) {
+func getJoinerIndexPaths(ji JoinerIndex) (arr []string) {
 	for _, el := range ji {
 		arr = append(arr, el.Path)
 	}
@@ -166,24 +163,16 @@ func getJoinerIndexPaths(ji tJoinerIndex) (arr []string) {
 }
 
 func BenchmarkServer(b *testing.B) {
-	pos := trace()
-	conf = readConfig(fromTestFolder("conf.yaml"))
-	svr := httptest.NewServer(http.HandlerFunc(
+	ind, _, _ := prepareTests("", "", true)
+	pos := ut.Trace()
+	testsrv := httptest.NewServer(http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			serveContent(w, r)
+			ind.ServeContent(w, r)
 		}))
-	defer svr.Close()
-	for url := range conf.API {
-		c := NewClient(svr.URL)
+	defer testsrv.Close()
+	for url := range ind.Conf.API {
+		c := NewClient(testsrv.URL)
 		http.Get(c.url + url)
 	}
 	fmt.Printf("%s took %s with b.N = %d\n", pos, b.Elapsed(), b.N)
-}
-
-func trace() (r string) {
-	pc, fullfile, line, _ := runtime.Caller(1)
-	fn := runtime.FuncForPC(pc)
-	file := rxFind("src.*", fullfile)
-	r = fmt.Sprintf("%s:%d %s", file, line, fn.Name())
-	return
 }

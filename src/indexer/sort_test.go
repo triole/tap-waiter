@@ -1,4 +1,4 @@
-package main
+package indexer
 
 import (
 	"testing"
@@ -14,8 +14,8 @@ type tSpecSortTest struct {
 }
 
 func readSortTestSpecs(t *testing.T) (specs []tSpecSortTest) {
-	filename := fromTestFolder("specs/sort/spec.yaml")
-	by, _, _ := readFile(filename)
+	filename := ut.FromTestFolder("specs/sort/spec.yaml")
+	by, _, _ := ut.ReadFile(filename)
 	err := yaml.Unmarshal(by, &specs)
 	if err != nil {
 		t.Errorf("reading specs file failed: %q", filename)
@@ -24,14 +24,15 @@ func readSortTestSpecs(t *testing.T) (specs []tSpecSortTest) {
 }
 
 func TestSort(t *testing.T) {
+	ind, _, _ := prepareTests("", "", true)
 	specs := readSortTestSpecs(t)
 	for _, spec := range specs {
 		sortBy := "default"
 		asc := true
-		params := newTestParams(fromTestFolder(spec.ContentFolder), sortBy, asc)
+		params := newTestParams(ut.FromTestFolder(spec.ContentFolder), sortBy, asc)
 		params.Endpoint.SortFileName = spec.SortFile
 		params.Endpoint.IgnoreList = spec.IgnoreList
-		idx := makeJoinerIndex(params)
+		idx := ind.MakeJoinerIndex(params)
 		idx.applySortFileOrder(params)
 		if !orderOK(idx, spec.Expectation, t) {
 			t.Errorf(
