@@ -17,19 +17,18 @@ func (conf Conf) newConf() Conf {
 	}
 }
 
-func (conf Conf) readConfig() (content confContent) {
-	tempconf := conf.newConf()
+func (conf *Conf) readConfig() {
+	var content ConfContent
 	by, err := os.ReadFile(conf.FileName)
 	conf.Lg.IfErrFatal(
 		"can not read file", logseal.F{"path": conf.FileName, "error": err},
 	)
-	err = yaml.Unmarshal(by, &tempconf)
+	err = yaml.Unmarshal(by, &content)
 	conf.Lg.IfErrFatal(
 		"can not unmarshal config", logseal.F{"path": conf.FileName, "error": err},
 	)
-	conf = conf.newConf()
-	conf.Port = tempconf.Port
-	for key, val := range tempconf.API {
+	conf.Port = content.Port
+	for key, val := range content.API {
 		key = "/" + path.Clean(key)
 		val.Folder, _ = conf.Util.AbsPath(val.Folder)
 		var v datasize.ByteSize
@@ -48,5 +47,4 @@ func (conf Conf) readConfig() (content confContent) {
 		}
 		conf.API[key] = val
 	}
-	return
 }

@@ -13,8 +13,7 @@ func Init(confFile string, threads int, util util.Util, lg logseal.Logseal) (con
 		Lg:       lg,
 		Util:     util,
 	}
-	content := conf.readConfig()
-	conf.Port = content.Port
-	conf.API = content.API
+	conf.API = make(map[string]Endpoint)
+	conf.readConfig()
 	return
 }

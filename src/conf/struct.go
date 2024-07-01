@@ -15,7 +15,7 @@ type Conf struct {
 	Lg       logseal.Logseal
 }
 
-type confContent struct {
+type ConfContent struct {
 	Port int                 `yaml:"port"`
 	API  map[string]Endpoint `yaml:"api"`
 }
