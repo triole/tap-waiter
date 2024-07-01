@@ -164,7 +164,6 @@ func getJoinerIndexPaths(ji JoinerIndex) (arr []string) {
 
 func BenchmarkServer(b *testing.B) {
 	ind, _, _ := prepareTests("", "", true)
-
 	pos := ut.Trace()
 	testsrv := httptest.NewServer(http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
