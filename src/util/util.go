@@ -111,6 +111,13 @@ func (ut Util) ReadYAMLFile(filepath string) (r map[string]interface{}) {
 	return
 }
 
+func (ut Util) ReverseArr(arr []string) []string {
+	for i, j := 0, len(arr)-1; i < j; i, j = i+1, j-1 {
+		arr[i], arr[j] = arr[j], arr[i]
+	}
+	return arr
+}
+
 func (ut Util) RxFind(rx string, content string) string {
 	temp, _ := regexp.Compile(rx)
 	return temp.FindString(content)
