@@ -1,5 +1,6 @@
 #!/bin/bash
+scriptdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+basedir=$(echo "${scriptdir%/*}")
 
-task test >/dev/stdout 2>&1 |
-  grep -Po "(?<=url\=).*" |
-  grep -Po "\?.*" | sort
+cd "${basedir}/src/indexer" && go test >/dev/stdout 2>&1 |
+  grep "url" | grep -Po "/.*" | sort
