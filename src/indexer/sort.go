@@ -38,7 +38,7 @@ func (ji JoinerIndex) collectSortFiles(params Params) (sfs tSortFiles) {
 	return
 }
 
-func (ji JoinerIndex) applySortFileOrder(params Params) {
+func (ji JoinerIndex) applySortFileOrderAndExclusion(params Params) (r JoinerIndex) {
 	sortFiles := ji.collectSortFiles(params)
 	var sortIndex int
 	var exclude bool
@@ -62,8 +62,16 @@ func (ji JoinerIndex) applySortFileOrder(params Params) {
 				exclude,
 			},
 		)
+		if relevantSortFile.Content.Exclusive {
+			if ut.RxSliceContainsString(relevantSortFile.Content.Order, indexEl.Path) {
+				r = append(r, ji[idx])
+			}
+		} else {
+			r = append(r, ji[idx])
+		}
 	}
 	sort.Sort(JoinerIndex(ji))
+	return
 }
 
 func (ji JoinerIndex) getRelevantSortFile(folder string, sfs tSortFiles) (sf tSortFile) {

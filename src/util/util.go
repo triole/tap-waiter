@@ -13,15 +13,11 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-// keep-sorted start
+// keep-sorted start block=yes newline_separated=yes
 func (ut Util) AbsPath(str string) (p string, err error) {
 	p, err = filepath.Abs(str)
 	ut.Lg.IfErrFatal("invalid file path", logseal.F{"path": str, "error": err})
 	return p, err
-}
-
-func (ut Util) GetPathDepth(pth string) int {
-	return len(strings.Split(pth, string(filepath.Separator))) - 1
 }
 
 func (ut Util) Find(basedir string, rxFilter string) []string {
@@ -60,6 +56,24 @@ func (ut Util) Find(basedir string, rxFilter string) []string {
 	return filelist
 }
 
+func (ut Util) FromTestFolder(s string) (r string) {
+	t, err := filepath.Abs("../../testdata")
+	if err == nil {
+		r = filepath.Join(t, s)
+	}
+	return
+}
+
+func (ut Util) GetFileLastMod(filename string) (uts int64) {
+	fil, err := os.Stat(filename)
+	if err != nil {
+		ut.Lg.Error("can not stat file", logseal.F{"path": filename, "error": err})
+		return
+	}
+	uts = fil.ModTime().Unix()
+	return
+}
+
 func (ut Util) GetFileSize(filename string) (siz uint64) {
 	file, err := os.Open(filename)
 	ut.Lg.IfErrError(
@@ -80,14 +94,8 @@ func (ut Util) GetFileSize(filename string) (siz uint64) {
 	return
 }
 
-func (ut Util) GetFileLastMod(filename string) (uts int64) {
-	fil, err := os.Stat(filename)
-	if err != nil {
-		ut.Lg.Error("can not stat file", logseal.F{"path": filename, "error": err})
-		return
-	}
-	uts = fil.ModTime().Unix()
-	return
+func (ut Util) GetPathDepth(pth string) int {
+	return len(strings.Split(pth, string(filepath.Separator))) - 1
 }
 
 func (ut Util) ReadFile(filename string) (by []byte, isTextfile bool, err error) {
@@ -166,7 +174,7 @@ func (ut Util) ToFloat(inp interface{}) (fl float64) {
 	return
 }
 
-func (util Util) ToString(inp interface{}) string {
+func (ut Util) ToString(inp interface{}) string {
 	return fmt.Sprintf("%s", inp)
 }
 
@@ -175,14 +183,6 @@ func (ut Util) Trace() (r string) {
 	fn := runtime.FuncForPC(pc)
 	file := ut.RxFind("src.*", fullfile)
 	r = fmt.Sprintf("%s:%d %s", file, line, fn.Name())
-	return
-}
-
-func (ut Util) FromTestFolder(s string) (r string) {
-	t, err := filepath.Abs("../../testdata")
-	if err == nil {
-		r = filepath.Join(t, s)
-	}
 	return
 }
 

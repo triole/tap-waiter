@@ -14,7 +14,9 @@ type tSpecSortTest struct {
 }
 
 func readSortTestSpecs(t *testing.T) (specs []tSpecSortTest) {
-	filename := ut.FromTestFolder("specs/sort/spec.yaml")
+	specFile := "specs/sort/spec.yaml"
+	t.Logf("read test specs: %s", specFile)
+	filename := ut.FromTestFolder(specFile)
 	by, _, _ := ut.ReadFile(filename)
 	err := yaml.Unmarshal(by, &specs)
 	if err != nil {
@@ -33,11 +35,10 @@ func TestSort(t *testing.T) {
 		params.Endpoint.SortFileName = spec.SortFile
 		params.Endpoint.IgnoreList = spec.IgnoreList
 		idx := ind.MakeJoinerIndex(params)
-		idx.applySortFileOrder(params)
 		if !orderOK(idx, spec.Expectation, t) {
 			t.Errorf(
 				"sort failed: %s, asc: %v, \n  exp: %v\n, got: %v",
-				sortBy, asc, spec.Expectation, getJoinerIndexPaths(idx),
+				spec.ContentFolder, asc, spec.Expectation, getJoinerIndexPaths(idx),
 			)
 		}
 	}

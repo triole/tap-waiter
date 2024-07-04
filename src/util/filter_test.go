@@ -73,7 +73,7 @@ func TestRxMatchSliceCompletely(t *testing.T) {
 	ut := Init(lg)
 	specs := readFilterSpecs("slice_rxmatch_all.yaml", t)
 	for _, spec := range specs {
-		spec.Res = ut.RxMatchSliceAll(spec.Pre, spec.Suf)
+		spec.Res = ut.RxSliceMatchesSliceFully(spec.Pre, spec.Suf)
 		printTestFilterResult(spec, t)
 	}
 }
@@ -82,7 +82,7 @@ func TestRxMatchSliceOnce(t *testing.T) {
 	ut := Init(lg)
 	specs := readFilterSpecs("slice_rxmatch_once.yaml", t)
 	for _, spec := range specs {
-		spec.Res = ut.RxMatchSliceOnce(spec.Pre, spec.Suf)
+		spec.Res = ut.RxSliceContainsSliceFully(spec.Pre, spec.Suf)
 		printTestFilterResult(spec, t)
 	}
 }

@@ -31,7 +31,7 @@ func (ji JoinerIndex) Swap(i, j int) {
 	ji[i], ji[j] = ji[j], ji[i]
 }
 
-func (ind Indexer) MakeJoinerIndex(params Params) (joinerIndex JoinerIndex) {
+func (ind Indexer) MakeJoinerIndex(params Params) (ji JoinerIndex) {
 	ind.Lg.Debug(
 		"make joiner index and start measure duration",
 		logseal.F{"index_params": fmt.Sprintf("%+v", params)},
@@ -56,10 +56,10 @@ func (ind Indexer) MakeJoinerIndex(params Params) (joinerIndex JoinerIndex) {
 
 		c := 0
 		for li := range chout {
-			li.SortIndex = joinerIndex.stringifySortIndex(
+			li.SortIndex = ji.stringifySortIndex(
 				[]interface{}{ind.Util.GetPathDepth(li.Path), li.Path},
 			)
-			joinerIndex = append(joinerIndex, li)
+			ji = append(ji, li)
 			c++
 			if c >= ln {
 				close(chin)
@@ -67,34 +67,34 @@ func (ind Indexer) MakeJoinerIndex(params Params) (joinerIndex JoinerIndex) {
 				break
 			}
 		}
-		sort.Sort(JoinerIndex(joinerIndex))
+		sort.Sort(JoinerIndex(ji))
 
-		// apply sort
 		if params.Endpoint.SortFileName != "" {
-			joinerIndex.applySortFileOrder(params)
-		}
-
-		switch params.SortBy {
-		case "created":
-			joinerIndex.sortByCreated()
-		case "lastmod":
-			joinerIndex.sortByLastMod()
-		case "size":
-			joinerIndex.sortBySize()
-		default:
-			joinerIndex.sortByOtherParams(params)
+			ji = ji.applySortFileOrderAndExclusion(params)
+		} else {
+			switch params.SortBy {
+			case "created":
+				ji.sortByCreated()
+			case "lastmod":
+				ji.sortByLastMod()
+			case "size":
+				ji.sortBySize()
+			default:
+				ji.sortByOtherParams(params)
+			}
 		}
 
 		if params.Filter.Enabled {
-			joinerIndex = joinerIndex.filterIndex(params)
+			ji = ji.filterIndex(params)
 		}
 
 		if params.Ascending {
-			sort.Sort(JoinerIndex(joinerIndex))
+			sort.Sort(JoinerIndex(ji))
 		} else {
-			sort.Sort(sort.Reverse(JoinerIndex(joinerIndex)))
+			sort.Sort(sort.Reverse(JoinerIndex(ji)))
 		}
 	}
+	ji = ji.applyIgnoreList(params)
 	return
 }
 
@@ -114,9 +114,9 @@ func (ji JoinerIndex) filterIndex(params Params) JoinerIndex {
 			case "!=":
 				match = ut.SliceNotContainsSlice(val, params.Filter.Suffix)
 			case "==~":
-				match = ut.RxMatchSliceAll(val, params.Filter.Suffix)
+				match = ut.RxSliceMatchesSliceFully(val, params.Filter.Suffix)
 			case "=~":
-				match = ut.RxMatchSliceOnce(val, params.Filter.Suffix)
+				match = ut.RxSliceContainsSliceFully(val, params.Filter.Suffix)
 			}
 			if match {
 				temp = append(temp, el)
@@ -125,4 +125,14 @@ func (ji JoinerIndex) filterIndex(params Params) JoinerIndex {
 	}
 	ji = temp
 	return temp
+}
+
+func (ji JoinerIndex) applyIgnoreList(params Params) JoinerIndex {
+	var nuJI JoinerIndex
+	for _, el := range ji {
+		if !ut.RxSliceContainsString(params.Endpoint.IgnoreList, el.Path) {
+			nuJI = append(nuJI, el)
+		}
+	}
+	return nuJI
 }

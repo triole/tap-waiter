@@ -8,7 +8,6 @@
     - 1.html
     - 2.html
     - more_than_10k.html
-    - sort.yaml
 
 - content_folder: dump/markdown
   sort_file: sort.yaml
@@ -20,8 +19,3 @@
     - subfolder2/1.md
     - subfolder1/1.md
     - 1.md
-    - no_front_matter.md
-    - sort.yaml
-    - subfolder1/2.md
-    - subfolder1/4.md
-    - subfolder2/2.md
