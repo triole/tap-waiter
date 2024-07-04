@@ -13,6 +13,7 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+// keep-sorted start
 func (ut Util) AbsPath(str string) (p string, err error) {
 	p, err = filepath.Abs(str)
 	ut.Lg.IfErrFatal("invalid file path", logseal.F{"path": str, "error": err})
@@ -184,3 +185,5 @@ func (ut Util) FromTestFolder(s string) (r string) {
 	}
 	return
 }
+
+// keep-sorted end

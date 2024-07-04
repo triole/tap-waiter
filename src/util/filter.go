@@ -7,6 +7,7 @@ import (
 	"github.com/triole/logseal"
 )
 
+// keep-sorted start
 func (ut Util) SlicesEqual(content, filter []string) (r bool) {
 	content = ut.SliceToLowerCase(content)
 	filter = ut.SliceToLowerCase(filter)
@@ -119,3 +120,5 @@ func (ut Util) appliedFilterTraceMessage(name string, content, filter []string, 
 		logseal.F{"content": content, "filter": filter, "result": r},
 	)
 }
+
+// keep sorted end
