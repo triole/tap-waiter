@@ -90,11 +90,14 @@ func validateMakeJoinerIndex(ji JoinerIndex, params Params, specs tSpecIndexTest
 
 func orderOK(idx JoinerIndex, exp []string, t *testing.T) bool {
 	if len(idx) != len(exp) {
-		t.Errorf("sort failed, lengths differ: %-4d != %-4d", len(idx), len(exp))
-	}
-	for i := 0; i <= len(exp)-1; i++ {
-		if idx[i].Path != exp[i] {
-			return false
+		t.Errorf(
+			"sort failed, lengths differ: %-4d != %-4d\n exp: %+v,\n got: %+v ",
+			len(exp), len(idx), exp, idx)
+	} else {
+		for i := 0; i <= len(exp)-1; i++ {
+			if idx[i].Path != exp[i] {
+				return false
+			}
 		}
 	}
 	return true
