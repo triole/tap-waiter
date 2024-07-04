@@ -88,14 +88,14 @@ func validateMakeJoinerIndex(ji JoinerIndex, params Params, specs tSpecIndexTest
 	}
 }
 
-func orderOK(idx JoinerIndex, exp []string, t *testing.T) bool {
-	if len(idx) != len(exp) {
+func orderOK(ji JoinerIndex, exp []string, t *testing.T) bool {
+	if len(ji) != len(exp) {
 		t.Errorf(
 			"sort failed, lengths differ: %-4d != %-4d\n exp: %+v,\n got: %+v ",
-			len(exp), len(idx), exp, idx)
+			len(exp), len(ji), exp, getFileNamesOfJI(ji))
 	} else {
 		for i := 0; i <= len(exp)-1; i++ {
-			if idx[i].Path != exp[i] {
+			if ji[i].Path != exp[i] {
 				return false
 			}
 		}
