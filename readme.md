@@ -4,6 +4,7 @@
 
 - [Synopsis](#synopsis)
 - [Configuration](#configuration)
+- [URL Parameters](#url-parameters)
 - [Filters](#filters)
   - [Logical Operators](#logical-operators)
 
@@ -64,6 +65,18 @@ api: # list of api endpoints
       # set content=false and split_markdown_front_matter=true to
       # have only front matter in the final json
       split_markdown_front_matter: false
+```
+
+# Sort Files
+
+Sort files contain a list that determines the `order` in which files in the same or in sub folders shell be returned in the index. The `exclusive` entry is a boolean value that switches between excluding files that are not on the list and displaying them. If true, the index will only contain the exact elements that are in the `order` list even if there are more files. If false, index will consist of the entries of `order` and any other relevant files will follow below.
+
+```go mdox-exec="tail -n +2 testdata/sort.yaml"
+exclusive: true
+order:
+  - filter
+  - dump
+  - markdown/subfolder2/1.md
 ```
 
 # URL Parameters
