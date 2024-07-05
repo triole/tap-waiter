@@ -3,7 +3,7 @@ port: 17777
 api:
   all.json:
     folder: ../../testdata/dump
-    rxfilter: ".+"
+    regex_filter: ".+"
     max_return_size: 10K
     return_values:
       split_path: true
@@ -15,7 +15,7 @@ api:
 
   list.json:
     folder: ../../testdata/dump
-    rxfilter: ".+"
+    regex_filter: ".+"
     return_values:
       split_path: true
       size: false
@@ -26,9 +26,9 @@ api:
 
   sort.json:
     folder: ../../testdata
-    rxfilter: ".+"
+    regex_filter: ".+"
     sort_file_name: sort.yaml
-    ignore_list:
+    regex_ignore_list:
       - sort.yaml
     return_values:
       size: true
@@ -37,7 +37,7 @@ api:
 
   md_body_only.json:
     folder: ../../testdata/dump
-    rxfilter: "\\.(md)$"
+    regex_filter: "\\.(md)$"
     max_return_size: 10K
     return_values:
       split_path: false
@@ -49,7 +49,7 @@ api:
 
   md_front_matter_only.json:
     folder: ../../testdata/dump
-    rxfilter: "\\.(md)$"
+    regex_filter: "\\.(md)$"
     max_return_size: 10K
     return_values:
       split_path: false
@@ -61,7 +61,7 @@ api:
 
   yaml_dates.json:
     folder: ../../testdata/dump
-    rxfilter: "\\.(ya?ml)$"
+    regex_filter: "\\.(ya?ml)$"
     max_return_size: 1K
     return_values:
       created: true
@@ -69,7 +69,7 @@ api:
 
   yaml_sizes_created_and_content.json:
     folder: ../../testdata/dump
-    rxfilter: "\\.(ya?ml)$"
+    regex_filter: "\\.(ya?ml)$"
     max_return_size: 500B
     return_values:
       created: true
@@ -78,6 +78,6 @@ api:
 
   yaml_default_max_return_size.json:
     folder: ../../testdata/dump
-    rxfilter: "\\.(ya?ml)$"
+    regex_filter: "\\.(ya?ml)$"
     return_values:
       content: true

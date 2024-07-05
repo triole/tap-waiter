@@ -27,12 +27,15 @@ api: # list of api endpoints
     folder: ../testdata
 
     # only detect files which fit the regex filter
-    rxfilter: ".+"
+    regex_filter: ".+"
 
-    # sort and filter file in yaml format, contains a list of document paths
-    # if given, only documents matching that list will be returned in
-    # exactly the same order, any other document will not be in the json output
-    saf_file: ../testdata/saf_list.yaml
+    # name of all files that are considered to be sort files, there can be
+    # multiple of them, each one refers to its folder and possible substructures
+    sort_file_name: sort.yaml
+
+    # files that should not be returned in index
+    regex_ignore_list:
+      - sort.yaml
 
     # maximum file size up to which file content will appear in json
     # default is 10K to avoid too big json outputs
@@ -68,14 +71,15 @@ api: # list of api endpoints
 Here are a few URL parameter examples which are hopefully self explanatory. Please keep in mind that special characters have to be url encoded.
 
 ```go mdox-exec="sh/display_test_urls.sh"
-?filter=front_matter.tags!=tag1
-?filter=front_matter.tags===tag1
-?filter=front_matter.tags==tag1
-?filter=front_matter.tags!==tag1&order=desc
-?filter=metadata.tags==ivoa
-?filter=tags!==ivoa&order=desc
-?sortby=front_matter.title
-?sortby=size&order=desc
+/all.json
+/all.json?filter=front_matter.tags!=tag1
+/all.json?filter=front_matter.tags===tag1
+/all.json?filter=front_matter.tags==tag1
+/all.json?filter=front_matter.tags!==tag1&order=desc
+/all.json?filter=metadata.tags==ivoa
+/all.json?filter=tags!==ivoa&order=desc
+/all.json?sortby=front_matter.title
+/all.json?sortby=size&order=desc
 ```
 
 # Filters

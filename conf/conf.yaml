@@ -8,12 +8,15 @@ api: # list of api endpoints
     folder: ../testdata
 
     # only detect files which fit the regex filter
-    rxfilter: ".+"
+    regex_filter: ".+"
 
-    # sort and filter file in yaml format, contains a list of document paths
-    # if given, only documents matching that list will be returned in
-    # exactly the same order, any other document will not be in the json output
-    saf_file: ../testdata/saf_list.yaml
+    # name of all files that are considered to be sort files, there can be
+    # multiple of them, each one refers to its folder and possible substructures
+    sort_file_name: sort.yaml
+
+    # files that should not be returned in index
+    regex_ignore_list:
+      - sort.yaml
 
     # maximum file size up to which file content will appear in json
     # default is 10K to avoid too big json outputs
