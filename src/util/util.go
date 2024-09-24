@@ -25,7 +25,7 @@ func (ut Util) Find(basedir string, rxFilter string) (filelist []string, err err
 	inf, err := os.Stat(basedir)
 	if err != nil {
 		ut.Lg.Error(
-			"unable to access md folder", logseal.F{
+			"unable to access folder", logseal.F{
 				"path": basedir, "error": err,
 			},
 		)
