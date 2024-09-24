@@ -22,7 +22,7 @@ type ConfContent struct {
 
 type Endpoint struct {
 	Folder             string   `yaml:"folder"`
-	RxFilter           string   `yaml:"rexex_filter"`
+	RxFilter           string   `yaml:"regex_filter"`
 	SortFileName       string   `yaml:"sort_file_name"`
 	IgnoreList         []string `yaml:"regex_ignore_list"`
 	MaxReturnSize      string   `yaml:"max_return_size"`
