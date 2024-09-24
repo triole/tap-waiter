@@ -36,7 +36,10 @@ func (ind Indexer) MakeJoinerIndex(params Params) (ji JoinerIndex) {
 		"make joiner index and start measure duration",
 		logseal.F{"index_params": fmt.Sprintf("%+v", params)},
 	)
-	dataFiles := ind.Util.Find(params.Endpoint.Folder, params.Endpoint.RxFilter)
+	dataFiles, err := ind.Util.Find(params.Endpoint.Folder, params.Endpoint.RxFilter)
+	if err != nil {
+		return
+	}
 	ln := len(dataFiles)
 
 	if ln < 1 {

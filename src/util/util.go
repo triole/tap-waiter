@@ -20,25 +20,26 @@ func (ut Util) AbsPath(str string) (p string, err error) {
 	return p, err
 }
 
-func (ut Util) Find(basedir string, rxFilter string) []string {
+func (ut Util) Find(basedir string, rxFilter string) (filelist []string, err error) {
+	filelist = []string{}
 	inf, err := os.Stat(basedir)
 	if err != nil {
-		ut.Lg.IfErrFatal(
+		ut.Lg.Error(
 			"unable to access md folder", logseal.F{
 				"path": basedir, "error": err,
 			},
 		)
+		return
 	}
 	if !inf.IsDir() {
-		ut.Lg.Fatal(
+		ut.Lg.Error(
 			"not a folder, please provide a directory to look for md files.",
 			logseal.F{"path": basedir},
 		)
+		return
 	}
 
-	filelist := []string{}
 	rxf, _ := regexp.Compile(rxFilter)
-
 	err = filepath.Walk(basedir, func(path string, f os.FileInfo, err error) error {
 		if rxf.MatchString(path) {
 			inf, err := os.Stat(path)
@@ -52,8 +53,8 @@ func (ut Util) Find(basedir string, rxFilter string) []string {
 		}
 		return nil
 	})
-	ut.Lg.IfErrFatal("find files failed", logseal.F{"path": basedir, "error": err})
-	return filelist
+	ut.Lg.IfErrError("find files failed", logseal.F{"path": basedir, "error": err})
+	return
 }
 
 func (ut Util) FromTestFolder(s string) (r string) {

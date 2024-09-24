@@ -68,7 +68,7 @@ func validateParseFilter(filter string, exp FilterParams, t *testing.T) {
 }
 
 func TestServeContent(t *testing.T) {
-	testSpecs := ut.Find(ut.FromTestFolder("specs/server"), "\\.yaml$")
+	testSpecs, _ := ut.Find(ut.FromTestFolder("specs/server"), "\\.yaml$")
 	for _, specFile := range testSpecs {
 		validateServeContent(specFile, t)
 	}

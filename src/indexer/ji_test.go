@@ -59,7 +59,7 @@ func TestMakeJoinerIndex(t *testing.T) {
 		sort.Strings(globalDummyTestFiles)
 	}
 
-	testSpecs := ind.Util.Find(ind.Util.FromTestFolder("specs/index"), "\\.yaml$")
+	testSpecs, _ := ind.Util.Find(ind.Util.FromTestFolder("specs/index"), "\\.yaml$")
 	ascending := []bool{true, false}
 	for _, el := range testSpecs {
 		spec := readIndexTestSpecs(el, t)
