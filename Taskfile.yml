@@ -27,16 +27,7 @@ tasks:
   test:
     desc: run go tests
     cmds:
-      - cmd: |
-          for fol in {{.MODULES}}; do
-            echo -e "\nTest ${fol}"
-            cd "${fol}"
-            go test -timeout 30s -trace go.trace -race -cover -bench=. .
-          done
-    vars:
-      MODULES:
-        sh: find $(pwd)/src -maxdepth 1 -type d | sort | tr '\n'
-          ' '
+      - cmd: go test ./... -v -coverpkg=./... -race -bench=.
 
   deploy:
     desc: build and copy to my personal arch mybins folder
