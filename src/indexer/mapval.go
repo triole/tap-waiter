@@ -7,11 +7,12 @@ import (
 func (ji JoinerIndex) getContentVal(key interface{}, content FileContent) (s []string) {
 	keypath := ji.splitKey(key)
 	if len(keypath) > 0 {
-		if keypath[0] == "front_matter" {
+		switch keypath[0] {
+		case "front_matter":
 			s = ji.getMapVal(keypath[1:], content.FrontMatter)
-		} else if keypath[0] == "body" {
+		case "body":
 			s = ji.getMapVal(keypath[1:], content.Body)
-		} else {
+		default:
 			s = ji.getMapVal(keypath, content.Body)
 		}
 	}
