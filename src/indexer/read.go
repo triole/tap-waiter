@@ -3,6 +3,8 @@ package indexer
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"path"
 	"path/filepath"
 	"strings"
 	"tyson-tap/src/conf"
@@ -18,9 +20,13 @@ import (
 
 func (ind Indexer) readDataFile(filename string, ps conf.Endpoint, chin chan string, chout chan JoinerEntry) {
 	chin <- filename
-	pth := strings.TrimPrefix(
-		strings.TrimPrefix(filename, ps.Source), string(filepath.Separator),
-	)
+	pth := path.Base(filename)
+	if !strings.EqualFold(filename, ps.Source) {
+		pth = strings.TrimPrefix(
+			strings.TrimPrefix(filename, ps.Source), string(filepath.Separator),
+		)
+	}
+	fmt.Printf("%+v\n", pth)
 	je := JoinerEntry{
 		Path: pth,
 	}
