@@ -6,10 +6,10 @@ api:
     source: http://all.chipotle.box
 
   file.json:
-    source: ../testdata/dump/html/1.html
+    source: {{.confdir}}/dump/html/1.html
 
   all.json:
-    source: ../testdata/dump
+    source: {{.confdir}}/dump
     regex_filter: ".+"
     max_return_size: 10K
     return_values:
@@ -21,7 +21,7 @@ api:
       split_markdown_front_matter: true
 
   list.json:
-    source: ../testdata/dump
+    source: {{.confdir}}/dump
     regex_filter: ".+"
     return_values:
       split_path: true
@@ -32,7 +32,7 @@ api:
       split_markdown_front_matter: false
 
   sort.json:
-    source: ../testdata
+    source: {{.confdir}}/
     regex_filter: ".+"
     sort_file_name: sort.yaml
     regex_ignore_list:
@@ -43,7 +43,7 @@ api:
       lastmod: true
 
   md_body_only.json:
-    source: ../testdata/dump
+    source: {{.confdir}}/dump
     regex_filter: "\\.(md)$"
     max_return_size: 10K
     return_values:
@@ -55,7 +55,7 @@ api:
       split_markdown_front_matter: false
 
   md_front_matter_only.json:
-    source: ../testdata/dump
+    source: {{.confdir}}/dump
     regex_filter: "\\.(md)$"
     max_return_size: 10K
     return_values:
@@ -67,7 +67,7 @@ api:
       split_markdown_front_matter: true
 
   yaml_dates.json:
-    source: ../testdata/dump
+    source: {{.confdir}}/dump
     regex_filter: "\\.(ya?ml)$"
     max_return_size: 1K
     return_values:
@@ -75,7 +75,7 @@ api:
       lastmod: true
 
   yaml_sizes_created_and_content.json:
-    source: ../testdata/dump
+    source: {{.confdir}}/dump
     regex_filter: "\\.(ya?ml)$"
     max_return_size: 500B
     return_values:
@@ -84,7 +84,7 @@ api:
       content: true
 
   yaml_default_max_return_size.json:
-    source: ../testdata/dump
+    source: {{.confdir}}/dump
     regex_filter: "\\.(ya?ml)$"
     return_values:
       content: true

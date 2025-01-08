@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -18,6 +19,11 @@ func (ut Util) AbsPath(str string) (p string, err error) {
 	p, err = filepath.Abs(str)
 	ut.Lg.IfErrFatal("invalid file path", logseal.F{"path": str, "error": err})
 	return p, err
+}
+
+func (ut Util) AbsPathSlim(str string) (p string) {
+	p, _ = ut.AbsPath(str)
+	return
 }
 
 func (ut Util) Find(basedir string, rxFilter string) (filelist []string, err error) {
@@ -65,6 +71,14 @@ func (ut Util) FromTestFolder(s string) (r string) {
 	return
 }
 
+func (ut Util) GetBinDir() string {
+	ex, err := os.Executable()
+	ut.Lg.IfErrError(
+		"unable to determine binary folder", logseal.F{"error": err},
+	)
+	return filepath.Dir(ex)
+}
+
 func (ut Util) GetFileLastMod(filename string) (uts int64) {
 	fil, err := os.Stat(filename)
 	if err != nil {
@@ -97,6 +111,20 @@ func (ut Util) GetFileSize(filename string) (siz uint64) {
 
 func (ut Util) GetPathDepth(pth string) int {
 	return len(strings.Split(pth, string(filepath.Separator))) - 1
+}
+
+func (ut Util) IsDir(path string) bool {
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		ut.Lg.Error("can not open path", logseal.F{"error": err})
+		return false
+	}
+	return fileInfo.IsDir()
+}
+
+func (ut Util) IsURL(s string) bool {
+	_, err := url.ParseRequestURI(s)
+	return err == nil
 }
 
 func (ut Util) ReadFile(filename string) (by []byte, isTextfile bool, err error) {

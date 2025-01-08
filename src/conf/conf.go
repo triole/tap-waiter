@@ -23,6 +23,12 @@ func (conf *Conf) readConfig() {
 	conf.Lg.IfErrFatal(
 		"can not read file", logseal.F{"path": conf.FileName, "error": err},
 	)
+
+	by, err = conf.templateFile(by)
+	conf.Lg.IfErrFatal(
+		"can not expand config variables", logseal.F{"path": conf.FileName, "error": err},
+	)
+
 	err = yaml.Unmarshal(by, &content)
 	conf.Lg.IfErrFatal(
 		"can not unmarshal config", logseal.F{"path": conf.FileName, "error": err},
@@ -32,7 +38,7 @@ func (conf *Conf) readConfig() {
 		key = "/" + path.Clean(key)
 
 		val.SourceType = "url"
-		if !conf.isURL(val.Source) {
+		if !conf.Util.IsURL(val.Source) {
 			val.Source, _ = conf.Util.AbsPath(val.Source)
 			val.SourceType = conf.fileOrFolder(val.Source)
 		}
@@ -52,4 +58,11 @@ func (conf *Conf) readConfig() {
 		}
 		conf.API[key] = val
 	}
+}
+
+func (conf Conf) fileOrFolder(s string) string {
+	if conf.Util.IsDir(s) {
+		return "folder"
+	}
+	return "file"
 }
