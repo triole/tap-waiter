@@ -38,7 +38,7 @@ func (conf *Conf) readConfig() {
 		key = "/" + path.Clean(key)
 
 		val.SourceType = "url"
-		if !conf.Util.IsURL(val.Source) {
+		if conf.Util.IsLocalPath(val.Source) {
 			val.Source, _ = conf.Util.AbsPath(val.Source)
 			val.SourceType = conf.fileOrFolder(val.Source)
 		}

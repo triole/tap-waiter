@@ -122,6 +122,11 @@ func (ut Util) IsDir(path string) bool {
 	return fileInfo.IsDir()
 }
 
+func (ut Util) IsLocalPath(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil
+}
+
 func (ut Util) IsURL(s string) bool {
 	_, err := url.ParseRequestURI(s)
 	return err == nil

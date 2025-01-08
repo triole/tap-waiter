@@ -37,10 +37,12 @@ func (ind Indexer) MakeJoinerIndex(params Params) (ji JoinerIndex) {
 		logseal.F{"index_params": fmt.Sprintf("%+v", params)},
 	)
 
-	if params.Endpoint.Source != "" {
+	switch params.Endpoint.SourceType {
+	case "file":
+		fmt.Printf("%+v\n", "read file")
+	case "folder":
 		ji = idx.gatherFiles(params)
-	}
-	if params.Endpoint.URL != "" {
+	case "url":
 		fmt.Printf("%+v\n", "fetch url")
 	}
 
