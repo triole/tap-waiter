@@ -32,6 +32,7 @@ func TestSort(t *testing.T) {
 		sortBy := "default"
 		asc := true
 		params := newTestParams(ut.FromTestFolder(spec.ContentFolder), sortBy, asc)
+		params.Endpoint.SourceType = "folder"
 		params.Endpoint.SortFileName = spec.SortFile
 		params.Endpoint.IgnoreList = spec.IgnoreList
 		idx := ind.MakeJoinerIndex(params)

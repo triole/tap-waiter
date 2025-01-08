@@ -17,6 +17,7 @@ func prepareTests(folder, sortBy string, asc bool) (Indexer, JoinerIndex, Params
 		folder = ut.FromTestFolder("dump")
 	}
 	params := newTestParams(folder, sortBy, asc)
+	params.Endpoint.SourceType = "folder"
 	ji := ind.MakeJoinerIndex(params)
 	return ind, ji, params
 }

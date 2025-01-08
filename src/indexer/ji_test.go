@@ -40,6 +40,7 @@ func TestMakeJoinerIndex(t *testing.T) {
 	var ind Indexer
 	var ji JoinerIndex
 	var params Params
+	params.Endpoint.SourceType = "folder"
 	globalDummyTestFiles = createDummyFiles()
 	specsArr := []string{"created", "lastmod"}
 	for _, el := range specsArr {

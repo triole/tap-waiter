@@ -48,7 +48,6 @@ func (ind Indexer) MakeJoinerIndex(params Params) (ji JoinerIndex) {
 	case "url":
 		fmt.Printf("%+v\n", "fetch url")
 	}
-
 	sort.Sort(JoinerIndex(ji))
 
 	if params.Endpoint.SortFileName != "" {
