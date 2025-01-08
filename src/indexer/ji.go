@@ -36,14 +36,52 @@ func (ind Indexer) MakeJoinerIndex(params Params) (ji JoinerIndex) {
 		"make joiner index and start measure duration",
 		logseal.F{"index_params": fmt.Sprintf("%+v", params)},
 	)
-	dataFiles, err := ind.Util.Find(params.Endpoint.Folder, params.Endpoint.RxFilter)
+
+	if params.Endpoint.Source != "" {
+		ji = idx.gatherFiles(params)
+	}
+	if params.Endpoint.URL != "" {
+		fmt.Printf("%+v\n", "fetch url")
+	}
+
+	sort.Sort(JoinerIndex(ji))
+
+	if params.Endpoint.SortFileName != "" {
+		ji = ji.applySortFileOrderAndExclusion(params)
+	} else {
+		switch params.SortBy {
+		case "created":
+			ji.sortByCreated()
+		case "lastmod":
+			ji.sortByLastMod()
+		case "size":
+			ji.sortBySize()
+		default:
+			ji.sortByOtherParams(params)
+		}
+	}
+
+	if params.Filter.Enabled {
+		ji = ji.filterIndex(params)
+	}
+
+	if params.Ascending {
+		sort.Sort(JoinerIndex(ji))
+	} else {
+		sort.Sort(sort.Reverse(JoinerIndex(ji)))
+	}
+	ji = ji.applyIgnoreList(params)
+	return
+}
+
+func (ind Indexer) gatherFiles(params Params) (ji JoinerIndex) {
+	dataFiles, err := ind.Util.Find(params.Endpoint.Source, params.Endpoint.RxFilter)
 	if err != nil {
 		return
 	}
 	ln := len(dataFiles)
-
 	if ln < 1 {
-		ind.Lg.Warn("no data files found", logseal.F{"path": params.Endpoint.Folder})
+		ind.Lg.Warn("no data files found", logseal.F{"path": params.Endpoint.Source})
 	} else {
 		chin := make(chan string, params.Threads)
 		chout := make(chan JoinerEntry, params.Threads)
@@ -70,34 +108,7 @@ func (ind Indexer) MakeJoinerIndex(params Params) (ji JoinerIndex) {
 				break
 			}
 		}
-		sort.Sort(JoinerIndex(ji))
-
-		if params.Endpoint.SortFileName != "" {
-			ji = ji.applySortFileOrderAndExclusion(params)
-		} else {
-			switch params.SortBy {
-			case "created":
-				ji.sortByCreated()
-			case "lastmod":
-				ji.sortByLastMod()
-			case "size":
-				ji.sortBySize()
-			default:
-				ji.sortByOtherParams(params)
-			}
-		}
-
-		if params.Filter.Enabled {
-			ji = ji.filterIndex(params)
-		}
-
-		if params.Ascending {
-			sort.Sort(JoinerIndex(ji))
-		} else {
-			sort.Sort(sort.Reverse(JoinerIndex(ji)))
-		}
 	}
-	ji = ji.applyIgnoreList(params)
 	return
 }
 

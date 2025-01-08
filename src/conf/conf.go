@@ -30,7 +30,12 @@ func (conf *Conf) readConfig() {
 	conf.Port = content.Port
 	for key, val := range content.API {
 		key = "/" + path.Clean(key)
-		val.Folder, _ = conf.Util.AbsPath(val.Folder)
+
+		val.SourceType = "url"
+		if !conf.isURL(val.Source) {
+			val.Source, _ = conf.Util.AbsPath(val.Source)
+			val.SourceType = conf.fileOrFolder(val.Source)
+		}
 		var v datasize.ByteSize
 		if val.MaxReturnSize == "" {
 			val.MaxReturnSize = "10K"

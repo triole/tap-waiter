@@ -79,7 +79,7 @@ func validateMakeJoinerIndex(ji JoinerIndex, params Params, specs tSpecIndexTest
 	if !orderOK(ji, specs.Expectation, t) {
 		t.Errorf(
 			"sort failed: %s, by: %s, asc: %v,\nspec file: %s,\n  exp: %v\n, got: %v",
-			params.Endpoint.Folder,
+			params.Endpoint.Source,
 			params.SortBy,
 			params.Ascending,
 			specs.SpecFile,

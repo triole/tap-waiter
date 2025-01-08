@@ -19,7 +19,7 @@ import (
 func (ind Indexer) readDataFile(filename string, ps conf.Endpoint, chin chan string, chout chan JoinerEntry) {
 	chin <- filename
 	pth := strings.TrimPrefix(
-		strings.TrimPrefix(filename, ps.Folder), string(filepath.Separator),
+		strings.TrimPrefix(filename, ps.Source), string(filepath.Separator),
 	)
 	je := JoinerEntry{
 		Path: pth,

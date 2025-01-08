@@ -64,7 +64,7 @@ func (ind Indexer) ServeContent(w http.ResponseWriter, r *http.Request) {
 		ind.Lg.Debug(
 			"serve json",
 			logseal.F{
-				"url": url, "path": val.Folder, "rxfilter": val.RxFilter, "duration": time.Since(start),
+				"url": url, "path": val.Source, "rxfilter": val.RxFilter, "duration": time.Since(start),
 			},
 		)
 		w.Header().Add("Content Type", "application/json")

@@ -21,7 +21,9 @@ type ConfContent struct {
 }
 
 type Endpoint struct {
-	Folder             string   `yaml:"folder"`
+	Source             string `yaml:"source"`
+	SourceType         string
+	URL                string   `yaml:"url"`
 	RxFilter           string   `yaml:"regex_filter"`
 	SortFileName       string   `yaml:"sort_file_name"`
 	IgnoreList         []string `yaml:"regex_ignore_list"`

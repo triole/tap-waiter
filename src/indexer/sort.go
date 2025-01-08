@@ -28,7 +28,7 @@ type tSortFileContent struct {
 func (ji JoinerIndex) collectSortFiles(params Params) (sfs tSortFiles) {
 	for _, el := range ji {
 		sortFile := ji.readSortFile(
-			filepath.Join(params.Endpoint.Folder, el.Path),
+			filepath.Join(params.Endpoint.Source, el.Path),
 			params.Endpoint.SortFileName,
 		)
 		if sortFile.IsSortFile {
@@ -46,7 +46,7 @@ func (ji JoinerIndex) applySortFileOrderAndExclusion(params Params) (r JoinerInd
 		exclude = false
 		sortIndex = 999999
 		relevantSortFile := ji.getRelevantSortFile(
-			filepath.Join(params.Endpoint.Folder, indexEl.Path), sortFiles,
+			filepath.Join(params.Endpoint.Source, indexEl.Path), sortFiles,
 		)
 		for orderIndex, orderEl := range relevantSortFile.Content.Order {
 			if orderEl == indexEl.Path {

@@ -21,8 +21,8 @@ func prepareTests(folder, sortBy string, asc bool) (Indexer, JoinerIndex, Params
 	return ind, ji, params
 }
 
-func newTestParams(folder, sortBy string, ascending bool) (p Params) {
-	p.Endpoint.Folder = folder
+func newTestParams(source, sortBy string, ascending bool) (p Params) {
+	p.Endpoint.Source = source
 	p.Endpoint.ReturnValues.Content = true
 	p.Endpoint.ReturnValues.Created = true
 	p.Endpoint.ReturnValues.LastMod = true
