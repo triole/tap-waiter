@@ -2,11 +2,12 @@ package conf
 
 import (
 	"bytes"
-	"fmt"
 	"os"
 	"os/user"
 	"path/filepath"
 	"text/template"
+
+	"github.com/triole/logseal"
 )
 
 func (conf Conf) templateFile(inp []byte) (by []byte, err error) {
@@ -46,7 +47,7 @@ func (conf Conf) getUserdataMap() map[string]string {
 func (conf Conf) pwd() string {
 	pwd, err := os.Getwd()
 	if err != nil {
-		fmt.Println(err)
+		conf.Lg.Error("can not determine current dir", logseal.F{"error": err})
 		os.Exit(1)
 	}
 	return pwd

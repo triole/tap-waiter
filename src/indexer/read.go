@@ -3,7 +3,6 @@ package indexer
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"path"
 	"path/filepath"
 	"strings"
@@ -26,7 +25,6 @@ func (ind Indexer) readDataFile(filename string, ps conf.Endpoint, chin chan str
 			strings.TrimPrefix(filename, ps.Source), string(filepath.Separator),
 		)
 	}
-	fmt.Printf("%+v\n", pth)
 	je := JoinerEntry{
 		Path: pth,
 	}
