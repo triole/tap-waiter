@@ -39,7 +39,7 @@ func (ut Util) Find(basedir string, rxFilter string) (filelist []string, err err
 	}
 	if !inf.IsDir() {
 		ut.Lg.Error(
-			"not a folder, please provide a directory to look for md files.",
+			"not a folder, please provide a directory to look for files",
 			logseal.F{"path": basedir},
 		)
 		return

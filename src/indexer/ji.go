@@ -42,10 +42,9 @@ func (ind Indexer) MakeJoinerIndex(params Params) (ji JoinerIndex) {
 		ji = idx.gatherFiles([]string{params.Endpoint.Source}, params)
 	case "folder":
 		dataFiles, err := ind.Util.Find(params.Endpoint.Source, params.Endpoint.RxFilter)
-		if err != nil {
-			return
+		if err == nil {
+			ji = idx.gatherFiles(dataFiles, params)
 		}
-		ji = idx.gatherFiles(dataFiles, params)
 	case "url":
 		fmt.Printf("%+v\n", "fetch url")
 	}
