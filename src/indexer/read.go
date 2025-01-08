@@ -3,6 +3,7 @@ package indexer
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"path"
 	"path/filepath"
 	"strings"
@@ -93,6 +94,30 @@ func (ind Indexer) readFileContent(filename string, ps conf.Endpoint) (content F
 
 func (ind Indexer) byteToBody(by []byte) (content FileContent) {
 	content.Body = string(by)
+	return
+}
+
+func (ind Indexer) unmarshal(by []byte) (content FileContent) {
+	if content = ind.unmarshalJSON(by); content.Error == nil {
+		ind.Lg.Trace("json unmarshalled", logseal.F{"content": string(by)})
+		return
+	}
+	if content = ind.unmarshalTOML(by); content.Error == nil {
+		ind.Lg.Trace("toml unmarshalled", logseal.F{"content": string(by)})
+		return
+	}
+	/* NOTE: responses like "404 page not found" are unmarshalled as yaml,
+	find out later if this is only an inconsistency or a real problem */
+	if content = ind.unmarshalYAML(by); content.Error == nil {
+		ind.Lg.Trace("yaml unmarshalled", logseal.F{"content": string(by)})
+		return
+	}
+	content = ind.byteToBody(by)
+	content.Error = errors.New("unmarshal failed, kept the plain data")
+	ind.Lg.Trace(
+		"could not unmarshal",
+		logseal.F{"content": string(by), "err": content.Error},
+	)
 	return
 }
 

@@ -46,7 +46,17 @@ func (ind Indexer) MakeJoinerIndex(params Params) (ji JoinerIndex) {
 			ji = idx.gatherFiles(dataFiles, params)
 		}
 	case "url":
-		fmt.Printf("%+v\n", "fetch url")
+		je := JoinerEntry{Path: params.Endpoint.Source}
+		if params.Endpoint.ReturnValues.Content {
+			resp, err := ind.req(params.Endpoint.Source)
+			// TODO: maybe later add the possibility to encode base64
+			je.Content = ind.byteToBody(resp)
+			je.Content.Error = err
+			if params.Endpoint.ReturnValues.UnmarshalContent {
+				je.Content = ind.unmarshal(resp)
+			}
+		}
+		ji = append(ji, je)
 	}
 	sort.Sort(JoinerIndex(ji))
 

@@ -36,6 +36,7 @@ type ReturnValues struct {
 	SplitPath                bool `yaml:"split_path"`
 	Metadata                 bool `yaml:"metadata"`
 	Content                  bool `yaml:"content"`
+	UnmarshalContent         bool `yaml:"unmarshal_content"`
 	Size                     bool `yaml:"size"`
 	LastMod                  bool `yaml:"lastmod"`
 	Created                  bool `yaml:"created"`
