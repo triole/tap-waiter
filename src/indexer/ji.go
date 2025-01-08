@@ -39,9 +39,13 @@ func (ind Indexer) MakeJoinerIndex(params Params) (ji JoinerIndex) {
 
 	switch params.Endpoint.SourceType {
 	case "file":
-		fmt.Printf("%+v\n", "read file")
+		ji = idx.gatherFiles([]string{params.Endpoint.Source}, params)
 	case "folder":
-		ji = idx.gatherFiles(params)
+		dataFiles, err := ind.Util.Find(params.Endpoint.Source, params.Endpoint.RxFilter)
+		if err != nil {
+			return
+		}
+		ji = idx.gatherFiles(dataFiles, params)
 	case "url":
 		fmt.Printf("%+v\n", "fetch url")
 	}
@@ -76,11 +80,7 @@ func (ind Indexer) MakeJoinerIndex(params Params) (ji JoinerIndex) {
 	return
 }
 
-func (ind Indexer) gatherFiles(params Params) (ji JoinerIndex) {
-	dataFiles, err := ind.Util.Find(params.Endpoint.Source, params.Endpoint.RxFilter)
-	if err != nil {
-		return
-	}
+func (ind Indexer) gatherFiles(dataFiles []string, params Params) (ji JoinerIndex) {
 	ln := len(dataFiles)
 	if ln < 1 {
 		ind.Lg.Warn("no data files found", logseal.F{"path": params.Endpoint.Source})

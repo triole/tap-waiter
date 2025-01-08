@@ -7,6 +7,10 @@ api:
 
   file.json:
     source: {{.confdir}}/dump/html/1.html
+    return_values:
+      created: true
+      lastmod: true
+      content: true
 
   all.json:
     source: {{.confdir}}/dump
