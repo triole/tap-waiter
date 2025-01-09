@@ -24,6 +24,7 @@ type Endpoint struct {
 	Source             string `yaml:"source"`
 	SourceType         string
 	URL                string   `yaml:"url"`
+	HTTPMethod         string   `yaml:"http_method"`
 	RxFilter           string   `yaml:"regex_filter"`
 	SortFileName       string   `yaml:"sort_file_name"`
 	IgnoreList         []string `yaml:"regex_ignore_list"`
