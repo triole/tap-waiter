@@ -3,12 +3,19 @@ version: '3'
 
 vars:
   SOURCE_FOLDER: src
+  CURDIR:
+    sh: pwd
 
 tasks:
   default:
     cmds:
       - task: test
       - task: build
+
+  mok:
+    desc: run mock test api
+    cmds:
+      - cmd: mokapi --providers-file-directory {{.CURDIR}}/testdata/api
 
   mod:
     desc: update go modules, add submodules to go root

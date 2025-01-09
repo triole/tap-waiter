@@ -1,28 +1,6 @@
 ---
 port: 17777
 api:
-
-  url.json:
-    source: http://whatever-host.box/api/rawdata
-    return_values:
-      created: true
-      content: true
-      unmarshal_content: true
-
-  url_no_content.json:
-    source: http://whatever-host.box/api/rawdata
-    return_values:
-      created: true
-      content: false
-      unmarshal_content: false
-
-  url_no_unmarshal.json:
-    source: http://whatever-host.box/api/rawdata
-    return_values:
-      created: true
-      content: true
-      unmarshal_content: false
-
   file.json:
     source: "{{.confdir}}/dump/html/1.html"
     return_values:

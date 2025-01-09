@@ -1,0 +1,26 @@
+---
+openapi: 3.1.0
+info:
+  title: gitlab_api
+  version: 0.1.0
+servers:
+  - url: /
+paths:
+  /repos:
+    get:
+      summary: returns mock gitlab repo metadata
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+  /public:
+    get:
+      summary: returns punch public data
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
