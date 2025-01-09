@@ -63,27 +63,21 @@ func (ind Indexer) readDataFile(filename string, ps conf.Endpoint, chin chan str
 
 func (ind Indexer) readFileContent(filename string, ps conf.Endpoint) (content FileContent) {
 	by, isTextfile, err := ind.Util.ReadFile(filename)
-	if isTextfile {
-		if err == nil {
-			switch filepath.Ext(filename) {
-			case ".json":
-				content = ind.unmarshalJSON(by)
-			case ".toml":
-				content = ind.unmarshalTOML(by)
-			case ".yaml", ".yml":
-				content = ind.unmarshalYAML(by)
-			case ".md":
-				content = ind.readMarkdown(by, ps.ReturnValues)
-			default:
-				content = ind.byteToBody(by)
-			}
-			ind.Lg.IfErrError(
-				"error reading file",
-				logseal.F{
-					"path": filename, "error": err, "is_text_file": isTextfile,
-				},
-			)
+	if isTextfile && err == nil {
+		switch filepath.Ext(filename) {
+		case ".json", ".toml", ".yaml", ".yml":
+			content = ind.unmarshal(by, ps)
+		case ".md":
+			content = ind.readMarkdown(by, ps.ReturnValues)
+		default:
+			content = ind.byteToBody(by)
 		}
+		ind.Lg.IfErrError(
+			"error reading file",
+			logseal.F{
+				"path": filename, "error": err, "is_text_file": isTextfile,
+			},
+		)
 	} else {
 		ind.Lg.Debug(
 			"no text file, skip reading",
@@ -98,25 +92,38 @@ func (ind Indexer) byteToBody(by []byte) (content FileContent) {
 	return
 }
 
-func (ind Indexer) unmarshal(by []byte, jsonPath string) (content FileContent) {
-	if content = ind.unmarshalJSON(by); content.Error == nil {
-		ind.Lg.Trace("json unmarshalled", logseal.F{"content": string(by)})
-	}
-	if content.Error != nil {
-		if content = ind.unmarshalTOML(by); content.Error == nil {
-			ind.Lg.Trace("toml unmarshalled", logseal.F{"content": string(by)})
-			// return
+func (ind Indexer) unmarshal(by []byte, ps conf.Endpoint) (content FileContent) {
+	if ind.Util.IsTextData(by) {
+
+		for _, el := range ps.ReturnValues.RegexReplace {
+			by = []byte(
+				ind.Util.RxReplaceAll(
+					string(by),
+					el[0],
+					el[1],
+				),
+			)
+		}
+
+		if content = ind.unmarshalJSON(by); content.Error == nil {
+			ind.Lg.Trace("json unmarshalled", logseal.F{"content": string(by)})
+		}
+		if content.Error != nil {
+			if content = ind.unmarshalTOML(by); content.Error == nil {
+				ind.Lg.Trace("toml unmarshalled", logseal.F{"content": string(by)})
+				// return
+			}
+		}
+		/* NOTE: responses like "404 page not found" are unmarshalled as yaml,
+		find out later if this is only an inconsistency or a real problem */
+		if content.Error != nil {
+			if content = ind.unmarshalYAML(by); content.Error == nil {
+				ind.Lg.Trace("yaml unmarshalled", logseal.F{"content": string(by)})
+				// return
+			}
 		}
 	}
-	/* NOTE: responses like "404 page not found" are unmarshalled as yaml,
-	find out later if this is only an inconsistency or a real problem */
-	if content.Error != nil {
-		if content = ind.unmarshalYAML(by); content.Error == nil {
-			ind.Lg.Trace("yaml unmarshalled", logseal.F{"content": string(by)})
-			// return
-		}
-	}
-	if content.Error != nil {
+	if !ind.Util.IsTextData(by) || content.Error != nil {
 		content = ind.byteToBody(by)
 		content.Error = errors.New("unmarshal failed, kept the plain data")
 		ind.Lg.Trace(
@@ -124,12 +131,11 @@ func (ind Indexer) unmarshal(by []byte, jsonPath string) (content FileContent) {
 			logseal.F{"content": string(by), "err": content.Error},
 		)
 	}
-
-	if jsonPath != "" {
+	if ps.ReturnValues.JSONPath != "" {
 		ind.Lg.Trace(
 			"parse unmarshalled data using json path",
 			logseal.F{
-				"json_path": jsonPath,
+				"json_path": ps.ReturnValues.JSONPath,
 			},
 		)
 		marsh, err := json.Marshal(content.Body)
@@ -138,10 +144,11 @@ func (ind Indexer) unmarshal(by []byte, jsonPath string) (content FileContent) {
 			logseal.F{"error": err},
 		)
 		if err == nil {
-			result := gjson.GetBytes(marsh, jsonPath)
+			result := gjson.GetBytes(marsh, ps.ReturnValues.JSONPath)
 			if len(result.String()) < 1 {
 				ind.Lg.Warn(
-					"json path result is empty", logseal.F{"json_path": jsonPath},
+					"json path result is empty",
+					logseal.F{"json_path": ps.ReturnValues.JSONPath},
 				)
 			} else {
 				content = ind.unmarshalJSON([]byte(result.String()))

@@ -53,10 +53,7 @@ func (ind Indexer) MakeJoinerIndex(params Params) (ji JoinerIndex) {
 			je.Content = ind.byteToBody(resp)
 			je.Content.Error = err
 			if je.Content.Error == nil {
-				je.Content = ind.unmarshal(
-					resp,
-					params.Endpoint.ReturnValues.JSONPath,
-				)
+				je.Content = ind.unmarshal(resp, params.Endpoint)
 			}
 		}
 		ji = append(ji, je)

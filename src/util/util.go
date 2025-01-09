@@ -127,6 +127,10 @@ func (ut Util) IsLocalPath(path string) bool {
 	return err == nil
 }
 
+func (ut Util) IsTextData(by []byte) bool {
+	return utf8.ValidString(string(by))
+}
+
 func (ut Util) IsURL(s string) bool {
 	_, err := url.ParseRequestURI(s)
 	return err == nil
@@ -136,7 +140,7 @@ func (ut Util) ReadFile(filename string) (by []byte, isTextfile bool, err error)
 	fn, err := ut.AbsPath(filename)
 	if err == nil {
 		by, err = os.ReadFile(fn)
-		isTextfile = utf8.ValidString(string(by))
+		isTextfile = ut.IsTextData(by)
 		ut.Lg.IfErrError(
 			"can not read file", logseal.F{"path": filename, "error": err},
 		)
@@ -169,6 +173,12 @@ func (ut Util) RxFind(rx string, content string) string {
 func (ut Util) RxMatch(rx string, content string) bool {
 	temp, _ := regexp.Compile(rx)
 	return temp.MatchString(content)
+}
+
+func (ut Util) RxReplaceAll(basestring, regex, newstring string) (r string) {
+	rx := regexp.MustCompile(regex)
+	r = rx.ReplaceAllString(basestring, newstring)
+	return
 }
 
 func (ut Util) StringifySliceOfInterfaces(itf []interface{}) (r []string) {

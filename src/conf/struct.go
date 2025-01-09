@@ -33,13 +33,14 @@ type Endpoint struct {
 }
 
 type ReturnValues struct {
-	SplitPath                bool   `yaml:"split_path"`
-	Metadata                 bool   `yaml:"metadata"`
-	Content                  bool   `yaml:"content"`
-	UnmarshalContent         bool   `yaml:"unmarshal_content"`
-	JSONPath                 string `yaml:"json_path"`
-	Size                     bool   `yaml:"size"`
-	LastMod                  bool   `yaml:"lastmod"`
-	Created                  bool   `yaml:"created"`
-	SplitMarkdownFrontMatter bool   `yaml:"split_markdown_front_matter"`
+	SplitPath                bool       `yaml:"split_path"`
+	Metadata                 bool       `yaml:"metadata"`
+	Content                  bool       `yaml:"content"`
+	UnmarshalContent         bool       `yaml:"unmarshal_content"`
+	RegexReplace             [][]string `yaml:"regex_replace"`
+	JSONPath                 string     `yaml:"json_path"`
+	Size                     bool       `yaml:"size"`
+	LastMod                  bool       `yaml:"lastmod"`
+	Created                  bool       `yaml:"created"`
+	SplitMarkdownFrontMatter bool       `yaml:"split_markdown_front_matter"`
 }
