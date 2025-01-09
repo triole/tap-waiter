@@ -19,3 +19,4 @@ api:
     http_method: get
     return_values:
       content: true
+      json_path: "#.content.body"
