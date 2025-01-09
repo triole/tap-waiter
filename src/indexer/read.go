@@ -139,10 +139,13 @@ func (ind Indexer) unmarshal(by []byte, jsonPath string) (content FileContent) {
 		)
 		if err == nil {
 			result := gjson.GetBytes(marsh, jsonPath)
-			content = ind.unmarshalJSON([]byte(result.String()))
-			ind.Lg.Warn(
-				"json path result is empty", logseal.F{"json_path": jsonPath},
-			)
+			if len(result.String()) < 1 {
+				ind.Lg.Warn(
+					"json path result is empty", logseal.F{"json_path": jsonPath},
+				)
+			} else {
+				content = ind.unmarshalJSON([]byte(result.String()))
+			}
 		} else {
 			content = FileContent{}
 		}
