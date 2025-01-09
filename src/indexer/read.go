@@ -11,6 +11,7 @@ import (
 
 	"github.com/c2h5oh/datasize"
 	toml "github.com/pelletier/go-toml/v2"
+	"github.com/tidwall/gjson"
 	"github.com/triole/logseal"
 	"github.com/yuin/goldmark"
 	goldmarkmeta "github.com/yuin/goldmark-meta"
@@ -97,27 +98,56 @@ func (ind Indexer) byteToBody(by []byte) (content FileContent) {
 	return
 }
 
-func (ind Indexer) unmarshal(by []byte) (content FileContent) {
+func (ind Indexer) unmarshal(by []byte, jsonPath string) (content FileContent) {
 	if content = ind.unmarshalJSON(by); content.Error == nil {
 		ind.Lg.Trace("json unmarshalled", logseal.F{"content": string(by)})
-		return
 	}
-	if content = ind.unmarshalTOML(by); content.Error == nil {
-		ind.Lg.Trace("toml unmarshalled", logseal.F{"content": string(by)})
-		return
+	if content.Error != nil {
+		if content = ind.unmarshalTOML(by); content.Error == nil {
+			ind.Lg.Trace("toml unmarshalled", logseal.F{"content": string(by)})
+			// return
+		}
 	}
 	/* NOTE: responses like "404 page not found" are unmarshalled as yaml,
 	find out later if this is only an inconsistency or a real problem */
-	if content = ind.unmarshalYAML(by); content.Error == nil {
-		ind.Lg.Trace("yaml unmarshalled", logseal.F{"content": string(by)})
-		return
+	if content.Error != nil {
+		if content = ind.unmarshalYAML(by); content.Error == nil {
+			ind.Lg.Trace("yaml unmarshalled", logseal.F{"content": string(by)})
+			// return
+		}
 	}
-	content = ind.byteToBody(by)
-	content.Error = errors.New("unmarshal failed, kept the plain data")
-	ind.Lg.Trace(
-		"could not unmarshal",
-		logseal.F{"content": string(by), "err": content.Error},
-	)
+	if content.Error != nil {
+		content = ind.byteToBody(by)
+		content.Error = errors.New("unmarshal failed, kept the plain data")
+		ind.Lg.Trace(
+			"could not unmarshal",
+			logseal.F{"content": string(by), "err": content.Error},
+		)
+	}
+
+	if jsonPath != "" {
+		ind.Lg.Trace(
+			"parse unmarshalled data using json path",
+			logseal.F{
+				"json_path": jsonPath,
+			},
+		)
+		marsh, err := json.Marshal(content.Body)
+		ind.Lg.IfErrError(
+			"can not prepare to apply json path",
+			logseal.F{"error": err},
+		)
+		if err == nil {
+			result := gjson.GetBytes(marsh, jsonPath)
+			content = ind.unmarshalJSON([]byte(result.String()))
+			ind.Lg.Warn(
+				"json path result is empty", logseal.F{"json_path": jsonPath},
+			)
+		} else {
+			content = FileContent{}
+		}
+	}
+
 	return
 }
 

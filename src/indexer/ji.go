@@ -52,8 +52,11 @@ func (ind Indexer) MakeJoinerIndex(params Params) (ji JoinerIndex) {
 			// TODO: maybe later add the possibility to encode base64
 			je.Content = ind.byteToBody(resp)
 			je.Content.Error = err
-			if params.Endpoint.ReturnValues.UnmarshalContent {
-				je.Content = ind.unmarshal(resp)
+			if je.Content.Error == nil {
+				je.Content = ind.unmarshal(
+					resp,
+					params.Endpoint.ReturnValues.JSONPath,
+				)
 			}
 		}
 		ji = append(ji, je)
