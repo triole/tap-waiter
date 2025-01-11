@@ -8,7 +8,6 @@ import (
 	"sort"
 	"testing"
 	"time"
-	"tyson-tap/src/conf"
 
 	yaml "gopkg.in/yaml.v3"
 )
@@ -120,16 +119,6 @@ func createDummyFiles() (arr []string) {
 		arr = append(arr, filepath.Base(name))
 	}
 	return
-}
-
-func newTestEndpoint() conf.Endpoint {
-	return conf.Endpoint{ReturnValues: conf.ReturnValues{
-		Created:                  true,
-		LastMod:                  true,
-		Content:                  true,
-		SplitMarkdownFrontMatter: true,
-		Size:                     true,
-	}}
 }
 
 func getFileNamesOfJI(ji JoinerIndex) (arr []string) {

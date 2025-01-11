@@ -22,6 +22,16 @@ func prepareTests(folder, sortBy string, asc bool) (Indexer, JoinerIndex, Params
 	return ind, ji, params
 }
 
+func newTestEndpoint() conf.Endpoint {
+	return conf.Endpoint{ReturnValues: conf.ReturnValues{
+		Created:                  true,
+		LastMod:                  true,
+		Content:                  true,
+		SplitMarkdownFrontMatter: true,
+		Size:                     true,
+	}}
+}
+
 func newTestParams(source, sortBy string, ascending bool) (p Params) {
 	p.Endpoint = newTestEndpoint()
 	p.Endpoint.Source = source
