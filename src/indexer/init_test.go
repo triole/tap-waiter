@@ -23,12 +23,8 @@ func prepareTests(folder, sortBy string, asc bool) (Indexer, JoinerIndex, Params
 }
 
 func newTestParams(source, sortBy string, ascending bool) (p Params) {
+	p.Endpoint = newTestEndpoint()
 	p.Endpoint.Source = source
-	p.Endpoint.ReturnValues.Content = true
-	p.Endpoint.ReturnValues.Created = true
-	p.Endpoint.ReturnValues.LastMod = true
-	p.Endpoint.ReturnValues.Metadata = true
-	p.Endpoint.ReturnValues.Size = true
 	p.Threads = 8
 	p.Ascending = ascending
 	p.SortBy = sortBy
