@@ -31,6 +31,7 @@ type Endpoint struct {
 	MaxReturnSize      string   `yaml:"max_return_size"`
 	MaxReturnSizeBytes uint64
 	Return             ReturnValues `yaml:"return"`
+	Process            Process      `yaml:"process"`
 }
 
 type Process struct {
