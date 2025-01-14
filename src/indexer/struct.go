@@ -35,3 +35,27 @@ type FilterParams struct {
 	Errors   []error
 	Enabled  bool
 }
+
+func (ji JoinerIndex) Len() int {
+	return len(ji)
+}
+
+func (ji JoinerIndex) Less(i, j int) bool {
+	switch ji[i].SortIndex.(type) {
+	case float32, float64,
+		int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
+		if ji[i].SortIndex == ji[j].SortIndex {
+			return ji[i].Path > ji[j].Path
+		}
+		return ut.ToFloat(ji[i].SortIndex) < ut.ToFloat(ji[j].SortIndex)
+	default:
+		if ji[i].SortIndex.(string) == ji[j].SortIndex.(string) {
+			return ji[i].Path > ji[j].Path
+		}
+		return ji[i].SortIndex.(string) < ji[j].SortIndex.(string)
+	}
+}
+
+func (ji JoinerIndex) Swap(i, j int) {
+	ji[i], ji[j] = ji[j], ji[i]
+}
