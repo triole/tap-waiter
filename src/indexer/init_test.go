@@ -23,7 +23,7 @@ func prepareTests(folder, sortBy string, asc bool) (Indexer, JoinerIndex, Params
 }
 
 func newTestEndpoint() conf.Endpoint {
-	return conf.Endpoint{ReturnValues: conf.ReturnValues{
+	return conf.Endpoint{Return: conf.ReturnValues{
 		Created:                  true,
 		LastMod:                  true,
 		Content:                  true,

@@ -24,13 +24,20 @@ type Endpoint struct {
 	Source             string `yaml:"source"`
 	SourceType         string
 	URL                string   `yaml:"url"`
-	HTTPMethod         string   `yaml:"http_method"`
+	RequestMethod      string   `yaml:"request_method"`
 	RxFilter           string   `yaml:"regex_filter"`
 	SortFileName       string   `yaml:"sort_file_name"`
 	IgnoreList         []string `yaml:"regex_ignore_list"`
 	MaxReturnSize      string   `yaml:"max_return_size"`
 	MaxReturnSizeBytes uint64
-	ReturnValues       ReturnValues `yaml:"return_values"`
+	Return             ReturnValues `yaml:"return"`
+}
+
+type Process struct {
+	Strategy      string   `yaml:"strategy"`
+	RequestMethod string   `yaml:"request_method"`
+	JSONPath      string   `yaml:"json_path"`
+	RegexMatch    []string `yaml:"regex_match"`
 }
 
 type ReturnValues struct {
@@ -39,6 +46,7 @@ type ReturnValues struct {
 	Content                  bool       `yaml:"content"`
 	UnmarshalContent         bool       `yaml:"unmarshal_content"`
 	RegexReplace             [][]string `yaml:"regex_replace"`
+	RegexMatch               string     `yaml:"regex_match"`
 	JSONPath                 string     `yaml:"json_path"`
 	Size                     bool       `yaml:"size"`
 	LastMod                  bool       `yaml:"lastmod"`

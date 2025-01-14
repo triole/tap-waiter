@@ -47,10 +47,10 @@ func (ind Indexer) MakeJoinerIndex(params Params) (ji JoinerIndex) {
 		}
 	case "url":
 		je := JoinerEntry{Path: params.Endpoint.Source}
-		if params.Endpoint.ReturnValues.Content {
+		if params.Endpoint.Return.Content {
 			resp, err := ind.req(
 				params.Endpoint.Source,
-				params.Endpoint.HTTPMethod,
+				params.Endpoint.RequestMethod,
 			)
 			// TODO: maybe later add the possibility to encode base64
 			je.Content = ind.byteToBody(resp)

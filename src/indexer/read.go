@@ -31,11 +31,11 @@ func (ind Indexer) readDataFile(filename string, ps conf.Endpoint, chin chan str
 		Path: pth,
 	}
 	fileSize := ind.Util.GetFileSize(filename)
-	if ps.ReturnValues.Size {
+	if ps.Return.Size {
 		je.Size = fileSize
 	}
 	if ps.MaxReturnSizeBytes > fileSize {
-		if ps.ReturnValues.Content || ps.ReturnValues.SplitMarkdownFrontMatter {
+		if ps.Return.Content || ps.Return.SplitMarkdownFrontMatter {
 			je.Content = ind.readFileContent(filename, ps)
 		}
 	} else {
@@ -48,13 +48,13 @@ func (ind Indexer) readDataFile(filename string, ps conf.Endpoint, chin chan str
 			},
 		)
 	}
-	if ps.ReturnValues.SplitPath {
+	if ps.Return.SplitPath {
 		je.SplitPath = strings.Split(pth, string(filepath.Separator))
 	}
-	if ps.ReturnValues.Created {
+	if ps.Return.Created {
 		je.Created = ind.Util.GetFileCreated(filename)
 	}
-	if ps.ReturnValues.LastMod {
+	if ps.Return.LastMod {
 		je.LastMod = ind.Util.GetFileLastMod(filename)
 	}
 	chout <- je
@@ -68,7 +68,7 @@ func (ind Indexer) readFileContent(filename string, ps conf.Endpoint) (content F
 		case ".json", ".toml", ".yaml", ".yml":
 			content = ind.unmarshal(by, ps)
 		case ".md":
-			content = ind.readMarkdown(by, ps.ReturnValues)
+			content = ind.readMarkdown(by, ps.Return)
 		default:
 			content = ind.byteToBody(by)
 		}
@@ -95,7 +95,7 @@ func (ind Indexer) byteToBody(by []byte) (content FileContent) {
 func (ind Indexer) unmarshal(by []byte, ps conf.Endpoint) (content FileContent) {
 	if ind.Util.IsTextData(by) {
 
-		for _, el := range ps.ReturnValues.RegexReplace {
+		for _, el := range ps.Return.RegexReplace {
 			by = []byte(
 				ind.Util.RxReplaceAll(
 					string(by),
@@ -131,11 +131,11 @@ func (ind Indexer) unmarshal(by []byte, ps conf.Endpoint) (content FileContent) 
 			logseal.F{"content": string(by), "err": content.Error},
 		)
 	}
-	if ps.ReturnValues.JSONPath != "" {
+	if ps.Return.JSONPath != "" {
 		ind.Lg.Trace(
 			"parse unmarshalled data using json path",
 			logseal.F{
-				"json_path": ps.ReturnValues.JSONPath,
+				"json_path": ps.Return.JSONPath,
 			},
 		)
 		marsh, err := json.Marshal(content.Body)
@@ -144,11 +144,11 @@ func (ind Indexer) unmarshal(by []byte, ps conf.Endpoint) (content FileContent) 
 			logseal.F{"error": err},
 		)
 		if err == nil {
-			result := gjson.GetBytes(marsh, ps.ReturnValues.JSONPath)
+			result := gjson.GetBytes(marsh, ps.Return.JSONPath)
 			if len(result.String()) < 1 {
 				ind.Lg.Warn(
 					"json path result is empty",
-					logseal.F{"json_path": ps.ReturnValues.JSONPath},
+					logseal.F{"json_path": ps.Return.JSONPath},
 				)
 			} else {
 				content = ind.unmarshalJSON([]byte(result.String()))
