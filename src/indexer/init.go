@@ -7,20 +7,19 @@ import (
 	"github.com/triole/logseal"
 )
 
-type Indexer struct {
-	JI   JoinerIndex
-	Conf conf.Conf
-	Util util.Util
-	Lg   logseal.Logseal
-}
-
 var (
-	ut  util.Util
-	idx Indexer
+	ut util.Util
 )
 
-func Init(conf conf.Conf, util util.Util, lg logseal.Logseal) Indexer {
-	ut = util
+type Indexer struct {
+	TapIndex    TapIndex
+	DataSources DataSources
+	Conf        conf.Conf
+	Util        util.Util
+	Lg          logseal.Logseal
+}
+
+func Init(conf conf.Conf, util util.Util, lg logseal.Logseal) (idx Indexer) {
 	idx = Indexer{
 		Conf: conf,
 		Util: util,

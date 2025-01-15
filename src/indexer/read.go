@@ -4,12 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"path"
 	"path/filepath"
-	"strings"
 	"tyson-tap/src/conf"
 
-	"github.com/c2h5oh/datasize"
 	toml "github.com/pelletier/go-toml/v2"
 	"github.com/tidwall/gjson"
 	"github.com/triole/logseal"
@@ -18,48 +15,6 @@ import (
 	"github.com/yuin/goldmark/parser"
 	yaml "gopkg.in/yaml.v3"
 )
-
-func (ind Indexer) readDataFile(filename string, ps conf.Endpoint, chin chan string, chout chan JoinerEntry) {
-	chin <- filename
-	pth := path.Base(filename)
-	if !strings.EqualFold(filename, ps.Source) {
-		pth = strings.TrimPrefix(
-			strings.TrimPrefix(filename, ps.Source), string(filepath.Separator),
-		)
-	}
-	je := JoinerEntry{
-		Path: pth,
-	}
-	fileSize := ind.Util.GetFileSize(filename)
-	if ps.Return.Size {
-		je.Size = fileSize
-	}
-	if ps.MaxReturnSizeBytes > fileSize {
-		if ps.Return.Content || ps.Return.SplitMarkdownFrontMatter {
-			je.Content = ind.readFileContent(filename, ps)
-		}
-	} else {
-		ind.Lg.Trace(
-			"do not display file content, size limit exceeded",
-			logseal.F{
-				"path":      filename,
-				"file_size": datasize.ByteSize(fileSize).HumanReadable(),
-				"max_size":  datasize.ByteSize(ps.MaxReturnSizeBytes).HumanReadable(),
-			},
-		)
-	}
-	if ps.Return.SplitPath {
-		je.SplitPath = strings.Split(pth, string(filepath.Separator))
-	}
-	if ps.Return.Created {
-		je.Created = ind.Util.GetFileCreated(filename)
-	}
-	if ps.Return.LastMod {
-		je.LastMod = ind.Util.GetFileLastMod(filename)
-	}
-	chout <- je
-	<-chin
-}
 
 func (ind Indexer) readFileContent(filename string, ps conf.Endpoint) (content FileContent) {
 	by, isTextfile, err := ind.Util.ReadFile(filename)

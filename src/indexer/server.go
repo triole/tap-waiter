@@ -28,7 +28,6 @@ func (ind Indexer) ServeContent(w http.ResponseWriter, r *http.Request) {
 	ind.Lg.Info("got request", logseal.F{"url": r.URL})
 	params := Params{
 		Ascending: true,
-		Threads:   ind.Conf.Threads,
 		Filter:    FilterParams{Enabled: false},
 	}
 
@@ -60,7 +59,7 @@ func (ind Indexer) ServeContent(w http.ResponseWriter, r *http.Request) {
 	if val, ok := ind.Conf.API[url]; ok {
 		params.Endpoint = val
 		start := time.Now()
-		ji := ind.MakeJoinerIndex(params)
+		ind.MakeTapIndex(params)
 		ind.Lg.Debug(
 			"serve json",
 			logseal.F{
@@ -68,7 +67,7 @@ func (ind Indexer) ServeContent(w http.ResponseWriter, r *http.Request) {
 			},
 		)
 		w.Header().Add("Content Type", "application/json")
-		json.NewEncoder(w).Encode(ji)
+		json.NewEncoder(w).Encode(ind.TapIndex)
 	} else {
 		ind.return404(w)
 	}

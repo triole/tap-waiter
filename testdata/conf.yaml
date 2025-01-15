@@ -3,7 +3,7 @@ port: 17777
 api:
   file.json:
     source: "{{.confdir}}/dump/html/1.html"
-    return_values:
+    return:
       created: true
       lastmod: true
       content: true
@@ -12,7 +12,7 @@ api:
     source: "{{.confdir}}/dump"
     regex_filter: ".+"
     max_return_size: 10K
-    return_values:
+    return:
       split_path: true
       size: true
       created: true
@@ -23,7 +23,7 @@ api:
   list.json:
     source: "{{.confdir}}/dump"
     regex_filter: ".+"
-    return_values:
+    return:
       split_path: true
       size: false
       created: false
@@ -37,7 +37,7 @@ api:
     sort_file_name: sort.yaml
     regex_ignore_list:
       - sort.yaml
-    return_values:
+    return:
       size: true
       created: true
       lastmod: true
@@ -46,7 +46,7 @@ api:
     source: "{{.confdir}}/dump"
     regex_filter: "\\.(md)$"
     max_return_size: 10K
-    return_values:
+    return:
       split_path: false
       size: false
       created: false
@@ -58,7 +58,7 @@ api:
     source: "{{.confdir}}/dump"
     regex_filter: "\\.(md)$"
     max_return_size: 10K
-    return_values:
+    return:
       split_path: false
       size: false
       created: false
@@ -70,7 +70,7 @@ api:
     source: "{{.confdir}}/dump"
     regex_filter: "\\.(ya?ml)$"
     max_return_size: 1K
-    return_values:
+    return:
       created: true
       lastmod: true
 
@@ -78,7 +78,7 @@ api:
     source: "{{.confdir}}/dump"
     regex_filter: "\\.(ya?ml)$"
     max_return_size: 500B
-    return_values:
+    return:
       created: true
       size: true
       content: true
@@ -86,5 +86,5 @@ api:
   yaml_default_max_return_size.json:
     source: "{{.confdir}}/dump"
     regex_filter: "\\.(ya?ml)$"
-    return_values:
+    return:
       content: true

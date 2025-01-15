@@ -4,35 +4,35 @@ import (
 	"strings"
 )
 
-func (ji JoinerIndex) getContentVal(key interface{}, content FileContent) (s []string) {
-	keypath := ji.splitKey(key)
+func (ti TapIndex) getContentVal(key interface{}, content FileContent) (s []string) {
+	keypath := ti.splitKey(key)
 	if len(keypath) > 0 {
 		switch keypath[0] {
 		case "front_matter":
-			s = ji.getMapVal(keypath[1:], content.FrontMatter)
+			s = ti.getMapVal(keypath[1:], content.FrontMatter)
 		case "body":
-			s = ji.getMapVal(keypath[1:], content.Body)
+			s = ti.getMapVal(keypath[1:], content.Body)
 		default:
-			s = ji.getMapVal(keypath, content.Body)
+			s = ti.getMapVal(keypath, content.Body)
 		}
 	}
 	return
 }
 
-func (ji JoinerIndex) getMapVal(keypath []string, itf interface{}) (s []string) {
+func (ti TapIndex) getMapVal(keypath []string, itf interface{}) (s []string) {
 	switch val := itf.(type) {
 	case map[string]interface{}:
-		val = ji.keyToLower(val)
+		val = ti.keyToLower(val)
 		if len(keypath) > 0 {
 			if dictval, ok := val[keypath[0]]; ok {
-				s = ji.getMapVal(keypath[1:], dictval)
+				s = ti.getMapVal(keypath[1:], dictval)
 			}
 		}
 	case []interface{}:
 		for _, x := range val {
 			switch val2 := x.(type) {
 			case map[string]interface{}:
-				t := ji.getMapVal(keypath, val2)
+				t := ti.getMapVal(keypath, val2)
 				if len(t) > 0 {
 					s = t
 				}
@@ -50,7 +50,7 @@ func (ji JoinerIndex) getMapVal(keypath []string, itf interface{}) (s []string) 
 	return
 }
 
-func (ji JoinerIndex) keyToLower(dict map[string]interface{}) (r map[string]interface{}) {
+func (ti TapIndex) keyToLower(dict map[string]interface{}) (r map[string]interface{}) {
 	r = make(map[string]interface{})
 	for key, val := range dict {
 		r[strings.ToLower(key)] = val
@@ -58,7 +58,7 @@ func (ji JoinerIndex) keyToLower(dict map[string]interface{}) (r map[string]inte
 	return
 }
 
-func (ji JoinerIndex) splitKey(key interface{}) (arr []string) {
+func (ti TapIndex) splitKey(key interface{}) (arr []string) {
 	var tmp []string
 	switch val := key.(type) {
 	case string:

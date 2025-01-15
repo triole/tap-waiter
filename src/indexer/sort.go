@@ -25,9 +25,9 @@ type tSortFileContent struct {
 	Folder    string   `yaml:"-"`
 }
 
-func (ji JoinerIndex) collectSortFiles(params Params) (sfs tSortFiles) {
-	for _, el := range ji {
-		sortFile := ji.readSortFile(
+func (ti TapIndex) collectSortFiles(params Params) (sfs tSortFiles) {
+	for _, el := range ti {
+		sortFile := ti.readSortFile(
 			filepath.Join(params.Endpoint.Source, el.Path),
 			params.Endpoint.SortFileName,
 		)
@@ -38,14 +38,14 @@ func (ji JoinerIndex) collectSortFiles(params Params) (sfs tSortFiles) {
 	return
 }
 
-func (ji JoinerIndex) applySortFileOrderAndExclusion(params Params) (r JoinerIndex) {
-	sortFiles := ji.collectSortFiles(params)
+func (ti TapIndex) applySortFileOrderAndExclusion(params Params) (r TapIndex) {
+	sortFiles := ti.collectSortFiles(params)
 	var sortIndex int
 	var exclude bool
-	for idx, indexEl := range ji {
+	for idx, indexEl := range ti {
 		exclude = false
 		sortIndex = 999999
-		relevantSortFile := ji.getRelevantSortFile(
+		relevantSortFile := ti.getRelevantSortFile(
 			filepath.Join(params.Endpoint.Source, indexEl.Path), sortFiles,
 		)
 		for orderIndex, orderEl := range relevantSortFile.Content.Order {
@@ -54,7 +54,7 @@ func (ji JoinerIndex) applySortFileOrderAndExclusion(params Params) (r JoinerInd
 				exclude = relevantSortFile.Content.Exclusive
 			}
 		}
-		ji[idx].SortIndex = ji.stringifySortIndex(
+		ti[idx].SortIndex = ti.stringifySortIndex(
 			[]interface{}{
 				sortIndex,
 				ut.GetPathDepth(indexEl.Path),
@@ -64,17 +64,17 @@ func (ji JoinerIndex) applySortFileOrderAndExclusion(params Params) (r JoinerInd
 		)
 		if relevantSortFile.Content.Exclusive {
 			if ut.RxSliceContainsString(relevantSortFile.Content.Order, indexEl.Path) {
-				r = append(r, ji[idx])
+				r = append(r, ti[idx])
 			}
 		} else {
-			r = append(r, ji[idx])
+			r = append(r, ti[idx])
 		}
 	}
-	sort.Sort(JoinerIndex(ji))
+	sort.Sort(TapIndex(ti))
 	return
 }
 
-func (ji JoinerIndex) getRelevantSortFile(folder string, sfs tSortFiles) (sf tSortFile) {
+func (ti TapIndex) getRelevantSortFile(folder string, sfs tSortFiles) (sf tSortFile) {
 	for _, el := range sfs {
 		if strings.HasPrefix(folder, el.Folder) {
 			sf = el
@@ -83,7 +83,7 @@ func (ji JoinerIndex) getRelevantSortFile(folder string, sfs tSortFiles) (sf tSo
 	return
 }
 
-func (ji JoinerIndex) stringifySortIndex(li []interface{}) (r string) {
+func (ti TapIndex) stringifySortIndex(li []interface{}) (r string) {
 	sep := "|"
 	for _, itf := range li {
 		switch val := itf.(type) {
@@ -105,32 +105,32 @@ func (ji JoinerIndex) stringifySortIndex(li []interface{}) (r string) {
 	return
 }
 
-func (ji JoinerIndex) sortByCreated() {
-	for idx, el := range ji {
+func (ti TapIndex) sortByCreated() {
+	for idx, el := range ti {
 		el.SortIndex = el.Created
-		ji[idx] = el
+		ti[idx] = el
 	}
 }
 
-func (ji JoinerIndex) sortByLastMod() {
-	for idx, el := range ji {
+func (ti TapIndex) sortByLastMod() {
+	for idx, el := range ti {
 		el.SortIndex = el.LastMod
-		ji[idx] = el
+		ti[idx] = el
 	}
 }
 
-func (ji JoinerIndex) sortBySize() {
-	for idx, el := range ji {
+func (ti TapIndex) sortBySize() {
+	for idx, el := range ti {
 		el.SortIndex = el.Size
-		ji[idx] = el
+		ti[idx] = el
 	}
 }
 
-func (ji JoinerIndex) sortByOtherParams(params Params) {
-	for idx, el := range ji {
+func (ti TapIndex) sortByOtherParams(params Params) {
+	for idx, el := range ti {
 		var val []string
 		if params.SortBy != "" {
-			val = ji.getContentVal(params.SortBy, el.Content)
+			val = ti.getContentVal(params.SortBy, el.Content)
 		}
 		if len(val) > 0 {
 			el.SortIndex = strings.Join(val, ".")
@@ -143,11 +143,11 @@ func (ji JoinerIndex) sortByOtherParams(params Params) {
 				"%s%05d_%s", prefix, ut.GetPathDepth(el.Path), el.Path,
 			)
 		}
-		ji[idx] = el
+		ti[idx] = el
 	}
 }
 
-func (ji JoinerIndex) readSortFile(filename, sortFileName string) (sf tSortFile) {
+func (ti TapIndex) readSortFile(filename, sortFileName string) (sf tSortFile) {
 	sf.IsSortFile = strings.HasSuffix(filename, sortFileName)
 	if !sf.IsSortFile {
 		return

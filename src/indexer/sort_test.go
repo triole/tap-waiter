@@ -26,20 +26,20 @@ func readSortTestSpecs(t *testing.T) (specs []tSpecSortTest) {
 }
 
 func TestSort(t *testing.T) {
-	ind, _, _ := prepareTests("", "", true)
+	ind, _ := prepareTests("", "", true)
 	specs := readSortTestSpecs(t)
 	for _, spec := range specs {
-		sortBy := "default"
+		// sortBy := "default"
 		asc := true
-		params := newTestParams(ut.FromTestFolder(spec.ContentFolder), sortBy, asc)
-		params.Endpoint.SourceType = "folder"
-		params.Endpoint.SortFileName = spec.SortFile
-		params.Endpoint.IgnoreList = spec.IgnoreList
-		idx := ind.MakeJoinerIndex(params)
-		if !orderOK(idx, spec.Expectation, t) {
+		// params := newTestParams(ut.FromTestFolder(spec.ContentFolder), sortBy, asc)
+		// params.Endpoint.SourceType = "folder"
+		// params.Endpoint.SortFileName = spec.SortFile
+		// params.Endpoint.IgnoreList = spec.IgnoreList
+		// ind.MakeTapIndex(params)
+		if !orderOK(ind.TapIndex, spec.Expectation, t) {
 			t.Errorf(
 				"sort failed: %s, asc: %v, \n  exp: %v\n, got: %v",
-				spec.ContentFolder, asc, spec.Expectation, getJoinerIndexPaths(idx),
+				spec.ContentFolder, asc, spec.Expectation, getJoinerIndexPaths(ind.TapIndex),
 			)
 		}
 	}

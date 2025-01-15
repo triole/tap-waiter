@@ -82,7 +82,7 @@ func (ut Util) GetBinDir() string {
 func (ut Util) GetFileLastMod(filename string) (uts int64) {
 	fil, err := os.Stat(filename)
 	if err != nil {
-		ut.Lg.Error("can not stat file", logseal.F{"path": filename, "error": err})
+		ut.Lg.Error("get last mod failed, cannot stat file", logseal.F{"path": filename, "error": err})
 		return
 	}
 	uts = fil.ModTime().Unix()

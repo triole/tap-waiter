@@ -2,10 +2,17 @@ package indexer
 
 import "tyson-tap/src/conf"
 
-type JoinerIndex []JoinerEntry
+type DataSources struct {
+	Paths  []string
+	Type   string
+	Params Params
+}
 
-type JoinerEntry struct {
+type TapIndex []TapEntry
+
+type TapEntry struct {
 	Path      string      `json:"path"`
+	FullPath  string      `json:"-"`
 	SplitPath []string    `json:"split_path,omitempty"`
 	Size      uint64      `json:"size,omitempty"`
 	LastMod   int64       `json:"lastmod,omitempty"`
@@ -25,7 +32,6 @@ type Params struct {
 	Filter    FilterParams
 	SortBy    string
 	Ascending bool
-	Threads   int
 }
 
 type FilterParams struct {
@@ -36,26 +42,26 @@ type FilterParams struct {
 	Enabled  bool
 }
 
-func (ji JoinerIndex) Len() int {
-	return len(ji)
+func (ti TapIndex) Len() int {
+	return len(ti)
 }
 
-func (ji JoinerIndex) Less(i, j int) bool {
-	switch ji[i].SortIndex.(type) {
+func (ti TapIndex) Less(i, j int) bool {
+	switch ti[i].SortIndex.(type) {
 	case float32, float64,
 		int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
-		if ji[i].SortIndex == ji[j].SortIndex {
-			return ji[i].Path > ji[j].Path
+		if ti[i].SortIndex == ti[j].SortIndex {
+			return ti[i].Path > ti[j].Path
 		}
-		return ut.ToFloat(ji[i].SortIndex) < ut.ToFloat(ji[j].SortIndex)
+		return ut.ToFloat(ti[i].SortIndex) < ut.ToFloat(ti[j].SortIndex)
 	default:
-		if ji[i].SortIndex.(string) == ji[j].SortIndex.(string) {
-			return ji[i].Path > ji[j].Path
+		if ti[i].SortIndex.(string) == ti[j].SortIndex.(string) {
+			return ti[i].Path > ti[j].Path
 		}
-		return ji[i].SortIndex.(string) < ji[j].SortIndex.(string)
+		return ti[i].SortIndex.(string) < ti[j].SortIndex.(string)
 	}
 }
 
-func (ji JoinerIndex) Swap(i, j int) {
-	ji[i], ji[j] = ji[j], ji[i]
+func (ti TapIndex) Swap(i, j int) {
+	ti[i], ti[j] = ti[j], ti[i]
 }

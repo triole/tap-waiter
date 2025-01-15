@@ -17,11 +17,11 @@ api:
     source: http://localhost:17777/repos.json
     request_method: http_get
     process:
-      - strategy: use_as_url_list
-        request_method: http_get
-        json_path: "#.content.body"
-        regex_match:
-          - "http:\\/\\//*?\""
+      strategy: use_as_url_list
+      request_method: http_get
+      json_path: "#.content.body"
+      regex_match:
+        - "http:\\/\\//*?\""
     return:
       content: true
       unmarshal_content: true
