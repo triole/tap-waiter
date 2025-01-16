@@ -31,7 +31,7 @@ func (ut Util) Find(basedir string, rxFilter string) (filelist []string, err err
 	inf, err := os.Stat(basedir)
 	if err != nil {
 		ut.Lg.Error(
-			"unable to access folder", logseal.F{
+			"find files failed, unable to access folder", logseal.F{
 				"path": basedir, "error": err,
 			},
 		)
@@ -39,7 +39,7 @@ func (ut Util) Find(basedir string, rxFilter string) (filelist []string, err err
 	}
 	if !inf.IsDir() {
 		ut.Lg.Error(
-			"not a folder, please provide a directory to look for files",
+			"find files failed, not a folder, please provide a directory to look for files",
 			logseal.F{"path": basedir},
 		)
 		return
@@ -134,6 +134,13 @@ func (ut Util) IsTextData(by []byte) bool {
 func (ut Util) IsURL(s string) bool {
 	_, err := url.ParseRequestURI(s)
 	return err == nil
+}
+
+func (ut Util) ListInterfaceToListString(itf []interface{}) (r []string) {
+	for _, el := range itf {
+		r = append(r, fmt.Sprintf("%v", el))
+	}
+	return
 }
 
 func (ut Util) ReadFile(filename string) (by []byte, isTextfile bool, err error) {

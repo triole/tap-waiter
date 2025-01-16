@@ -10,7 +10,7 @@ import (
 	"github.com/triole/logseal"
 )
 
-func (conf Conf) templateFile(inp []byte) (by []byte, err error) {
+func (conf Conf) TemplateFile(inp []byte) (by []byte, err error) {
 	ud := conf.getUserdataMap()
 	buf := &bytes.Buffer{}
 	templ, err := template.New("conf").Parse(string(inp))

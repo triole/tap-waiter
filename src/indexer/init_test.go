@@ -1,42 +1,66 @@
 package indexer
 
 import (
+	"testing"
 	"tyson-tap/src/conf"
 	"tyson-tap/src/util"
 
 	"github.com/triole/logseal"
+	yaml "gopkg.in/yaml.v3"
 )
 
-func prepareTests(folder, sortBy string, asc bool) (Indexer, JoinerIndex, Params) {
+type testContext struct {
+	ind    Indexer
+	params Params
+	t      *testing.T
+}
+
+func InitTests(doIndex bool) (tc testContext) {
 	lg := logseal.Init()
-	ut := util.Init(lg)
-	ind := Init(conf.Init(
-		ut.FromTestFolder("conf.yaml"), 16, ut, lg), ut, logseal.Init(),
-	)
-	if folder == "" {
-		folder = ut.FromTestFolder("dump")
+	util := util.Init(lg)
+	conf := conf.Init(ut.FromTestFolder("conf.yaml"), 16, util, lg)
+	tc.ind.Lg = lg
+	tc.ind.Util = util
+	tc.ind.Conf = conf
+	tc.ind = Init(conf, util, lg)
+	tc.params.Endpoint = newTestEndpoint()
+	tc.params.Endpoint.SourceType = "folder"
+	if doIndex {
+		tc.ind.UpdateTapIndex(tc.params)
 	}
-	params := newTestParams(folder, sortBy, asc)
-	params.Endpoint.SourceType = "folder"
-	ji := ind.MakeJoinerIndex(params)
-	return ind, ji, params
+	return
+}
+
+func (tc testContext) readSpecs(filename string) (specs []interface{}) {
+	var by []byte
+	var err error
+	absFilename := tc.ind.Util.FromTestFolder(filename)
+
+	by, _, err = tc.ind.Util.ReadFile(absFilename)
+	if err != nil {
+		tc.t.Errorf("can not read specs file: %q", absFilename)
+	}
+
+	by, err = tc.ind.Conf.TemplateFile(by)
+	if err != nil {
+		tc.t.Errorf("can not expand variables in specs file: %q", absFilename)
+	}
+
+	err = yaml.Unmarshal(by, &specs)
+	if err != nil {
+		tc.t.Errorf("reading specs file failed: %q", filename)
+	} else {
+		tc.ind.Lg.Info("got specs", logseal.F{"filename": filename, "specs": specs})
+	}
+	return
 }
 
 func newTestEndpoint() conf.Endpoint {
 	return conf.Endpoint{Return: conf.ReturnValues{
-		Created:                  true,
-		LastMod:                  true,
+		Created:                  false,
+		LastMod:                  false,
 		Content:                  true,
 		SplitMarkdownFrontMatter: true,
 		Size:                     true,
 	}}
-}
-
-func newTestParams(source, sortBy string, ascending bool) (p Params) {
-	p.Endpoint = newTestEndpoint()
-	p.Endpoint.Source = source
-	p.Threads = 8
-	p.Ascending = ascending
-	p.SortBy = sortBy
-	return
 }

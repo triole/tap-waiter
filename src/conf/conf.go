@@ -25,7 +25,7 @@ func (conf *Conf) readConfig() {
 		"can not read file", logseal.F{"path": conf.FileName, "error": err},
 	)
 
-	by, err = conf.templateFile(by)
+	by, err = conf.TemplateFile(by)
 	conf.Lg.IfErrFatal(
 		"can not expand config variables", logseal.F{"path": conf.FileName, "error": err},
 	)

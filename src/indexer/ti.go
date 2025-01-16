@@ -7,9 +7,9 @@ import (
 	"github.com/triole/logseal"
 )
 
-func (ind *Indexer) MakeTapIndex(params Params) {
+func (ind *Indexer) UpdateTapIndex(params Params) {
 	ind.Lg.Debug(
-		"start indexing and measure duration",
+		"start indexing",
 		logseal.F{"index_params": fmt.Sprintf("%+v", params)},
 	)
 
