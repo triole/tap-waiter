@@ -16,8 +16,11 @@ import (
 
 // keep-sorted start block=yes newline_separated=yes
 func (ut Util) AbsPath(str string) (p string, err error) {
-	p, err = filepath.Abs(str)
-	ut.Lg.IfErrFatal("invalid file path", logseal.F{"path": str, "error": err})
+	p = str
+	if !ut.IsAbs(str) {
+		p, err = filepath.Abs(str)
+		ut.Lg.IfErrFatal("invalid file path", logseal.F{"path": str, "error": err})
+	}
 	return p, err
 }
 
@@ -111,6 +114,10 @@ func (ut Util) GetFileSize(filename string) (siz uint64) {
 
 func (ut Util) GetPathDepth(pth string) int {
 	return len(strings.Split(pth, string(filepath.Separator))) - 1
+}
+
+func (ut Util) IsAbs(s string) bool {
+	return filepath.IsAbs(s)
 }
 
 func (ut Util) IsDir(path string) bool {

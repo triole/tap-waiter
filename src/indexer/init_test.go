@@ -34,23 +34,28 @@ func InitTests(doIndex bool) (tc testContext) {
 func (tc testContext) readSpecs(filename string) (specs []interface{}) {
 	var by []byte
 	var err error
-	absFilename := tc.ind.Util.FromTestFolder(filename)
-
+	absFilename := filename
+	if !tc.ind.Util.IsAbs(absFilename) {
+		absFilename = tc.ind.Util.FromTestFolder(filename)
+	}
+	tc.ind.Lg.Info("read specs file", logseal.F{"filename": absFilename})
 	by, _, err = tc.ind.Util.ReadFile(absFilename)
 	if err != nil {
 		tc.t.Errorf("can not read specs file: %q", absFilename)
 	}
-
 	by, err = tc.ind.Conf.TemplateFile(by)
 	if err != nil {
 		tc.t.Errorf("can not expand variables in specs file: %q", absFilename)
 	}
-
 	err = yaml.Unmarshal(by, &specs)
 	if err != nil {
-		tc.t.Errorf("reading specs file failed: %q", filename)
+		tc.ind.Lg.Fatal(
+			"reading specs file failed",
+			logseal.F{"path": absFilename, "error": err},
+		)
+		// tc.t.Errorf("reading specs file failed: %q", absFilename)
 	} else {
-		tc.ind.Lg.Info("got specs", logseal.F{"filename": filename, "specs": specs})
+		tc.ind.Lg.Info("got specs", logseal.F{"filename": absFilename, "specs": specs})
 	}
 	return
 }

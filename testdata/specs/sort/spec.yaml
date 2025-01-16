@@ -1,19 +1,19 @@
 ---
-- content_folder: dump/html
+- content_folder: "{{.confdir}}/dump/html"
   sort_file: sort.yaml
   ignore_list:
     - sort.yaml
-  expectation:
+  exp:
     - 3.html
     - 1.html
     - 2.html
     - more_than_10k.html
 
-- content_folder: dump/markdown
+- content_folder: "{{.confdir}}/dump/markdown"
   sort_file: sort.yaml
   ignore_list:
     - sort.yaml
-  expectation:
+  exp:
     - subfolder2/3.md
     - subfolder1/3.md
     - subfolder2/1.md

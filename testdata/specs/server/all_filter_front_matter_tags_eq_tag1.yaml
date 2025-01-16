@@ -1,5 +1,5 @@
 ---
-urls:
-  - /all.json?filter=front_matter.tags===tag1
-expectation:
-  - markdown/subfolder1/1.md
+- urls:
+    - /all.json?filter=front_matter.tags===tag1
+  exp:
+    - markdown/subfolder1/1.md

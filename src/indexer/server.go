@@ -57,9 +57,9 @@ func (ind Indexer) ServeContent(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if val, ok := ind.Conf.API[url]; ok {
-		params.Endpoint = val
 		start := time.Now()
-		ind.MakeTapIndex(params)
+		params.Endpoint = val
+		ind.UpdateTapIndex(params)
 		ind.Lg.Debug(
 			"serve json",
 			logseal.F{
