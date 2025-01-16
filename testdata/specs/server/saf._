@@ -1,8 +1,0 @@
----
-urls:
-  - /saf.json
-expectation:
-  - markdown/subfolder1/4.md
-  - markdown/subfolder2/3.md
-  - binary/binary_5k.file
-  - markdown/subfolder2/1.md
