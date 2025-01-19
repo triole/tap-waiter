@@ -60,7 +60,7 @@ function make_repo() {
   var r = {}
   r.id = rand_range(1, 9000)
   r.name = fake({ type: 'string', format: '{productname}' }).toLowerCase().replace(/ /g, '-')
-  r.readme_url = 'http://localhost:4466/punch/public/README.md'
+  r.readme_url = 'http://localhost/private/README.md'
   return r
 }
 

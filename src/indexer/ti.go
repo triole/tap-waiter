@@ -14,50 +14,54 @@ func (ind *Indexer) UpdateTapIndex(params Params) {
 	)
 
 	var err error
-	ind.DataSources.Params = params
-	ind.DataSources.Type = params.Endpoint.SourceType
-	switch ind.DataSources.Type {
-	case "folder":
-		ind.DataSources.Paths, err = ind.Util.Find(
-			ind.DataSources.Params.Endpoint.Source,
-			ind.DataSources.Params.Endpoint.RxFilter,
-		)
-		ind.Lg.IfErrError(
-			"can not identify data sources", logseal.F{"error": err},
-		)
-	default:
-		ind.DataSources.Paths = []string{
-			ind.DataSources.Params.Endpoint.Source,
-		}
-	}
-	ind.assembleTapIndex()
-	sort.Sort(TapIndex(ind.TapIndex))
-
-	if params.Endpoint.SortFileName != "" {
-		ind.TapIndex = ind.TapIndex.applySortFileOrderAndExclusion(params)
-	} else {
-		switch params.SortBy {
-		case "created":
-			ind.TapIndex.sortByCreated()
-		case "lastmod":
-			ind.TapIndex.sortByLastMod()
-		case "size":
-			ind.TapIndex.sortBySize()
+	ti := ind.getTapIndexCache(params.Endpoint.Source)
+	if len(ti) < 1 {
+		ind.DataSources.Params = params
+		ind.DataSources.Type = params.Endpoint.SourceType
+		switch ind.DataSources.Type {
+		case "folder":
+			ind.DataSources.Paths, err = ind.Util.Find(
+				ind.DataSources.Params.Endpoint.Source,
+				ind.DataSources.Params.Endpoint.RxFilter,
+			)
+			ind.Lg.IfErrError(
+				"can not identify data sources", logseal.F{"error": err},
+			)
 		default:
-			ind.TapIndex.sortByOtherParams(params)
+			ind.DataSources.Paths = []string{
+				ind.DataSources.Params.Endpoint.Source,
+			}
 		}
-	}
+		ti = ind.assembleTapIndex()
+		sort.Sort(TapIndex(ti))
 
-	if params.Filter.Enabled {
-		ind.TapIndex = ind.TapIndex.filterIndex(params)
-	}
+		if params.Endpoint.SortFileName != "" {
+			ti = ti.applySortFileOrderAndExclusion(params)
+		} else {
+			switch params.SortBy {
+			case "created":
+				ti.sortByCreated()
+			case "lastmod":
+				ti.sortByLastMod()
+			case "size":
+				ti.sortBySize()
+			default:
+				ti.sortByOtherParams(params)
+			}
+		}
 
-	if params.Ascending {
-		sort.Sort(TapIndex(ind.TapIndex))
-	} else {
-		sort.Sort(sort.Reverse(TapIndex(ind.TapIndex)))
+		if params.Filter.Enabled {
+			ti = ti.filterIndex(params)
+		}
+
+		if params.Ascending {
+			sort.Sort(TapIndex(ti))
+		} else {
+			sort.Sort(sort.Reverse(TapIndex(ti)))
+		}
+		ti = ti.applyIgnoreList(params)
+		ind.setTapIndexCache(params.Endpoint.Source, ti)
 	}
-	ind.TapIndex = ind.TapIndex.applyIgnoreList(params)
 }
 
 func (ti TapIndex) filterIndex(params Params) TapIndex {

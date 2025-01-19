@@ -71,15 +71,15 @@ func TestServeContent(t *testing.T) {
 	fol := ut.FromTestFolder("specs/server")
 	specFiles, err := tc.ind.Util.Find(fol, "\\.yaml$")
 	if err != nil {
-		tc.t.Errorf("can not find specs files: %q", fol)
+		t.Errorf("can not find specs files: %q", fol)
 	}
 
 	for _, specFile := range specFiles {
-		tc.validateServeContent(specFile)
+		tc.validateServeContent(specFile, t)
 	}
 }
 
-func (tc testContext) validateServeContent(specFile string) {
+func (tc testContext) validateServeContent(specFile string, t *testing.T) {
 	specs := tc.readSpecs(specFile)
 	for _, specItf := range specs {
 		spec := specItf.(map[string]interface{})
@@ -96,34 +96,35 @@ func (tc testContext) validateServeContent(specFile string) {
 		defer testsrv.Close()
 
 		for _, url := range urls {
+			tc.ind.flushCache()
 			c := NewClient(testsrv.URL)
 			res, err := http.Get(c.url + url)
 			if err != nil {
-				tc.t.Errorf("test serve content, request failed: %s, %s", url, err)
+				t.Errorf("test serve content, request failed: %s, %s", url, err)
 			}
 			defer res.Body.Close()
 
 			bodyBytes, err := io.ReadAll(res.Body)
 			if err != nil {
-				tc.t.Errorf("test serve content failed, can not read body: %+v", err)
+				t.Errorf("test serve content failed, can not read body: %+v", err)
 			} else {
 				var ti TapIndex
 				err = json.Unmarshal([]byte(bodyBytes), &ti)
 				if err != nil {
-					tc.t.Errorf(
+					t.Errorf(
 						"test joiner index failed, can not unmarshal server response: %+v", err,
 					)
 				}
-				tc.validateTapIndex(ti, url, exp)
+				tc.validateTapIndex(ti, url, exp, t)
 			}
 		}
 	}
 }
 
-func (tc testContext) validateTapIndex(ti TapIndex, url string, exp []string) {
+func (tc testContext) validateTapIndex(ti TapIndex, url string, exp []string, t *testing.T) {
 	failed := false
 	if len(ti) != len(exp) {
-		tc.t.Errorf(
+		t.Errorf(
 			"validate tap index failed: %q, lengths do not match: exp: %+v, got: %+v",
 			url, len(exp), len(ti),
 		)
@@ -135,12 +136,13 @@ func (tc testContext) validateTapIndex(ti TapIndex, url string, exp []string) {
 			}
 		}
 	}
+
 	if failed {
-		tc.t.Errorf(
+		t.Errorf(
 			"validate tap index failed: %q\n"+
 				"exp, len: %d\n %+v,\n"+
 				"got, len: %d\n%+v\n",
-			url, len(exp), exp, len(ti), tc.getTapIndexPaths(),
+			url, len(exp), exp, len(ti), tc.getTapIndexPaths(ti),
 		)
 	}
 }

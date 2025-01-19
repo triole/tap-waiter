@@ -10,13 +10,13 @@ import (
 	yaml "gopkg.in/yaml.v3"
 )
 
-func (conf Conf) newConf() Conf {
-	m := make(map[string]Endpoint)
-	return Conf{
-		Port: 0,
-		API:  m,
-	}
-}
+// func (conf Conf) newConf() Conf {
+// 	m := make(map[string]Endpoint)
+// 	return Conf{
+// 		Port: 0,
+// 		API:  m,
+// 	}
+// }
 
 func (conf *Conf) readConfig() {
 	var content ConfContent

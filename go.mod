@@ -5,6 +5,7 @@ go 1.22.4
 require (
 	github.com/alecthomas/kong v0.9.0
 	github.com/c2h5oh/datasize v0.0.0-20231215233829-aa82cc1e6500
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pelletier/go-toml/v2 v2.2.2
 	github.com/tidwall/gjson v1.18.0
 	github.com/triole/logseal v0.0.0-20240105053125-57d1f8179998

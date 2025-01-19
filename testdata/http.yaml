@@ -2,6 +2,14 @@
 port: 17777
 
 api:
+  repos_unchanged.json:
+    sources: http://localhost/repos
+    request_method: http_get
+    return:
+      created: true
+      content: true
+      unmarshal_content: true
+
   repos.json:
     source: http://localhost/repos
     request_method: http_get
@@ -11,17 +19,19 @@ api:
       unmarshal_content: true
       json_path: "#.readme_url"
       regex_replace:
-        - ["README\\.md", "public.yaml"]
+        - ["private", "public"]
+        - ["/README.md", ""]
 
   meta.json:
-    source: http://localhost:17777/repos.json
+    sources: http://localhost:17777/repos.json
     request_method: http_get
     process:
       strategy: use_as_url_list
       request_method: http_get
-      json_path: "#.content.body"
+      # json_path: "#.content.body"
       regex_match:
-        - "http:\\/\\//*?\""
+        - "https?://[A-Za-z0-9\\/\\.\\-_:]+"
     return:
       content: true
       unmarshal_content: true
+      json_path: "#.content.body"

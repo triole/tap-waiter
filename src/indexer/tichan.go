@@ -10,7 +10,7 @@ import (
 	"github.com/triole/logseal"
 )
 
-func (ind *Indexer) assembleTapIndex() {
+func (ind *Indexer) assembleTapIndex() (ti TapIndex) {
 	chin := make(chan string, ind.Conf.Threads)
 	chout := make(chan TapEntry, ind.Conf.Threads)
 	ln := len(ind.DataSources.Paths)
@@ -34,10 +34,10 @@ func (ind *Indexer) assembleTapIndex() {
 
 		c := 0
 		for te := range chout {
-			te.SortIndex = ind.TapIndex.stringifySortIndex(
+			te.SortIndex = ti.stringifySortIndex(
 				[]interface{}{ind.Util.GetPathDepth(te.Path), te.Path},
 			)
-			ind.TapIndex = append(ind.TapIndex, te)
+			ti = append(ti, te)
 			c++
 			if c >= ln {
 				close(chin)
@@ -48,6 +48,7 @@ func (ind *Indexer) assembleTapIndex() {
 	} else {
 		ind.Lg.Warn("no data source paths", logseal.F{"data_source": ind.DataSources})
 	}
+	return
 }
 
 func (ind Indexer) fetchURL(pth string, ep conf.Endpoint, chin chan string, chout chan TapEntry) {

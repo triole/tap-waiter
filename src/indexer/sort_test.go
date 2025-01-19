@@ -22,13 +22,14 @@ func TestSort(t *testing.T) {
 		tc.params.Endpoint.IgnoreList = ign
 		tc.ind.UpdateTapIndex(tc.params)
 
-		if !tc.orderOK(tc.ind.TapIndex, exp, t) {
+		ti := tc.ind.getTapIndexCache(tc.params.Endpoint.Source)
+		if !tc.orderOK(ti, exp, t) {
 			t.Errorf(
 				"sort failed: %s, asc: %v, \n  exp: %v\n, got: %v",
 				spec["content_folder"].(string),
 				tc.params.Ascending,
 				exp,
-				tc.getTapIndexPaths(),
+				tc.getTapIndexPaths(ti),
 			)
 		}
 	}

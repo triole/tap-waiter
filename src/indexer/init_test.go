@@ -74,7 +74,7 @@ func (tc testContext) orderOK(ti TapIndex, exp []string, t *testing.T) bool {
 	if len(ti) != len(exp) {
 		t.Errorf(
 			"sort failed, lengths differ: %-4d != %-4d\n exp: %+v,\n got: %+v ",
-			len(exp), len(ti), exp, tc.getTapIndexFileNames())
+			len(exp), len(ti), exp, tc.getTapIndexFileNames(ti))
 	} else {
 		for i := 0; i <= len(exp)-1; i++ {
 			if ti[i].Path != exp[i] {
@@ -85,15 +85,15 @@ func (tc testContext) orderOK(ti TapIndex, exp []string, t *testing.T) bool {
 	return true
 }
 
-func (tc testContext) getTapIndexFileNames() (arr []string) {
-	for _, el := range tc.ind.TapIndex {
+func (tc testContext) getTapIndexFileNames(ti TapIndex) (arr []string) {
+	for _, el := range ti {
 		arr = append(arr, el.Path)
 	}
 	return
 }
 
-func (tc testContext) getTapIndexPaths() (arr []string) {
-	for _, el := range tc.ind.TapIndex {
+func (tc testContext) getTapIndexPaths(ti TapIndex) (arr []string) {
+	for _, el := range ti {
 		arr = append(arr, el.Path)
 	}
 	return
