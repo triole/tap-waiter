@@ -26,13 +26,12 @@ func (ind Indexer) req(targetURL, method string) (data []byte, err error) {
 	response, err := client.Do(request)
 	ind.Lg.IfErrError("request failed", logseal.F{"error": err})
 
-	//getting the response
-	data, err = io.ReadAll(response.Body)
-	ind.Lg.IfErrError(
-		"unable to read request response", logseal.F{"error": err},
-	)
-	if err != nil {
-		return
+	if err == nil {
+		//getting the response
+		data, err = io.ReadAll(response.Body)
+		ind.Lg.IfErrError(
+			"unable to read request response", logseal.F{"error": err},
+		)
 	}
 	return
 }
