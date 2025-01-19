@@ -25,7 +25,7 @@ func (ind Indexer) RunServer() {
 }
 
 func (ind Indexer) ServeContent(w http.ResponseWriter, r *http.Request) {
-	ind.Lg.Info("got request", logseal.F{"url": r.URL})
+	ind.Lg.Debug("got request", logseal.F{"url": r.URL})
 	params := Params{
 		Ascending: true,
 		Filter:    FilterParams{Enabled: false},
@@ -60,7 +60,7 @@ func (ind Indexer) ServeContent(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		params.Endpoint = val
 		ind.UpdateTapIndex(params)
-		ind.Lg.Debug(
+		ind.Lg.Info(
 			"serve json",
 			logseal.F{
 				"url": url, "path": val.Source, "rxfilter": val.RxFilter, "duration": time.Since(start),

@@ -22,11 +22,13 @@ func (ind Indexer) req(targetURL, method string) (data []byte, err error) {
 	)
 	ind.Lg.IfErrError("can not init request", logseal.F{"error": err})
 
-	response, err := client.Do(request)
-	ind.Lg.IfErrError("request failed", logseal.F{"error": err})
+	resp, err := client.Do(request)
+	ind.Lg.IfErrError(
+		"request failed",
+		logseal.F{"error": err})
 
 	if err == nil {
-		data, err = io.ReadAll(response.Body)
+		data, err = io.ReadAll(resp.Body)
 		ind.Lg.IfErrError(
 			"unable to read request response", logseal.F{"error": err},
 		)

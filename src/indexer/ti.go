@@ -14,7 +14,7 @@ func (ind *Indexer) UpdateTapIndex(params Params) {
 	)
 
 	var err error
-	ti := ind.getTapIndexCache(params.Endpoint.Source)
+	ti, tim := ind.getTapIndexCacheWithExpiration(params.Endpoint.Source)
 	if len(ti) < 1 {
 		ind.DataSources.Params = params
 		ind.DataSources.Type = params.Endpoint.SourceType
@@ -61,6 +61,13 @@ func (ind *Indexer) UpdateTapIndex(params Params) {
 		}
 		ti = ti.applyIgnoreList(params)
 		ind.setTapIndexCache(params.Endpoint.Source, ti)
+	} else {
+		ind.Lg.Debug(
+			"return from cache",
+			logseal.F{
+				"key":             params.Endpoint.Source,
+				"expiration_time": tim,
+			})
 	}
 }
 
