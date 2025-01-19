@@ -184,6 +184,11 @@ func (ut Util) RxFind(rx string, content string) string {
 	return temp.FindString(content)
 }
 
+func (ut Util) RxFindAll(rx string, content string) []string {
+	temp, _ := regexp.Compile(rx)
+	return temp.FindAllString(content, -1)
+}
+
 func (ut Util) RxMatch(rx string, content string) bool {
 	temp, _ := regexp.Compile(rx)
 	return temp.MatchString(content)
