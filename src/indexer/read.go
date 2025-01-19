@@ -87,32 +87,36 @@ func (ind Indexer) unmarshal(by []byte, ps conf.Endpoint) (content FileContent) 
 		)
 	}
 	if ps.Return.JSONPath != "" {
-		ind.Lg.Trace(
-			"parse unmarshalled data using json path",
-			logseal.F{
-				"json_path": ps.Return.JSONPath,
-			},
-		)
-		marsh, err := json.Marshal(content.Body)
-		ind.Lg.IfErrError(
-			"can not prepare to apply json path",
-			logseal.F{"error": err},
-		)
-		if err == nil {
-			result := gjson.GetBytes(marsh, ps.Return.JSONPath)
-			if len(result.String()) < 1 {
-				ind.Lg.Warn(
-					"json path result is empty",
-					logseal.F{"json_path": ps.Return.JSONPath},
-				)
-			} else {
-				content = ind.unmarshalJSON([]byte(result.String()))
-			}
-		} else {
-			content = FileContent{}
-		}
+		ind.returnJSONPath(content, ps)
 	}
+	return
+}
 
+func (ind Indexer) returnJSONPath(content FileContent, ep conf.Endpoint) (r FileContent) {
+	ind.Lg.Trace(
+		"parse unmarshalled data using json path",
+		logseal.F{
+			"json_path": ep.Return.JSONPath,
+		},
+	)
+	marsh, err := json.Marshal(content.Body)
+	ind.Lg.IfErrError(
+		"can not prepare to apply json path",
+		logseal.F{"error": err},
+	)
+	if err == nil {
+		result := gjson.GetBytes(marsh, ep.Return.JSONPath)
+		if len(result.String()) < 1 {
+			ind.Lg.Warn(
+				"json path result is empty",
+				logseal.F{"json_path": ep.Return.JSONPath},
+			)
+		} else {
+			r = ind.unmarshalJSON([]byte(result.String()))
+		}
+	} else {
+		r = FileContent{}
+	}
 	return
 }
 
