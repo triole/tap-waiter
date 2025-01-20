@@ -10,23 +10,23 @@ import (
 	"github.com/triole/logseal"
 )
 
-func (ind *Indexer) assembleTapIndex() (ti TapIndex) {
+func (ind *Indexer) assembleTapIndex(params Params) (ti TapIndex) {
 	chin := make(chan string, ind.Conf.Threads)
 	chout := make(chan TapEntry, ind.Conf.Threads)
-	ln := len(ind.DataSources.Paths)
+	ln := len(params.Sources)
 	if ln > 0 {
-		for _, pth := range ind.DataSources.Paths {
-			switch ind.DataSources.Type {
+		for _, pth := range params.Sources {
+			switch params.Type {
 			case "url":
-				ind.Lg.Debug("fetch url", logseal.F{"path": pth})
+				ind.Lg.Debug("fetch url", logseal.F{"url": pth})
 				go ind.fetchURL(
-					pth, ind.DataSources.Params.Endpoint,
+					pth, params.Endpoint,
 					chin, chout,
 				)
 			default:
 				ind.Lg.Debug("read file", logseal.F{"path": pth})
 				go ind.readFile(
-					pth, ind.DataSources.Params.Endpoint,
+					pth, params.Endpoint,
 					chin, chout,
 				)
 			}
@@ -46,7 +46,10 @@ func (ind *Indexer) assembleTapIndex() (ti TapIndex) {
 			}
 		}
 	} else {
-		ind.Lg.Warn("no data source paths", logseal.F{"data_source": ind.DataSources})
+		ind.Lg.Warn(
+			"no data source paths",
+			logseal.F{"data_source": params.Sources},
+		)
 	}
 	return
 }

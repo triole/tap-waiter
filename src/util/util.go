@@ -29,6 +29,13 @@ func (ut Util) AbsPathSlim(str string) (p string) {
 	return
 }
 
+func (ut Util) FileOrFolder(s string) string {
+	if ut.IsDir(s) {
+		return "folder"
+	}
+	return "file"
+}
+
 func (ut Util) Find(basedir string, rxFilter string) (filelist []string, err error) {
 	filelist = []string{}
 	inf, err := os.Stat(basedir)

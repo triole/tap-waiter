@@ -3,7 +3,7 @@ port: 17777
 
 api:
   repos_unchanged.json:
-    sources: http://localhost/repos
+    source: http://localhost/repos
     request_method: http_get
     return:
       created: true
@@ -23,12 +23,12 @@ api:
         - ["/README.md", ""]
 
   meta.json:
-    sources: http://localhost:17777/repos.json
+    source: http://localhost:17777/repos.json
     request_method: http_get
     process:
       strategy: use_as_url_list
       request_method: http_get
-      # json_path: "#.content.body"
+      json_path: "#.content.body"
       regex_match:
         - "https?://[A-Za-z0-9\\/\\.\\-_:]+"
     return:

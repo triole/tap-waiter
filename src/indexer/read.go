@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"path/filepath"
 	"tyson-tap/src/conf"
 
@@ -87,16 +88,16 @@ func (ind Indexer) unmarshal(by []byte, ps conf.Endpoint) (content FileContent) 
 		)
 	}
 	if ps.Return.JSONPath != "" {
-		ind.returnJSONPath(content, ps)
+		ind.returnJSONPath(content, ps.Return.JSONPath)
 	}
 	return
 }
 
-func (ind Indexer) returnJSONPath(content FileContent, ep conf.Endpoint) (r FileContent) {
+func (ind Indexer) returnJSONPath(content FileContent, jsonPath string) (r FileContent) {
 	ind.Lg.Trace(
 		"parse unmarshalled data using json path",
 		logseal.F{
-			"json_path": ep.Return.JSONPath,
+			"json_path": jsonPath,
 		},
 	)
 	marsh, err := json.Marshal(content.Body)
@@ -105,17 +106,27 @@ func (ind Indexer) returnJSONPath(content FileContent, ep conf.Endpoint) (r File
 		logseal.F{"error": err},
 	)
 	if err == nil {
-		result := gjson.GetBytes(marsh, ep.Return.JSONPath)
+		result := gjson.GetBytes(marsh, jsonPath)
 		if len(result.String()) < 1 {
 			ind.Lg.Warn(
 				"json path result is empty",
-				logseal.F{"json_path": ep.Return.JSONPath},
+				logseal.F{"json_path": jsonPath},
 			)
 		} else {
 			r = ind.unmarshalJSON([]byte(result.String()))
 		}
 	} else {
 		r = FileContent{}
+	}
+	return
+}
+
+func (ind Indexer) returnRegexMatch(content FileContent, regex []string) (r []string) {
+	for _, rx := range regex {
+		r = append(
+			r,
+			ind.Util.RxFindAll(rx, fmt.Sprintf("%s", content))...,
+		)
 	}
 	return
 }

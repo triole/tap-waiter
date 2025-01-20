@@ -33,7 +33,7 @@ func (conf *Conf) readConfig() {
 		val.SourceType = "url"
 		if conf.Util.IsLocalPath(val.Source) {
 			val.Source, _ = conf.Util.AbsPath(val.Source)
-			val.SourceType = conf.fileOrFolder(val.Source)
+			val.SourceType = conf.Util.FileOrFolder(val.Source)
 		}
 		if val.SourceType == "url" && val.RequestMethod == "" {
 			val.RequestMethod = "get"
@@ -58,11 +58,4 @@ func (conf *Conf) readConfig() {
 		}
 		conf.API[key] = val
 	}
-}
-
-func (conf Conf) fileOrFolder(s string) string {
-	if conf.Util.IsDir(s) {
-		return "folder"
-	}
-	return "file"
 }

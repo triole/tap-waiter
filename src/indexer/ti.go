@@ -3,36 +3,93 @@ package indexer
 import (
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/triole/logseal"
 )
 
+func (ind *Indexer) updateParams(params Params, process bool) Params {
+	src := params.Endpoint.Source
+	params.Type = "url"
+	if ind.Conf.Util.IsLocalPath(params.Endpoint.Source) {
+		src, _ = ind.Conf.Util.AbsPath(params.Endpoint.Source)
+		params.Type = ind.Util.FileOrFolder(src)
+	}
+	params.Sources = []string{src}
+	if params.RequestMethod == "" {
+		if process {
+			params.RequestMethod = params.Endpoint.Process.RequestMethod
+		} else {
+			params.RequestMethod = params.Endpoint.RequestMethod
+		}
+	}
+	if params.Type == "url" && params.RequestMethod == "" {
+		params.RequestMethod = "get"
+	}
+	params.RequestMethod = strings.ToUpper(params.RequestMethod)
+	params.RequestMethod = ind.Conf.Util.RxReplaceAll(
+		params.RequestMethod, "^HTTP_", "",
+	)
+	return params
+}
+
 func (ind *Indexer) UpdateTapIndex(params Params) {
+	params = ind.updateParams(params, false)
 	ind.Lg.Debug(
-		"start indexing",
+		"start updating index",
 		logseal.F{"index_params": fmt.Sprintf("%+v", params)},
 	)
-
 	var err error
 	ti, tim := ind.getTapIndexCacheWithExpiration(params.Endpoint.Source)
 	if len(ti) < 1 {
-		ind.DataSources.Params = params
-		ind.DataSources.Type = params.Endpoint.SourceType
-		switch ind.DataSources.Type {
+		switch params.Type {
 		case "folder":
-			ind.DataSources.Paths, err = ind.Util.Find(
-				ind.DataSources.Params.Endpoint.Source,
-				ind.DataSources.Params.Endpoint.RxFilter,
+			params.Sources, err = ind.Util.Find(
+				params.Endpoint.Source,
+				params.Endpoint.RxFilter,
 			)
 			ind.Lg.IfErrError(
 				"can not identify data sources", logseal.F{"error": err},
 			)
-		default:
-			ind.DataSources.Paths = []string{
-				ind.DataSources.Params.Endpoint.Source,
+		}
+		ti = ind.assembleTapIndex(params)
+		if params.Endpoint.Process.Strategy == "use_as_url_list" {
+			params = ind.updateParams(params, true)
+			if params.Endpoint.Process.JSONPath != "" {
+				for idx, el := range ti {
+					ti[idx].Content = ind.returnJSONPath(
+						el.Content, params.Endpoint.Process.JSONPath,
+					)
+				}
+			}
+			if len(params.Endpoint.Process.RegexMatch) > 0 {
+				for idx, el := range ti {
+					URLs := ind.returnRegexMatch(
+						el.Content, params.Endpoint.Process.RegexMatch,
+					)
+					ti[idx].Content = FileContent{Body: URLs}
+					params.Sources = URLs
+					params.Type = "url"
+					ind.DataSources.Params = params
+				}
+			}
+			if len(params.Sources) < 1 {
+				ind.Lg.Warn(
+					"process urls list is empty",
+					logseal.F{"regex": fmt.Sprintf("%+v", params.Endpoint.Process.RegexMatch)},
+				)
+			} else {
+				ti = ind.assembleTapIndex(params)
+				if params.Endpoint.Process.JSONPath != "" {
+					for idx, el := range ti {
+						ti[idx].Content = ind.returnJSONPath(
+							el.Content, params.Endpoint.Process.JSONPath,
+						)
+					}
+				}
 			}
 		}
-		ti = ind.assembleTapIndex()
+
 		sort.Sort(TapIndex(ti))
 
 		if params.Endpoint.SortFileName != "" {

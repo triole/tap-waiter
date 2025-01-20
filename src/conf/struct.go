@@ -23,7 +23,6 @@ type ConfContent struct {
 type Endpoint struct {
 	Source             string `yaml:"source"`
 	SourceType         string
-	URL                string   `yaml:"url"`
 	RequestMethod      string   `yaml:"request_method"`
 	RxFilter           string   `yaml:"regex_filter"`
 	SortFileName       string   `yaml:"sort_file_name"`
