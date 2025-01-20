@@ -29,18 +29,6 @@ func (conf *Conf) readConfig() {
 	for key, val := range content.API {
 		key = "/" + path.Clean(key)
 
-		val.SourceType = "url"
-		if conf.Util.IsLocalPath(val.Source) {
-			val.Source, _ = conf.Util.AbsPath(val.Source)
-			val.SourceType = conf.Util.FileOrFolder(val.Source)
-		}
-		// if val.SourceType == "url" && val.RequestMethod == "" {
-		// 	val.RequestMethod = "get"
-		// }
-		// val.RequestMethod = strings.ToUpper(val.RequestMethod)
-		// val.RequestMethod = conf.Util.RxReplaceAll(
-		// 	val.RequestMethod, "^HTTP_", "",
-		// )
 		var v datasize.ByteSize
 		if val.MaxReturnSize == "" {
 			val.MaxReturnSize = "10K"
