@@ -92,6 +92,16 @@ func (ind Indexer) unmarshal(by []byte, ps conf.Endpoint) (content FileContent) 
 	}
 	return
 }
+func (ind Indexer) applyJSONPath(ti TapIndex, jsonPath string) TapIndex {
+	if jsonPath != "" {
+		for idx, el := range ti {
+			ti[idx].Content = ind.returnJSONPath(
+				el.Content, jsonPath,
+			)
+		}
+	}
+	return ti
+}
 
 func (ind Indexer) returnJSONPath(content FileContent, jsonPath string) (r FileContent) {
 	ind.Lg.Trace(

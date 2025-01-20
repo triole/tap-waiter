@@ -55,13 +55,7 @@ func (ind *Indexer) UpdateTapIndex(params Params) {
 		ti = ind.assembleTapIndex(params)
 		if params.Endpoint.Process.Strategy == "use_as_url_list" {
 			params = ind.updateParams(params, true)
-			if params.Endpoint.Process.JSONPath != "" {
-				for idx, el := range ti {
-					ti[idx].Content = ind.returnJSONPath(
-						el.Content, params.Endpoint.Process.JSONPath,
-					)
-				}
-			}
+			ti = ind.applyJSONPath(ti, params.Endpoint.Process.JSONPath)
 			if len(params.Endpoint.Process.RegexMatch) > 0 {
 				for idx, el := range ti {
 					URLs := ind.returnRegexMatch(
@@ -80,13 +74,7 @@ func (ind *Indexer) UpdateTapIndex(params Params) {
 				)
 			} else {
 				ti = ind.assembleTapIndex(params)
-				if params.Endpoint.Process.JSONPath != "" {
-					for idx, el := range ti {
-						ti[idx].Content = ind.returnJSONPath(
-							el.Content, params.Endpoint.Process.JSONPath,
-						)
-					}
-				}
+				ti = ind.applyJSONPath(ti, params.Endpoint.Process.JSONPath)
 			}
 		}
 
