@@ -117,7 +117,7 @@ func (ind *Indexer) UpdateTapIndex(params Params) {
 			sort.Sort(sort.Reverse(TapIndex(ti)))
 		}
 		ti = ti.applyIgnoreList(params)
-		ind.setTapIndexCache(params.Endpoint.Source, ti)
+		ind.setTapIndexCache(params.Endpoint.EpURL, ti)
 	} else {
 		ind.Lg.Debug(
 			"return from cache",

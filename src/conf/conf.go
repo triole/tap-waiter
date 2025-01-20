@@ -56,6 +56,7 @@ func (conf *Conf) readConfig() {
 				},
 			)
 		}
+		val.EpURL = key
 		conf.API[key] = val
 	}
 }
