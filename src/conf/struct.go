@@ -24,7 +24,7 @@ type Endpoint struct {
 	EpURL              string
 	Source             string `yaml:"source"`
 	SourceType         string
-	RequestMethod      string   `yaml:"request_method"`
+	Method             string   `yaml:"request_method"`
 	RxFilter           string   `yaml:"regex_filter"`
 	SortFileName       string   `yaml:"sort_file_name"`
 	IgnoreList         []string `yaml:"regex_ignore_list"`
@@ -35,10 +35,10 @@ type Endpoint struct {
 }
 
 type Process struct {
-	Strategy      string   `yaml:"strategy"`
-	RequestMethod string   `yaml:"request_method"`
-	JSONPath      string   `yaml:"json_path"`
-	RegexMatch    []string `yaml:"regex_match"`
+	Strategy   string   `yaml:"strategy"`
+	Method     string   `yaml:"request_method"`
+	JSONPath   string   `yaml:"json_path"`
+	RegexMatch []string `yaml:"regex_match"`
 }
 
 type ReturnValues struct {

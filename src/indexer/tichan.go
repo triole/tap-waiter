@@ -58,7 +58,7 @@ func (ind Indexer) fetchURL(pth string, ep conf.Endpoint, chin chan string, chou
 	te := TapEntry{Path: pth}
 	chin <- te.Path
 	if ep.Return.Content || ep.Process.Strategy != "" {
-		resp, err := ind.req(ep.Source, ep.RequestMethod)
+		resp, err := ind.req(ep.Source, ep.Method)
 		te.Content = ind.byteToBody(resp)
 		te.Content.Error = err
 		if te.Content.Error == nil {

@@ -3,7 +3,6 @@ package conf
 import (
 	"os"
 	"path"
-	"strings"
 
 	"github.com/c2h5oh/datasize"
 	"github.com/triole/logseal"
@@ -35,13 +34,13 @@ func (conf *Conf) readConfig() {
 			val.Source, _ = conf.Util.AbsPath(val.Source)
 			val.SourceType = conf.Util.FileOrFolder(val.Source)
 		}
-		if val.SourceType == "url" && val.RequestMethod == "" {
-			val.RequestMethod = "get"
-		}
-		val.RequestMethod = strings.ToUpper(val.RequestMethod)
-		val.RequestMethod = conf.Util.RxReplaceAll(
-			val.RequestMethod, "^HTTP_", "",
-		)
+		// if val.SourceType == "url" && val.RequestMethod == "" {
+		// 	val.RequestMethod = "get"
+		// }
+		// val.RequestMethod = strings.ToUpper(val.RequestMethod)
+		// val.RequestMethod = conf.Util.RxReplaceAll(
+		// 	val.RequestMethod, "^HTTP_", "",
+		// )
 		var v datasize.ByteSize
 		if val.MaxReturnSize == "" {
 			val.MaxReturnSize = "10K"

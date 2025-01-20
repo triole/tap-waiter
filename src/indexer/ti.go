@@ -16,19 +16,19 @@ func (ind *Indexer) updateParams(params Params, process bool) Params {
 		params.Type = ind.Util.FileOrFolder(src)
 	}
 	params.Sources = []string{src}
-	if params.RequestMethod == "" {
+	if params.Method == "" {
 		if process {
-			params.RequestMethod = params.Endpoint.Process.RequestMethod
+			params.Method = params.Endpoint.Process.Method
 		} else {
-			params.RequestMethod = params.Endpoint.RequestMethod
+			params.Method = params.Endpoint.Method
 		}
 	}
-	if params.Type == "url" && params.RequestMethod == "" {
-		params.RequestMethod = "get"
+	if params.Type == "url" && params.Method == "" {
+		params.Method = "get"
 	}
-	params.RequestMethod = strings.ToUpper(params.RequestMethod)
-	params.RequestMethod = ind.Conf.Util.RxReplaceAll(
-		params.RequestMethod, "^HTTP_", "",
+	params.Method = strings.ToUpper(params.Method)
+	params.Method = ind.Conf.Util.RxReplaceAll(
+		params.Method, "^HTTP_", "",
 	)
 	return params
 }

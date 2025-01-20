@@ -28,13 +28,13 @@ type FileContent struct {
 }
 
 type Params struct {
-	Endpoint      conf.Endpoint
-	Sources       []string
-	RequestMethod string
-	Type          string
-	Filter        FilterParams
-	SortBy        string
-	Ascending     bool
+	Endpoint  conf.Endpoint
+	Sources   []string
+	Method    string
+	Type      string
+	Filter    FilterParams
+	SortBy    string
+	Ascending bool
 }
 
 type FilterParams struct {
