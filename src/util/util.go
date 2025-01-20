@@ -8,9 +8,11 @@ import (
 	"regexp"
 	"runtime"
 	"strings"
+	"time"
 	"unicode/utf8"
 
 	"github.com/triole/logseal"
+	str2duration "github.com/xhit/go-str2duration/v2"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -204,6 +206,11 @@ func (ut Util) RxMatch(rx string, content string) bool {
 func (ut Util) RxReplaceAll(basestring, regex, newstring string) (r string) {
 	rx := regexp.MustCompile(regex)
 	r = rx.ReplaceAllString(basestring, newstring)
+	return
+}
+
+func (ut Util) Str2Dur(s string) (dur time.Duration, err error) {
+	dur, err = str2duration.ParseDuration(s)
 	return
 }
 

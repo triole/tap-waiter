@@ -1,5 +1,8 @@
 ---
 port: 17777
+# use like: 180s, 3m... 0 for no caching
+default_cache_lifetime: 5m
+
 api:
   file.json:
     source: "{{.confdir}}/dump/html/1.html"
@@ -90,13 +93,13 @@ api:
       content: true
 
   # http part
-  simple_return:
+  simple_serve.json:
     source: |
       hello
       there
     method: serve
 
-  repos_unmod:
+  repos_unmod.json:
     source: http://localhost/repos
     method: http_get
     return:

@@ -1,7 +1,6 @@
 package indexer
 
 import (
-	"time"
 	"tyson-tap/src/conf"
 	"tyson-tap/src/util"
 
@@ -23,10 +22,13 @@ type Indexer struct {
 
 func Init(conf conf.Conf, util util.Util, lg logseal.Logseal) (idx Indexer) {
 	idx = Indexer{
-		Cache: cache.New(5*time.Minute, 10*time.Minute),
-		Conf:  conf,
-		Util:  util,
-		Lg:    lg,
+		Cache: cache.New(
+			conf.DefaultCacheLifetime,
+			conf.DefaultCacheLifetime*2,
+		),
+		Conf: conf,
+		Util: util,
+		Lg:   lg,
 	}
 	return idx
 }

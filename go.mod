@@ -9,6 +9,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.2.2
 	github.com/tidwall/gjson v1.18.0
 	github.com/triole/logseal v0.0.0-20240105053125-57d1f8179998
+	github.com/xhit/go-str2duration/v2 v2.1.0
 	github.com/yuin/goldmark v1.7.4
 	github.com/yuin/goldmark-meta v1.1.0
 	gopkg.in/yaml.v2 v2.3.0

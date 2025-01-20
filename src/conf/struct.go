@@ -1,23 +1,26 @@
 package conf
 
 import (
+	"time"
 	"tyson-tap/src/util"
 
 	"github.com/triole/logseal"
 )
 
 type Conf struct {
-	FileName string
-	Threads  int
-	Port     int
-	API      map[string]Endpoint
-	Util     util.Util
-	Lg       logseal.Logseal
+	FileName             string
+	Threads              int
+	Port                 int
+	DefaultCacheLifetime time.Duration
+	API                  map[string]Endpoint
+	Util                 util.Util
+	Lg                   logseal.Logseal
 }
 
 type ConfContent struct {
-	Port int                 `yaml:"port"`
-	API  map[string]Endpoint `yaml:"api"`
+	Port                    int                 `yaml:"port"`
+	API                     map[string]Endpoint `yaml:"api"`
+	DefaultCacheLifetimeStr string              `yaml:"default_cache_lifetime"`
 }
 
 type Endpoint struct {

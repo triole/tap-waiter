@@ -43,6 +43,15 @@ func (conf *Conf) readConfig() {
 				},
 			)
 		}
+
+		conf.DefaultCacheLifetime, err = conf.Util.Str2Dur(
+			content.DefaultCacheLifetimeStr,
+		)
+		conf.Lg.IfErrFatal(
+			"can not parse cache lifetime setting",
+			logseal.F{"error": err},
+		)
+
 		val.EpURL = key
 		conf.API[key] = val
 	}

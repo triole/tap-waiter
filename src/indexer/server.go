@@ -17,7 +17,10 @@ import (
 func (ind Indexer) RunServer() {
 	http.HandleFunc("/", ind.ServeContent)
 	portstr := strconv.Itoa(ind.Conf.Port)
-	ind.Lg.Info("run server, listen at :" + portstr + "/")
+	ind.Lg.Info(
+		"run server, listen at :"+portstr+"/",
+		logseal.F{"default_cache_lifetime": ind.Conf.DefaultCacheLifetime},
+	)
 	err := http.ListenAndServe(":"+portstr, nil)
 	if err != nil {
 		panic(err)
