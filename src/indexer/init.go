@@ -1,8 +1,8 @@
 package indexer
 
 import (
-	"tyson-tap/src/conf"
-	"tyson-tap/src/util"
+	"tap-waiter/src/conf"
+	"tap-waiter/src/util"
 
 	cache "github.com/patrickmn/go-cache"
 	"github.com/triole/logseal"

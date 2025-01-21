@@ -1,4 +1,4 @@
-# Tyson Tap ![build](https://github.com/triole/tyson-tap/actions/workflows/build.yaml/badge.svg) ![test](https://github.com/triole/tyson-tap/actions/workflows/test.yaml/badge.svg)
+# Tyson Tap ![build](https://github.com/triole/tap-waiter/actions/workflows/build.yaml/badge.svg) ![test](https://github.com/triole/tap-waiter/actions/workflows/test.yaml/badge.svg)
 
 <!-- toc -->
 
@@ -84,15 +84,7 @@ order:
 Here are a few URL parameter examples which are hopefully self explanatory. Please keep in mind that special characters have to be url encoded.
 
 ```go mdox-exec="sh/display_test_urls.sh"
-/all.json
-/all.json?filter=front_matter.tags!=tag1
-/all.json?filter=front_matter.tags===tag1
-/all.json?filter=front_matter.tags==tag1
-/all.json?filter=front_matter.tags!==tag1&order=desc
-/all.json?filter=metadata.tags==ivoa
-/all.json?filter=tags!==ivoa&order=desc
-/all.json?sortby=front_matter.title
-/all.json?sortby=size&order=desc
+
 ```
 
 # Filters

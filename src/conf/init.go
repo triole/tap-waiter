@@ -1,7 +1,7 @@
 package conf
 
 import (
-	"tyson-tap/src/util"
+	"tap-waiter/src/util"
 
 	"github.com/triole/logseal"
 )

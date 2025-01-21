@@ -1,9 +1,9 @@
 package indexer
 
 import (
+	"tap-waiter/src/conf"
+	"tap-waiter/src/util"
 	"testing"
-	"tyson-tap/src/conf"
-	"tyson-tap/src/util"
 
 	"github.com/triole/logseal"
 	yaml "gopkg.in/yaml.v3"

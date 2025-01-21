@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"tyson-tap/src/conf"
-	"tyson-tap/src/indexer"
-	"tyson-tap/src/util"
+	"tap-waiter/src/conf"
+	"tap-waiter/src/indexer"
+	"tap-waiter/src/util"
 
 	"github.com/triole/logseal"
 )

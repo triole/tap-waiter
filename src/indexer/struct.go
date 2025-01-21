@@ -1,6 +1,6 @@
 package indexer
 
-import "tyson-tap/src/conf"
+import "tap-waiter/src/conf"
 
 type DataSources struct {
 	Paths  []string

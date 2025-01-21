@@ -4,7 +4,7 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
-	"tyson-tap/src/conf"
+	"tap-waiter/src/conf"
 
 	"github.com/c2h5oh/datasize"
 	"github.com/triole/logseal"

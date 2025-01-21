@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
-	"tyson-tap/src/conf"
+	"tap-waiter/src/conf"
 
 	toml "github.com/pelletier/go-toml/v2"
 	"github.com/tidwall/gjson"

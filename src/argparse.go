@@ -14,13 +14,13 @@ import (
 
 var (
 	BUILDTAGS      string
-	appName        = "tyson tap"
+	appName        = "tap-waiter"
 	appDescription = "scan folders for toml, yaml, json or markdown files and offer a web server to fetch information about them"
 	appMainversion = "0.1"
 )
 
 var CLI struct {
-	Conf         string `help:"path to scan, default is current dir" arg:"" optional:"" default:"${curdir}"`
+	Conf         string `help:"path to config, default is {current_dir}/tap.json" arg:"" optional:"" default:"${curdir}"`
 	Threads      int    `help:"max threads, default no of avail. cpu threads" short:"t" default:"${proc}"`
 	LogFile      string `help:"log file" default:"/dev/stdout"`
 	LogLevel     string `help:"log level" default:"info" enum:"trace,debug,info,error"`
@@ -43,7 +43,7 @@ func parseArgs() {
 		kong.Vars{
 			"curdir":  curdir,
 			"logfile": path.Join(os.TempDir(), alnum(appName)+".log"),
-			"output":  path.Join(curdir, "tyson.json"),
+			"output":  path.Join(curdir, "tap.json"),
 			"proc":    strconv.Itoa(runtime.NumCPU()),
 			"filter":  "\\.(md|toml|yaml|json)$",
 		},
