@@ -10,7 +10,7 @@ import (
 type Conf struct {
 	FileName             string
 	Threads              int
-	Port                 int
+	Bind                 string
 	DefaultCacheLifetime time.Duration
 	API                  map[string]Endpoint
 	Util                 util.Util
@@ -18,7 +18,7 @@ type Conf struct {
 }
 
 type ConfContent struct {
-	Port                    int                 `yaml:"port"`
+	Bind                    string              `yaml:"bind"`
 	API                     map[string]Endpoint `yaml:"api"`
 	DefaultCacheLifetimeStr string              `yaml:"default_cache_lifetime"`
 }

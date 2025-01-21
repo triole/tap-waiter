@@ -25,7 +25,7 @@ func (conf *Conf) readConfig() {
 	conf.Lg.IfErrFatal(
 		"can not unmarshal config", logseal.F{"path": conf.FileName, "error": err},
 	)
-	conf.Port = content.Port
+	conf.Bind = content.Bind
 	for key, val := range content.API {
 		key = "/" + path.Clean(key)
 
