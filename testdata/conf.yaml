@@ -1,6 +1,5 @@
 ---
 port: 17777
-# use like: 180s, 3m... 0 for no caching
 default_cache_lifetime: 5m
 
 api:

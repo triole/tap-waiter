@@ -1,11 +1,17 @@
 ---
 port: 17777 # port to listen at
+default_cache_lifetime: 5m # e.g.: 180s, 3m... 0 for no caching
+
 api: # list of api endpoints
   # url where to endpoint is reachable
   all.json:
 
-    # folder to be scanned for files
-    folder: ../testdata
+    # data source, can be folder, file or url
+    source: ../testdata
+
+    # method to read the data, to specify http request method
+    # not necessary for file reading
+    # method: get
 
     # only detect files which fit the regex filter
     regex_filter: ".+"
@@ -25,7 +31,7 @@ api: # list of api endpoints
 
     # set of return values to add to the final json
     # bool values are by default false and have to be enabled explicitely
-    return_values:
+    return:
       # an array of the file path split at the path separator
       split_path: false
 
