@@ -44,6 +44,9 @@ func (conf *Conf) readConfig() {
 			)
 		}
 
+		if content.DefaultCacheLifetimeStr == "" {
+			content.DefaultCacheLifetimeStr = "5m"
+		}
 		conf.DefaultCacheLifetime, err = conf.Util.Str2Dur(
 			content.DefaultCacheLifetimeStr,
 		)
