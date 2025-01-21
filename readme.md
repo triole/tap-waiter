@@ -19,7 +19,7 @@ Tap Waiter offers an http api that serves json objects containing information ab
 A configuration file is required and defines the listening port and the api endpoint definitions. A simple example can be found below and another in the `testdata` folder.
 
 ```go mdox-exec="tail -n +2 conf/conf.yaml"
-port: 17777 # port to listen at
+bind: 0.0.0.0:17777 # bind server to
 default_cache_lifetime: 5m # e.g.: 180s, 3m... 0 for no caching
 
 api: # list of api endpoints

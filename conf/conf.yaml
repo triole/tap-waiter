@@ -1,5 +1,5 @@
 ---
-port: 17777 # port to listen at
+bind: 0.0.0.0:17777 # bind server to
 default_cache_lifetime: 5m # e.g.: 180s, 3m... 0 for no caching
 
 api: # list of api endpoints
