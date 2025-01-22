@@ -14,7 +14,7 @@ import (
 )
 
 func (ind Indexer) RunServer() {
-	http.HandleFunc("/", ind.ServeContent)
+	http.HandleFunc("/", ind.serveContent)
 	ind.Lg.Info(
 		"run server",
 		logseal.F{
@@ -28,7 +28,7 @@ func (ind Indexer) RunServer() {
 	}
 }
 
-func (ind Indexer) ServeContent(w http.ResponseWriter, r *http.Request) {
+func (ind Indexer) serveContent(w http.ResponseWriter, r *http.Request) {
 	ind.Lg.Debug("got request", logseal.F{"url": r.URL})
 	params := Params{
 		Ascending: true,
@@ -63,7 +63,7 @@ func (ind Indexer) ServeContent(w http.ResponseWriter, r *http.Request) {
 	if val, ok := ind.Conf.API[url]; ok {
 		start := time.Now()
 		params.Endpoint = val
-		ind.UpdateTapIndex(params)
+		ind.updateTapIndex(params)
 		ind.Lg.Info(
 			"serve json",
 			logseal.F{

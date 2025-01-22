@@ -33,7 +33,7 @@ func (ind *Indexer) updateParams(params Params, process bool) Params {
 	return params
 }
 
-func (ind *Indexer) UpdateTapIndex(params Params) {
+func (ind *Indexer) updateTapIndex(params Params) {
 	params = ind.updateParams(params, false)
 	ind.Lg.Debug(
 		"start updating index",

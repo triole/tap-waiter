@@ -26,7 +26,7 @@ func InitTests(doIndex bool) (tc testContext) {
 	tc.params.Endpoint = newTestEndpoint()
 	tc.params.Endpoint.SourceType = "folder"
 	if doIndex {
-		tc.ind.UpdateTapIndex(tc.params)
+		tc.ind.updateTapIndex(tc.params)
 	}
 	return
 }
