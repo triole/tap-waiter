@@ -28,6 +28,7 @@ type FileContent struct {
 }
 
 type Params struct {
+	Response  string
 	Endpoint  conf.Endpoint
 	Sources   []string
 	Method    string

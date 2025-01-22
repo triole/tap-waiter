@@ -92,11 +92,10 @@ api:
       content: true
 
   # http part
-  simple_serve.json:
-    source: |
+  respond.json:
+    response: |
       hello
       there
-    method: serve
 
   repos_unmod.json:
     source: http://localhost/repos

@@ -25,9 +25,10 @@ type ConfContent struct {
 
 type Endpoint struct {
 	EpURL              string
+	Response           string `yaml:"response"`
 	Source             string `yaml:"source"`
 	SourceType         string
-	Method             string   `yaml:"request_method"`
+	Method             string   `yaml:"method"`
 	RxFilter           string   `yaml:"regex_filter"`
 	SortFileName       string   `yaml:"sort_file_name"`
 	IgnoreList         []string `yaml:"regex_ignore_list"`
@@ -39,7 +40,7 @@ type Endpoint struct {
 
 type Process struct {
 	Strategy   string   `yaml:"strategy"`
-	Method     string   `yaml:"request_method"`
+	Method     string   `yaml:"method"`
 	JSONPath   string   `yaml:"json_path"`
 	RegexMatch []string `yaml:"regex_match"`
 }
