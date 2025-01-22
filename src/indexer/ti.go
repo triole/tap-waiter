@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
-	"strings"
 
 	"github.com/triole/logseal"
 )
@@ -49,7 +48,7 @@ func (ind *Indexer) updateTapIndex(params Params) {
 	var err error
 	ti, tim := ind.getTapIndexCacheWithExpiration(params.Endpoint.Source)
 	if len(ti) < 1 {
-		if !strings.EqualFold(params.Response, "") {
+		if !ut.IsEmpty(params.Response) {
 			content := ind.byteToBody([]byte(params.Response))
 			te := TapEntry{
 				Path:    params.Endpoint.EpURL,
