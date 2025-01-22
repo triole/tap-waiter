@@ -138,6 +138,11 @@ func (ut Util) IsDir(path string) bool {
 	return fileInfo.IsDir()
 }
 
+func (ut Util) IsEmpty(str string) bool {
+	r := strings.TrimSpace(str)
+	return strings.EqualFold(r, "")
+}
+
 func (ut Util) IsLocalPath(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil

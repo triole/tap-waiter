@@ -52,3 +52,21 @@ func validateTestRxMatch(rx, str string, exp bool, t *testing.T) {
 		)
 	}
 }
+
+func TestIsEmpty(t *testing.T) {
+	validateIsEmpty("hello world", false, t)
+	validateIsEmpty("___", false, t)
+	validateIsEmpty(" ", true, t)
+	validateIsEmpty("   ", true, t)
+}
+
+func validateIsEmpty(str string, exp bool, t *testing.T) {
+	ut := Init(lg)
+	res := ut.IsEmpty(str)
+	if res != exp {
+		t.Errorf(
+			"error is empty: str: %s, exp: %v, got: %v",
+			str, exp, res,
+		)
+	}
+}
