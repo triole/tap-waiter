@@ -97,16 +97,8 @@ api:
       hello
       there
 
-  repos_unmod.json:
-    source: http://localhost/repos
-    method: http_get
-    return:
-      created: true
-      content: true
-      unmarshal_content: true
-
   repos.json:
-    source: http://localhost/repos
+    source: http://localhost:17777/repos_raw.json
     method: http_get
     return:
       created: true
@@ -116,6 +108,39 @@ api:
       regex_replace:
         - ["private", "public"]
         - ["/README.md", ""]
+
+  repos_raw.json:
+    response: >
+      [
+        {
+          "id": 3734,
+          "name": "zoom-zen-bike",
+          "readme_url": "http://localhost/private/README.md"
+        },
+        {
+          "id": 393,
+          "name": "console-pro-brass",
+          "readme_url": "http://localhost/private/README.md"
+        },
+        {
+          "id": 2751,
+          "name": "green-laptop-plus",
+          "readme_url": "http://localhost/private/README.md"
+        },
+        {
+          "id": 4003,
+          "name": "olive-lightbulb-nova",
+          "readme_url": "http://localhost/private/README.md"
+        },
+        {
+          "id": 6853,
+          "name": "flux-pure-toy",
+          "readme_url": "http://localhost/private/README.md"
+        }
+      ]
+    return:
+      content: true
+      unmarshal_content: true
 
   meta.json:
     source: http://localhost:17777/repos.json

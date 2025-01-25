@@ -49,7 +49,8 @@ func (ind *Indexer) updateTapIndex(params Params) {
 	ti, tim := ind.getTapIndexCacheWithExpiration(params.Endpoint.Source)
 	if len(ti) < 1 {
 		if !ut.IsEmpty(params.Response) {
-			content := ind.byteToBody([]byte(params.Response))
+			content := ind.unmarshal([]byte(params.Response), params.Endpoint)
+
 			te := TapEntry{
 				Path:    params.Endpoint.EpURL,
 				Content: content,
