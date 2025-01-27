@@ -48,7 +48,7 @@ func (ind *Indexer) updateTapIndex(params Params) {
 		logseal.F{"index_params": fmt.Sprintf("%+v", params)},
 	)
 	var err error
-	ti, tim := ind.getTapIndexCacheWithExpiration(params.Endpoint.Source)
+	ti, tim := ind.getTapIndexCacheWithExpiration(params.Endpoint.EpURL)
 	if len(ti) < 1 {
 		if !ut.IsEmpty(params.Response) {
 			content := ind.unmarshal([]byte(params.Response), params.Endpoint)
