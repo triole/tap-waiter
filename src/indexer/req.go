@@ -11,7 +11,7 @@ import (
 
 func (ind Indexer) req(targetURL, method string) (data []byte, err error) {
 	method = strings.ToUpper(method)
-	ind.Lg.Debug("fire request", logseal.F{"url": targetURL, "method": method})
+	ind.Lg.Info("fire request", logseal.F{"url": targetURL, "method": method})
 	url, err := url.Parse(targetURL)
 	ind.Lg.IfErrError("can not parse url", logseal.F{"error": err})
 

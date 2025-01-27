@@ -14,7 +14,7 @@ func pprint(i interface{}) {
 	fmt.Println(string(s))
 }
 
-func (ind *Indexer) updateParams(params Params, process bool) Params {
+func (ind *Indexer) updateParams(params Params) Params {
 	src := params.Endpoint.Source
 	params.Method = params.Endpoint.Method
 	params.Response = params.Endpoint.Response
@@ -25,11 +25,12 @@ func (ind *Indexer) updateParams(params Params, process bool) Params {
 		src, _ = ind.Conf.Util.AbsPath(params.Endpoint.Source)
 		params.Type = ind.Util.FileOrFolder(src)
 	}
-	params.Sources = []string{src}
-	if process {
-		params.Method = params.Endpoint.Process.Method
+	if len(params.Sources) < 1 {
+		params.Sources = []string{src}
 	}
-
+	// if process {
+	// 	params.Method = params.Endpoint.Process.Method
+	// }
 	if params.Type == "url" {
 		if params.Method == "" {
 			params.Method = "GET"
@@ -41,7 +42,7 @@ func (ind *Indexer) updateParams(params Params, process bool) Params {
 }
 
 func (ind *Indexer) updateTapIndex(params Params) {
-	params = ind.updateParams(params, false)
+	params = ind.updateParams(params)
 	ind.Lg.Debug(
 		"start updating index",
 		logseal.F{"index_params": fmt.Sprintf("%+v", params)},
@@ -70,18 +71,15 @@ func (ind *Indexer) updateTapIndex(params Params) {
 			}
 			ti = ind.assembleTapIndex(params)
 			if params.Endpoint.Process.Strategy == "use_as_url_list" {
-				params = ind.updateParams(params, true)
 				ti = ind.applyJSONPath(ti, params.Endpoint.Process.JSONPath)
-				if len(params.Endpoint.Process.RegexMatch) > 0 {
-					for idx, el := range ti {
-						URLs := ind.returnRegexMatch(
-							el.Content, params.Endpoint.Process.RegexMatch,
-						)
-						ti[idx].Content = FileContent{Body: URLs}
-						params.Sources = URLs
-						params.Type = "url"
-						ind.DataSources.Params = params
-					}
+				urls := ind.returnRegexMatchFullIndex(ti, params.Endpoint.Process.RegexMatch)
+				if len(urls) > 0 {
+					params.Sources = urls
+					params.Method = params.Endpoint.Process.Method
+					params = ind.updateParams(params)
+					ti = ind.assembleTapIndex(params)
+				} else {
+					ind.Lg.Warn("regex match was empty, skip building index")
 				}
 			}
 			ti = ind.applyJSONPath(ti, params.Endpoint.Return.JSONPath)
