@@ -131,6 +131,18 @@ func (ind Indexer) returnJSONPath(content FileContent, jsonPath string) (r FileC
 	return
 }
 
+func (ind Indexer) returnRegexMatchFullIndex(ti TapIndex, regex []string) (arr []string) {
+	for _, el := range ti {
+		m := ind.returnRegexMatch(
+			el.Content, regex,
+		)
+		if len(m) > 0 {
+			arr = append(arr, m...)
+		}
+	}
+	return
+}
+
 func (ind Indexer) returnRegexMatch(content FileContent, regex []string) (r []string) {
 	for _, rx := range regex {
 		r = append(
