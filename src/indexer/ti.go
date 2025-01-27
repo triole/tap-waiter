@@ -1,12 +1,18 @@
 package indexer
 
 import (
+	"encoding/json"
 	"fmt"
 	"sort"
 	"strings"
 
 	"github.com/triole/logseal"
 )
+
+func pprint(i interface{}) {
+	s, _ := json.MarshalIndent(i, "", "  ")
+	fmt.Println(string(s))
+}
 
 func (ind *Indexer) updateParams(params Params, process bool) Params {
 	src := params.Endpoint.Source
@@ -77,16 +83,8 @@ func (ind *Indexer) updateTapIndex(params Params) {
 						ind.DataSources.Params = params
 					}
 				}
-				if len(params.Sources) < 1 {
-					ind.Lg.Warn(
-						"process urls list is empty",
-						logseal.F{"regex": fmt.Sprintf("%+v", params.Endpoint.Process.RegexMatch)},
-					)
-				} else {
-					ti = ind.assembleTapIndex(params)
-					ti = ind.applyJSONPath(ti, params.Endpoint.Process.JSONPath)
-				}
 			}
+			ti = ind.applyJSONPath(ti, params.Endpoint.Return.JSONPath)
 		}
 
 		sort.Sort(TapIndex(ti))
