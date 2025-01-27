@@ -1,18 +1,12 @@
 package indexer
 
 import (
-	"encoding/json"
 	"fmt"
 	"sort"
 	"strings"
 
 	"github.com/triole/logseal"
 )
-
-func pprint(i interface{}) {
-	s, _ := json.MarshalIndent(i, "", "  ")
-	fmt.Println(string(s))
-}
 
 func (ind *Indexer) updateParams(params Params) Params {
 	src := params.Endpoint.Source
@@ -28,9 +22,6 @@ func (ind *Indexer) updateParams(params Params) Params {
 	if len(params.Sources) < 1 {
 		params.Sources = []string{src}
 	}
-	// if process {
-	// 	params.Method = params.Endpoint.Process.Method
-	// }
 	if params.Type == "url" {
 		if params.Method == "" {
 			params.Method = "GET"
@@ -48,13 +39,13 @@ func (ind *Indexer) updateTapIndex(params Params) {
 		logseal.F{"index_params": fmt.Sprintf("%+v", params)},
 	)
 	var err error
-	ti, tim := ind.getTapIndexCacheWithExpiration(params.Endpoint.EpURL)
+	ti, tim := ind.getTapIndexCacheWithExpiration(params.Endpoint.ID)
 	if len(ti) < 1 {
 		if !ut.IsEmpty(params.Response) {
 			content := ind.unmarshal([]byte(params.Response), params.Endpoint)
 
 			te := TapEntry{
-				Path:    params.Endpoint.EpURL,
+				Path:    params.Endpoint.ID,
 				Content: content,
 			}
 			ti = append(ti, te)
@@ -112,7 +103,7 @@ func (ind *Indexer) updateTapIndex(params Params) {
 			sort.Sort(sort.Reverse(TapIndex(ti)))
 		}
 		ti = ti.applyIgnoreList(params)
-		ind.setTapIndexCache(params.Endpoint.EpURL, ti)
+		ind.setTapIndexCache(params.Endpoint.ID, ti)
 	} else {
 		ind.Lg.Debug(
 			"return from cache",

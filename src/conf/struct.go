@@ -24,7 +24,7 @@ type ConfContent struct {
 }
 
 type Endpoint struct {
-	EpURL              string
+	ID                 string
 	Response           string `yaml:"response"`
 	Source             string `yaml:"source"`
 	SourceType         string

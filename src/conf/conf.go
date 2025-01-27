@@ -54,8 +54,7 @@ func (conf *Conf) readConfig() {
 			"can not parse cache lifetime setting",
 			logseal.F{"error": err},
 		)
-
-		val.EpURL = key
-		conf.API[key] = val
+		val.ID = key
+		conf.API[val.ID] = val
 	}
 }
