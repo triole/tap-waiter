@@ -20,6 +20,7 @@ func TestSort(t *testing.T) {
 		tc.params.Endpoint.Source = spec["content_folder"].(string)
 		tc.params.Endpoint.SortFileName = spec["sort_file"].(string)
 		tc.params.Endpoint.IgnoreList = ign
+		tc.ind.flushCache()
 		tc.ind.updateTapIndex(tc.params)
 		ti := tc.ind.getTapIndexCache(tc.params.Endpoint.ID)
 		if !tc.orderOK(ti, exp, t) {
