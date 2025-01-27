@@ -1,17 +1,12 @@
 package indexer
 
 import (
-	"encoding/json"
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/triole/logseal"
 )
-
-func pprint(i interface{}) {
-	s, _ := json.MarshalIndent(i, "", "  ")
-	fmt.Println(string(s))
-}
 
 func (ind *Indexer) updateParams(params Params, process bool) Params {
 	src := params.Endpoint.Source
@@ -20,22 +15,22 @@ func (ind *Indexer) updateParams(params Params, process bool) Params {
 	if ind.Util.IsURL(params.Endpoint.Source) {
 		params.Type = "url"
 	}
-
 	if ind.Conf.Util.IsLocalPath(params.Endpoint.Source) {
 		src, _ = ind.Conf.Util.AbsPath(params.Endpoint.Source)
 		params.Type = ind.Util.FileOrFolder(src)
 	}
-
 	params.Sources = []string{src}
 	if process {
 		params.Method = params.Endpoint.Process.Method
 	}
-	if params.Type == "url" && params.Method == "" {
-		params.Method = "get"
+
+	if params.Type == "url" {
+		if params.Method == "" {
+			params.Method = "GET"
+		}
+		params.Method = strings.ToUpper(params.Method)
+		params.Method = strings.TrimPrefix(params.Method, "HTTP_")
 	}
-	params.Method = ind.Conf.Util.RxReplaceAll(
-		params.Method, "^HTTP_", "",
-	)
 	return params
 }
 

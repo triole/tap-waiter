@@ -18,7 +18,6 @@ func (ind *Indexer) assembleTapIndex(params Params) (ti TapIndex) {
 		for _, pth := range params.Sources {
 			switch params.Type {
 			case "url":
-				ind.Lg.Debug("fetch url", logseal.F{"url": pth})
 				go ind.fetchURL(
 					pth, params.Endpoint,
 					chin, chout,

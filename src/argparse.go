@@ -20,14 +20,13 @@ var (
 )
 
 var CLI struct {
-	Conf         string `help:"path to config, default is {current_dir}/tap.json" arg:"" optional:"" default:"${curdir}"`
-	Threads      int    `help:"max threads, default no of avail. cpu threads" short:"t" default:"${proc}"`
-	LogFile      string `help:"log file" default:"/dev/stdout"`
-	LogLevel     string `help:"log level" default:"info" enum:"trace,debug,info,error"`
-	LogNoColors  bool   `help:"disable output colours, print plain text"`
-	LogJSON      bool   `help:"enable json log, instead of text one"`
-	ValidateConf bool   `help:"validate configuration and pretty print it"`
-	VersionFlag  bool   `help:"display version" short:"V"`
+	Conf        string `help:"path to config, default is {current_dir}/tap.json" arg:"" optional:"" default:"${curdir}"`
+	Threads     int    `help:"max threads, default no of avail. cpu threads" short:"t" default:"${proc}"`
+	LogFile     string `help:"log file" default:"/dev/stdout"`
+	LogLevel    string `help:"log level" default:"info" enum:"trace,debug,info,error"`
+	LogNoColors bool   `help:"disable output colours, print plain text"`
+	LogJSON     bool   `help:"enable json log, instead of text one"`
+	VersionFlag bool   `help:"display version" short:"V"`
 }
 
 func parseArgs() {

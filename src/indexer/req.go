@@ -4,17 +4,18 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/triole/logseal"
 )
 
 func (ind Indexer) req(targetURL, method string) (data []byte, err error) {
+	method = strings.ToUpper(method)
 	ind.Lg.Debug("fire request", logseal.F{"url": targetURL, "method": method})
 	url, err := url.Parse(targetURL)
 	ind.Lg.IfErrError("can not parse url", logseal.F{"error": err})
 
 	client := &http.Client{}
-
 	request, err := http.NewRequest(method, url.String(), nil)
 	request.Header.Set(
 		"User-Agent",

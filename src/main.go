@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"tap-waiter/src/conf"
 	"tap-waiter/src/indexer"
 	"tap-waiter/src/util"
@@ -21,10 +20,5 @@ func main() {
 			"config": CLI.Conf, "log_level": CLI.LogLevel,
 		},
 	)
-	lg.Debug("full configuration layout", logseal.F{"config": fmt.Sprintf("%+v", conf)})
-	// if CLI.ValidateConf {
-	// 	pprint(conf)
-	// 	os.Exit(0)
-	// }
 	ind.RunServer()
 }
