@@ -16,7 +16,7 @@ type testContext struct {
 }
 
 func InitTests(doIndex bool) (tc testContext) {
-	lg := logseal.Init()
+	lg := logseal.Init("warn")
 	util := util.Init(lg)
 	conf := conf.Init(ut.FromTestFolder("conf.yaml"), 16, util, lg)
 	tc.ind.Lg = lg
