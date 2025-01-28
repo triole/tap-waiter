@@ -1,8 +1,10 @@
 package conf
 
 import (
+	"net/url"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/c2h5oh/datasize"
 	"github.com/triole/logseal"
@@ -25,7 +27,33 @@ func (conf *Conf) readConfig() {
 	conf.Lg.IfErrFatal(
 		"can not unmarshal config", logseal.F{"path": conf.FileName, "error": err},
 	)
+
+	conf.ServerURL = content.ServerURL
+	if conf.ServerURL == "" {
+		conf.ServerURL = content.Bind
+	}
+	if !strings.HasPrefix(conf.ServerURL, "http://") && !strings.HasPrefix(conf.ServerURL, "https://") {
+		conf.ServerURL = "https://" + conf.ServerURL
+	}
+	_, err = url.Parse(conf.ServerURL)
+	if err != nil {
+		conf.Lg.IfErrFatal(
+			"invalid server url", logseal.F{"path": conf.FileName, "error": err},
+		)
+	}
+
 	conf.Bind = content.Bind
+	if content.DefaultCacheLifetimeStr == "" {
+		content.DefaultCacheLifetimeStr = "5m"
+	}
+	conf.DefaultCacheLifetime, err = conf.Util.Str2Dur(
+		content.DefaultCacheLifetimeStr,
+	)
+	conf.Lg.IfErrFatal(
+		"can not parse cache lifetime setting",
+		logseal.F{"error": err},
+	)
+
 	for key, val := range content.API {
 		key = "/" + path.Clean(key)
 
@@ -43,17 +71,6 @@ func (conf *Conf) readConfig() {
 				},
 			)
 		}
-
-		if content.DefaultCacheLifetimeStr == "" {
-			content.DefaultCacheLifetimeStr = "5m"
-		}
-		conf.DefaultCacheLifetime, err = conf.Util.Str2Dur(
-			content.DefaultCacheLifetimeStr,
-		)
-		conf.Lg.IfErrFatal(
-			"can not parse cache lifetime setting",
-			logseal.F{"error": err},
-		)
 		val.ID = key
 		conf.API[val.ID] = val
 	}

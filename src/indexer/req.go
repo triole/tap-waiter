@@ -9,14 +9,24 @@ import (
 	"github.com/triole/logseal"
 )
 
+func (ind Indexer) makeAbsURL(targetURL string) (pURL *url.URL, err error) {
+	pURL, err = url.Parse(targetURL)
+	ind.Lg.IfErrError("can not parse url", logseal.F{"error": err})
+	if !pURL.IsAbs() {
+		var fullURL string
+		fullURL, err = url.JoinPath(ind.Conf.ServerURL, targetURL)
+		pURL, err = ind.makeAbsURL(fullURL)
+	}
+	return
+}
+
 func (ind Indexer) req(targetURL, method string) (data []byte, err error) {
 	var parsURL *url.URL
 	var requ *http.Request
 	var resp *http.Response
 	method = strings.ToUpper(method)
-	ind.Lg.Info("fire request", logseal.F{"url": targetURL, "method": method})
-	parsURL, err = url.Parse(targetURL)
-	ind.Lg.IfErrError("can not parse url", logseal.F{"error": err})
+	parsURL, err = ind.makeAbsURL(targetURL)
+	ind.Lg.Info("fire request", logseal.F{"url": parsURL, "method": method})
 	if err == nil {
 		client := &http.Client{}
 		requ, err = http.NewRequest(method, parsURL.String(), nil)

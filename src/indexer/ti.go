@@ -61,8 +61,8 @@ func (ind *Indexer) updateTapIndex(params Params) {
 				)
 			}
 			ti = ind.assembleTapIndex(params)
+			ti = ind.applyJSONPath(ti, params.Endpoint.Process.JSONPath)
 			if params.Endpoint.Process.Strategy == "use_as_url_list" {
-				ti = ind.applyJSONPath(ti, params.Endpoint.Process.JSONPath)
 				urls := ind.returnRegexMatchFullIndex(ti, params.Endpoint.Process.RegexMatch)
 				if len(urls) > 0 {
 					params.Sources = urls

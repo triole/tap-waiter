@@ -18,6 +18,7 @@ func (ind Indexer) RunServer() {
 	ind.Lg.Info(
 		"run server",
 		logseal.F{
+			"server_url":             ind.Conf.ServerURL,
 			"bind":                   ind.Conf.Bind,
 			"default_cache_lifetime": ind.Conf.DefaultCacheLifetime,
 		},

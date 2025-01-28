@@ -1,4 +1,5 @@
 ---
+server_url: http://localhost:17777
 bind: 0.0.0.0:17777
 default_cache_lifetime: 5m
 
@@ -97,18 +98,6 @@ api:
       hello
       there
 
-  repos.json:
-    source: /repos_raw.json
-    method: http_get
-    return:
-      created: true
-      content: true
-      unmarshal_content: true
-      json_path: "#.readme_url"
-      regex_replace:
-        - ["private", "public"]
-        - ["/README.md", ""]
-
   repos_raw.json:
     response: >
       [
@@ -126,31 +115,71 @@ api:
           "id": 2751,
           "name": "green-laptop-plus",
           "readme_url": "http://localhost/private/README.md"
-        },
-        {
-          "id": 4003,
-          "name": "olive-lightbulb-nova",
-          "readme_url": "http://localhost/private/README.md"
-        },
-        {
-          "id": 6853,
-          "name": "flux-pure-toy",
-          "readme_url": "http://localhost/private/README.md"
         }
       ]
     return:
       content: true
       unmarshal_content: true
 
+  repos.json:
+    source: /repos_raw.json
+    method: get
+    process:
+      json_path: "#.content.body.#.readme_url"
+    return:
+      created: true
+      content: true
+      unmarshal_content: true
+      regex_replace:
+        - ["http://localhost", ""]
+        - ["/private/README.md", "/meta_raw.json"]
+
+  meta_raw.json:
+    response: >
+      {
+        "category":
+        {
+          "communities": "astro particle physics",
+          "datatype": "csv, txt",
+          "env": "python3",
+          "goal": "Search for Dark Matter Indirect signals",
+          "method": "divers",
+          "purpose": null,
+          "type": "workflow"
+        },
+        "contacts": [
+          {
+            "mail": "mail_address@example.com",
+            "name": "Pedro Examplo Antonelli",
+            "orcid": null
+          }
+        ],
+        "creators": [
+          {
+            "mail": "mail_address@example.com",
+            "name": "Pedro Examplo Antonelli",
+            "orcid": null
+          }
+        ],
+        "license": {
+          "name": null,
+          "url": null
+        }
+      }
+    return:
+      content: true
+      unmarshal_content: true
+
   meta.json:
     source: /repos.json
-    method: http_get
+    method: get
     process:
       strategy: use_as_url_list
-      method: http_get
+      method: get
       json_path: "#.content.body"
       regex_match:
-        - "https?://[A-Za-z0-9\\/\\.\\-_:]+"
+        # - "https?://[A-Za-z0-9\\/\\.\\-_:]+"
+        - "meta_raw\\.json"
     return:
       content: true
       unmarshal_content: true
