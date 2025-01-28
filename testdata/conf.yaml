@@ -98,7 +98,7 @@ api:
       there
 
   repos.json:
-    source: http://localhost:17777/repos_raw.json
+    source: /repos_raw.json
     method: http_get
     return:
       created: true
@@ -143,7 +143,7 @@ api:
       unmarshal_content: true
 
   meta.json:
-    source: http://localhost:17777/repos.json
+    source: /repos.json
     method: http_get
     process:
       strategy: use_as_url_list

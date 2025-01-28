@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 )
 
@@ -157,16 +158,19 @@ func newClient(url string) Client {
 
 func BenchmarkServer(b *testing.B) {
 	tc := InitTests(false)
-
 	pos := ut.Trace()
 	testsrv := httptest.NewServer(http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			tc.ind.serveContent(w, r)
 		}))
 	defer testsrv.Close()
-	for url := range tc.ind.Conf.API {
-		c := newClient(testsrv.URL)
-		http.Get(c.url + url)
+	for urlStr := range tc.ind.Conf.API {
+		// NOTE: figure out how to deal with relative URLs later
+		pURL, err := url.Parse(urlStr)
+		if err == nil && pURL.IsAbs() {
+			c := newClient(testsrv.URL)
+			http.Get(c.url + pURL.String())
+		}
 	}
 	fmt.Printf("%s took %s with b.N = %d\n", pos, b.Elapsed(), b.N)
 }
