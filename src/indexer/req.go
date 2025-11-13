@@ -14,7 +14,7 @@ func (ind Indexer) makeAbsURL(targetURL string) (pURL *url.URL, err error) {
 	ind.Lg.IfErrError("can not parse url", logseal.F{"error": err})
 	if !pURL.IsAbs() {
 		var fullURL string
-		fullURL, err = url.JoinPath(ind.Conf.ServerURL, targetURL)
+		fullURL, _ = url.JoinPath(ind.Conf.ServerURL, targetURL)
 		pURL, err = ind.makeAbsURL(fullURL)
 	}
 	return
