@@ -3,8 +3,6 @@ version: '3'
 
 vars:
   SOURCE_FOLDER: src
-  CURDIR:
-    sh: pwd
 
 tasks:
   default:
@@ -12,17 +10,18 @@ tasks:
       - task: test
       - task: build
 
-  mok:
-    desc: run mock test api
-    cmds:
-      - cmd: mokapi --providers-file-directory {{.CURDIR}}/testdata/api
-
   mod:
     desc: update go modules, add submodules to go root
     cmds:
       - cmd: |
           export SOURCE_FOLDER={{.SOURCE_FOLDER}}
           curl -sL https://raw.githubusercontent.com/triole/ghwfe/master/sh/go_add_sub_packages.sh | bash
+
+  up:
+    desc: upgrade go dependencies
+    cmds:
+      - cmd: go get -u ./...
+      - cmd: go mod tidy
 
   build:
     desc: build binary using remote ghwfe script, requires curl
