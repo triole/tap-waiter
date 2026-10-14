@@ -7,6 +7,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/triole/logseal"
+
 	yaml "gopkg.in/yaml.v3"
 )
 
@@ -156,17 +158,21 @@ func (ind *Indexer) isValidSortFileName(sortFileName string) bool {
 	if sortFileName == "" {
 		return true // Empty means no sort file, which is valid
 	}
-	// Block path traversal patterns
-	if strings.Contains(sortFileName, "..") || strings.Contains(sortFileName, "//") {
-		return false
-	}
-	// Block absolute paths
-	if strings.HasPrefix(sortFileName, "/") {
+	// Block path traversal patterns - check for .. , \, and /
+	if containsPathTraversal(sortFileName) {
+		ind.Lg.Warn(
+			"path traversal detected in sort file name",
+			logseal.F{"sortFileName": sortFileName},
+		)
 		return false
 	}
 	// Only allow alphanumeric, underscore, hyphen, dot, and common extensions
 	// Maximum length of 100 characters to prevent DoS
 	if len(sortFileName) > 100 {
+		ind.Lg.Warn(
+			"sort file name too long",
+			logseal.F{"length": len(sortFileName)},
+		)
 		return false
 	}
 	matched, _ := regexp.MatchString(`^[a-zA-Z0-9._-]+$`, sortFileName)
