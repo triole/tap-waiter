@@ -34,6 +34,14 @@ func (ind *Indexer) updateParams(params Params) Params {
 
 func (ind *Indexer) updateTapIndex(params Params) {
 	params = ind.updateParams(params)
+	if params.Endpoint.SortFileName != "" {
+		if !ind.isValidSortFileName(params.Endpoint.SortFileName) {
+			ind.Lg.Error("invalid sort file name - potential path traversal blocked",
+				logseal.F{"sort_file_name": params.Endpoint.SortFileName})
+			params.Endpoint.SortFileName = ""
+		}
+	}
+
 	ind.Lg.Debug(
 		"start updating index",
 		logseal.F{"index_params": fmt.Sprintf("%+v", params)},
