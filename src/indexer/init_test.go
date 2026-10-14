@@ -19,9 +19,6 @@ func InitTests(doIndex bool) (tc testContext) {
 	lg := logseal.Init("warn")
 	util := util.Init(lg)
 	conf := conf.Init(ut.FromTestFolder("conf.yaml"), 16, util, lg)
-	tc.ind.Lg = lg
-	tc.ind.Util = util
-	tc.ind.Conf = conf
 	tc.ind = Init(conf, util, lg)
 	tc.params.Endpoint = newTestEndpoint()
 	tc.params.Endpoint.SourceType = "folder"
