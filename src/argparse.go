@@ -57,14 +57,22 @@ func parseArgs() {
 }
 
 func printBuildTags(buildtags string) {
-	regexp, _ := regexp.Compile(`({|}|,)`)
-	s := regexp.ReplaceAllString(buildtags, "\n")
+	reg, err := regexp.Compile(`({|}|,)`)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to compile regex: %v\n", err)
+		return
+	}
+	s := reg.ReplaceAllString(buildtags, "\n")
 	s = strings.Replace(s, "_subversion: ", "Version: "+appMainversion+".", -1)
 	fmt.Printf("%s\n", s)
 }
 
 func alnum(s string) string {
 	s = strings.ToLower(s)
-	re := regexp.MustCompile("[^a-z0-9_-]")
+	re, err := regexp.Compile("[^a-z0-9_-]")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to compile regex: %v\n", err)
+		return s
+	}
 	return re.ReplaceAllString(s, "-")
 }

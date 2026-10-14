@@ -57,7 +57,14 @@ func (ut Util) Find(basedir string, rxFilter string) (filelist []string, err err
 		return
 	}
 
-	rxf, _ := regexp.Compile(rxFilter)
+	rxf, compileErr := regexp.Compile(rxFilter)
+	if compileErr != nil {
+		ut.Lg.Error(
+			"invalid regex filter",
+			logseal.F{"filter": rxFilter, "error": compileErr},
+		)
+		return filelist, fmt.Errorf("regex compilation failed: %w", compileErr)
+	}
 	err = filepath.Walk(basedir, func(path string, f os.FileInfo, err error) error {
 		if rxf.MatchString(path) {
 			inf, err := os.Stat(path)
@@ -228,22 +235,50 @@ func (ut Util) ReverseArr(arr []string) []string {
 }
 
 func (ut Util) RxFind(rx string, content string) string {
-	temp, _ := regexp.Compile(rx)
+	temp, err := regexp.Compile(rx)
+	if err != nil {
+		ut.Lg.Error(
+			"invalid regex",
+			logseal.F{"regex": rx, "error": err},
+		)
+		return ""
+	}
 	return temp.FindString(content)
 }
 
 func (ut Util) RxFindAll(rx string, content string) []string {
-	temp, _ := regexp.Compile(rx)
+	temp, err := regexp.Compile(rx)
+	if err != nil {
+		ut.Lg.Error(
+			"invalid regex",
+			logseal.F{"regex": rx, "error": err},
+		)
+		return []string{}
+	}
 	return temp.FindAllString(content, -1)
 }
 
 func (ut Util) RxMatch(rx string, content string) bool {
-	temp, _ := regexp.Compile(rx)
+	temp, err := regexp.Compile(rx)
+	if err != nil {
+		ut.Lg.Error(
+			"invalid regex",
+			logseal.F{"regex": rx, "error": err},
+		)
+		return false
+	}
 	return temp.MatchString(content)
 }
 
 func (ut Util) RxReplaceAll(basestring, regex, newstring string) (r string) {
-	rx := regexp.MustCompile(regex)
+	rx, err := regexp.Compile(regex)
+	if err != nil {
+		ut.Lg.Error(
+			"invalid regex",
+			logseal.F{"regex": regex, "error": err},
+		)
+		return basestring
+	}
 	r = rx.ReplaceAllString(basestring, newstring)
 	return
 }
