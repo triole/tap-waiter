@@ -3,6 +3,8 @@ package util
 import (
 	"sort"
 	"strings"
+
+	"github.com/triole/logseal"
 )
 
 // keep-sorted start block=yes newline_separated=yes
@@ -18,6 +20,13 @@ func (ut Util) RxSliceContainsSliceFully(content, filter []string) bool {
 
 func (ut Util) RxSliceContainsString(slice []string, item string) bool {
 	for _, s := range slice {
+		if valid, err := ut.isValidRegex(s); !valid {
+			ut.Lg.Error(
+				"invalid regex in ignore list",
+				logseal.F{"pattern": s, "error": err},
+			)
+			continue
+		}
 		if ut.RxMatch(item, s) {
 			return true
 		}
