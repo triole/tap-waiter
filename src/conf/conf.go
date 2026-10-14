@@ -28,9 +28,15 @@ func (conf *Conf) readConfig() {
 		"can not unmarshal config", logseal.F{"path": conf.FileName, "error": err},
 	)
 
+	conf.Bind = strings.TrimSpace(content.Bind)
+	if conf.Bind == "" {
+		conf.Lg.Warn("bind address not set, defaulting to localhost:17777")
+		conf.Bind = "127.0.0.1:17777"
+	}
+
 	conf.ServerURL = content.ServerURL
 	if conf.ServerURL == "" {
-		conf.ServerURL = content.Bind
+		conf.ServerURL = conf.Bind
 	}
 	if !strings.HasPrefix(conf.ServerURL, "http://") && !strings.HasPrefix(conf.ServerURL, "https://") {
 		conf.ServerURL = "https://" + conf.ServerURL
@@ -41,8 +47,6 @@ func (conf *Conf) readConfig() {
 			"invalid server url", logseal.F{"path": conf.FileName, "error": err},
 		)
 	}
-
-	conf.Bind = content.Bind
 	if content.DefaultCacheLifetimeStr == "" {
 		content.DefaultCacheLifetimeStr = "5m"
 	}
