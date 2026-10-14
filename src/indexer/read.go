@@ -18,6 +18,18 @@ import (
 )
 
 func (ind Indexer) readFileContent(filename string, ps conf.Endpoint) (content FileContent) {
+	// Validate path is safe to prevent path traversal attacks
+	// For endpoints with a known source directory, validate against it
+	if ps.Source != "" {
+		baseDir, err := ind.Util.AbsPath(ps.Source)
+		if err == nil {
+			if !ind.Util.IsPathSafe(filename, baseDir) {
+				ind.Lg.Warn("path traversal attempt blocked during file read", logseal.F{"path": filename, "base_dir": baseDir, "endpoint": ps.ID})
+				return content // Return empty content
+			}
+		}
+	}
+
 	by, isTextfile, err := ind.Util.ReadFile(filename)
 	if isTextfile && err == nil {
 		switch filepath.Ext(filename) {

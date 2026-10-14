@@ -38,7 +38,7 @@ func (ind *Indexer) updateTapIndex(params Params) {
 		"start updating index",
 		logseal.F{"index_params": fmt.Sprintf("%+v", params)},
 	)
-	var err error
+
 	ti, tim := ind.getTapIndexCacheWithExpiration(params.Endpoint.ID)
 	if len(ti) < 1 {
 		if !ut.IsEmpty(params.Response) {
@@ -52,13 +52,27 @@ func (ind *Indexer) updateTapIndex(params Params) {
 		} else {
 			switch params.Type {
 			case "folder":
-				params.Sources, err = ind.Util.Find(
-					params.Endpoint.Source,
-					params.Endpoint.RxFilter,
-				)
-				ind.Lg.IfErrError(
-					"can not identify data sources", logseal.F{"error": err},
-				)
+				baseDir, baseErr := ind.Util.AbsPath(params.Endpoint.Source)
+				if baseErr != nil {
+					ind.Lg.Error("failed to resolve source directory", logseal.F{"path": params.Endpoint.Source, "error": baseErr})
+				} else {
+					allFiles, findErr := ind.Util.Find(
+						params.Endpoint.Source,
+						params.Endpoint.RxFilter,
+					)
+					if findErr != nil {
+						ind.Lg.IfErrError("can not identify data sources", logseal.F{"error": findErr})
+					} else {
+						// Filter out paths that escape the base directory to prevent path traversal
+						for _, src := range allFiles {
+							if ind.Util.IsPathSafe(src, baseDir) {
+								params.Sources = append(params.Sources, src)
+							} else {
+								ind.Lg.Warn("path traversal attempt blocked", logseal.F{"path": src, "base_dir": baseDir})
+							}
+						}
+					}
+				}
 			}
 			ti = ind.assembleTapIndex(params)
 			ti = ind.applyJSONPath(ti, params.Endpoint.Process.JSONPath)

@@ -148,6 +148,40 @@ func (ut Util) IsLocalPath(path string) bool {
 	return err == nil
 }
 
+// IsPathSafe validates that a file path is within the allowed base directory.
+// It prevents path traversal attacks by resolving the absolute path and
+// ensuring it starts with the base directory.
+func (ut Util) IsPathSafe(path, baseDir string) bool {
+	// Resolve the absolute path of the base directory first
+	absBase, err := filepath.Abs(baseDir)
+	if err != nil {
+		ut.Lg.Error("failed to resolve base directory", logseal.F{"path": baseDir, "error": err})
+		return false
+	}
+
+	// Clean the target path to remove .. and . components
+	cleanPath := filepath.Clean(path)
+
+	// Resolve the absolute path of the target file
+	absPath, err := filepath.Abs(cleanPath)
+	if err != nil {
+		ut.Lg.Error("failed to resolve file path", logseal.F{"path": path, "error": err})
+		return false
+	}
+
+	// The absolute path must be within the base directory
+	// It must either equal the base directory or start with baseDir + separator
+	if absPath == absBase {
+		return true
+	}
+
+	// Check path starts with base directory followed by separator
+	// This prevents prefix attacks like "allowed" matching "allowed-evil"
+	return len(absPath) > len(absBase) &&
+		absPath[len(absBase)] == filepath.Separator &&
+		absPath[:len(absBase)] == absBase
+}
+
 func (ut Util) IsTextData(by []byte) bool {
 	return utf8.ValidString(string(by))
 }
