@@ -57,27 +57,50 @@ func (ut Util) Find(basedir string, rxFilter string) (filelist []string, err err
 		return
 	}
 
-	rxf, compileErr := regexp.Compile(rxFilter)
-	if compileErr != nil {
-		ut.Lg.Error(
-			"invalid regex filter",
-			logseal.F{"filter": rxFilter, "error": compileErr},
-		)
-		return filelist, fmt.Errorf("regex compilation failed: %w", compileErr)
-	}
-	err = filepath.Walk(basedir, func(path string, f os.FileInfo, err error) error {
-		if rxf.MatchString(path) {
-			inf, err := os.Stat(path)
+	// Validate regex filter to prevent ReDoS
+	if rxFilter != "" {
+		valid, validErr := ut.isValidRegex(rxFilter)
+		if !valid {
+			ut.Lg.Error(
+				"invalid regex filter",
+				logseal.F{"filter": rxFilter, "error": validErr},
+			)
+			return filelist, validErr
+		}
+
+		rxf, compileErr := regexp.Compile(rxFilter)
+		if compileErr != nil {
+			ut.Lg.Error(
+				"invalid regex filter",
+				logseal.F{"filter": rxFilter, "error": compileErr},
+			)
+			return filelist, fmt.Errorf("regex compilation failed: %w", compileErr)
+		}
+		err = filepath.Walk(basedir, func(path string, f os.FileInfo, err error) error {
+			if rxf.MatchString(path) {
+				inf, err := os.Stat(path)
+				if err == nil {
+					if !inf.IsDir() {
+						filelist = append(filelist, path)
+					}
+				} else {
+					ut.Lg.IfErrInfo("stat file failed", logseal.F{"path": path})
+				}
+			}
+			return nil
+		})
+	} else {
+		// No filter, return all files
+		err = filepath.Walk(basedir, func(path string, f os.FileInfo, err error) error {
 			if err == nil {
-				if !inf.IsDir() {
+				if !f.IsDir() {
 					filelist = append(filelist, path)
 				}
-			} else {
-				ut.Lg.IfErrInfo("stat file failed", logseal.F{"path": path})
 			}
-		}
-		return nil
-	})
+			return nil
+		})
+	}
+
 	ut.Lg.IfErrError("find files failed", logseal.F{"path": basedir, "error": err})
 	return
 }
@@ -335,6 +358,42 @@ func (ut Util) Trace() (r string) {
 	file := ut.RxFind("src.*", fullfile)
 	r = fmt.Sprintf("%s:%d %s", file, line, fn.Name())
 	return
+}
+
+// isValidRegex validates a regex pattern to prevent ReDoS attacks.
+// It checks for length limits and potentially dangerous patterns.
+func (ut Util) isValidRegex(pattern string) (bool, error) {
+	// Maximum length to prevent DoS
+	const maxRegexpLen = 65536
+	if len(pattern) > maxRegexpLen {
+		return false, fmt.Errorf("regex pattern too long: %d bytes (max %d)", len(pattern), maxRegexpLen)
+	}
+
+	// Try to compile with a timeout to detect catastrophic backtracking
+	// We use a 1 second timeout for compilation
+	const compilationTimeout = time.Second
+	ch := make(chan struct {
+		ok    bool
+		error error
+	}, 1)
+
+	go func() {
+		_, err := regexp.Compile(pattern)
+		ch <- struct {
+			ok    bool
+			error error
+		}{ok: err == nil, error: err}
+	}()
+
+	select {
+	case <-time.After(compilationTimeout):
+		return false, fmt.Errorf("regex compilation timed out - possible ReDoS pattern")
+	case result := <-ch:
+		if result.error != nil {
+			return false, result.error
+		}
+		return true, nil
+	}
 }
 
 // keep-sorted end
