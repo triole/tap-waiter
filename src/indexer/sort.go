@@ -3,6 +3,7 @@ package indexer
 import (
 	"fmt"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -26,10 +27,12 @@ type tSortFileContent struct {
 }
 
 func (ti TapIndex) collectSortFiles(params Params) (sfs tSortFiles) {
+	baseDir := params.Endpoint.Source
 	for _, el := range ti {
 		sortFile := ti.readSortFile(
 			filepath.Join(params.Endpoint.Source, el.Path),
 			params.Endpoint.SortFileName,
+			baseDir,
 		)
 		if sortFile.IsSortFile {
 			sfs = append(sfs, sortFile)
@@ -147,19 +150,50 @@ func (ti TapIndex) sortByOtherParams(params Params) {
 	}
 }
 
-func (ti TapIndex) readSortFile(filename, sortFileName string) (sf tSortFile) {
+// isValidSortFileName validates that the sort file name is safe to prevent path traversal.
+// Only allows a specific filename without path components.
+func (ind *Indexer) isValidSortFileName(sortFileName string) bool {
+	if sortFileName == "" {
+		return true // Empty means no sort file, which is valid
+	}
+	// Block path traversal patterns
+	if strings.Contains(sortFileName, "..") || strings.Contains(sortFileName, "//") {
+		return false
+	}
+	// Block absolute paths
+	if strings.HasPrefix(sortFileName, "/") {
+		return false
+	}
+	// Only allow alphanumeric, underscore, hyphen, dot, and common extensions
+	// Maximum length of 100 characters to prevent DoS
+	if len(sortFileName) > 100 {
+		return false
+	}
+	matched, _ := regexp.MatchString(`^[a-zA-Z0-9._-]+$`, sortFileName)
+	return matched
+}
+
+func (ti TapIndex) readSortFile(filename string, sortFileName string, baseDir string) (sf tSortFile) {
 	sf.IsSortFile = strings.HasSuffix(filename, sortFileName)
 	if !sf.IsSortFile {
 		return
 	}
 	sf.Path = filename
+
+	// Validate path is within base directory to prevent traversal
+	if !ut.IsPathSafe(sf.Path, baseDir) {
+		sf.Error = fmt.Errorf("sort file outside allowed directory: %s", sf.Path)
+		return
+	}
+
 	sf.Folder = filepath.Dir(sf.Path)
 	var by []byte
 	var isTextfile bool
 	by, isTextfile, sf.Error = ut.ReadFile(sf.Path)
 	if sf.Error != nil && isTextfile {
 		return
-	} else {
+	}
+	if isTextfile && sf.Error == nil {
 		sf.Error = yaml.Unmarshal(by, &sf.Content)
 	}
 	sf.Folder = filepath.Dir(sf.Path)
