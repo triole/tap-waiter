@@ -25,7 +25,10 @@ func (ind Indexer) RunServer() {
 	)
 	err := http.ListenAndServe(ind.Conf.Bind, nil)
 	if err != nil {
-		panic(err)
+		ind.Lg.Fatal(
+			"server failed",
+			logseal.F{"error": err},
+		)
 	}
 }
 
@@ -94,7 +97,7 @@ func (ind Indexer) parseFilterString(s string) (fil FilterParams) {
 			fil.Errors, errors.New("error parsed filter: no match for operator"),
 		)
 	}
-	if fil.Prefix == "" {
+	if len(fil.Suffix) == 0 {
 		fil.Errors = append(
 			fil.Errors, errors.New("error parsed filter: no match for suffix"),
 		)
