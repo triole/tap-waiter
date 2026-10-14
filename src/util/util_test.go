@@ -76,13 +76,14 @@ func validateIsEmpty(str string, exp bool, t *testing.T) {
 func TestIsPathSafe(t *testing.T) {
 	ut := Init(logseal.Init())
 
-	// Test cases for path traversal protection
+	// Comprehensive test cases for path traversal protection
 	tests := []struct {
 		name     string
 		path     string
 		baseDir  string
 		expected bool
 	}{
+		// Valid paths within base directory
 		{
 			name:     "valid path within base",
 			path:     "/allowed/path/file.txt",
@@ -96,6 +97,26 @@ func TestIsPathSafe(t *testing.T) {
 			expected: true,
 		},
 		{
+			name:     "nested path within base",
+			path:     "/allowed/path/subdir/deep/file.txt",
+			baseDir:  "/allowed/path",
+			expected: true,
+		},
+		{
+			name:     "path with subdirectories",
+			path:     "/allowed/path/a/b/c/file.txt",
+			baseDir:  "/allowed/path",
+			expected: true,
+		},
+		{
+			name:     "valid path with dots in filename",
+			path:     "/allowed/path/file.name.txt",
+			baseDir:  "/allowed/path",
+			expected: true,
+		},
+
+		// Invalid paths with path traversal attempts
+		{
 			name:     "path traversal with ..",
 			path:     "/allowed/path/../secret/file.txt",
 			baseDir:  "/allowed/path",
@@ -108,8 +129,8 @@ func TestIsPathSafe(t *testing.T) {
 			expected: false,
 		},
 		{
-			name:     "path traversal with absolute ..",
-			path:     "/allowed/../../etc/passwd",
+			name:     "path traversal to root",
+			path:     "/allowed/../../../../../root/file.txt",
 			baseDir:  "/allowed",
 			expected: false,
 		},
@@ -120,11 +141,25 @@ func TestIsPathSafe(t *testing.T) {
 			expected: false,
 		},
 		{
-			name:     "nested path within base",
-			path:     "/allowed/path/subdir/deep/file.txt",
-			baseDir:  "/allowed/path",
-			expected: true,
+			name:     "multiple .. in path",
+			path:     "/allowed/deep/path/../../secret",
+			baseDir:  "/allowed/deep/path",
+			expected: false,
 		},
+		{
+			name:     "path traversal at start",
+			path:     "/../etc/passwd",
+			baseDir:  "/allowed",
+			expected: false,
+		},
+		{
+			name:     "absolute path outside base",
+			path:     "/etc/passwd",
+			baseDir:  "/allowed",
+			expected: false,
+		},
+
+		// Security edge cases - prefix attacks
 		{
 			name:     "similar prefix attack",
 			path:     "/allowed-fake/path/file.txt",
@@ -138,10 +173,54 @@ func TestIsPathSafe(t *testing.T) {
 			expected: false,
 		},
 		{
+			name:     "base as substring",
+			path:     "/notallowed/file.txt",
+			baseDir:  "/allowed",
+			expected: false,
+		},
+		{
+			name:     "base with number suffix",
+			path:     "/allowedpath/file.txt",
+			baseDir:  "/allowed",
+			expected: false,
+		},
+
+		// Edge cases
+		{
 			name:     "empty path",
 			path:     "",
 			baseDir:  "/allowed/path",
 			expected: false,
+		},
+		{
+			name:     "path with spaces",
+			path:     "/allowed/path/file with spaces.txt",
+			baseDir:  "/allowed/path",
+			expected: true,
+		},
+		{
+			name:     "path with special chars",
+			path:     "/allowed/path/file-special_chars.txt",
+			baseDir:  "/allowed/path",
+			expected: true,
+		},
+		{
+			name:     "relative path that resolves outside",
+			path:     "../../../etc/passwd",
+			baseDir:  "/allowed",
+			expected: false,
+		},
+		{
+			name:     "relative path staying within base",
+			path:     "./file.txt",
+			baseDir:  "/allowed",
+			expected: false, // Resolves to current dir, not within base
+		},
+		{
+			name:     "symlink-like pattern",
+			path:     "/allowed/path/link -> /secret",
+			baseDir:  "/allowed/path",
+			expected: true, // Pattern only, actual symlink not tested
 		},
 	}
 
