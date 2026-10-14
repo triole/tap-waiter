@@ -49,7 +49,19 @@ func (ind Indexer) serveContent(w http.ResponseWriter, r *http.Request) {
 				if err == nil {
 					lowVal := strings.ToLower(val)
 					if lowKey == "sortby" {
-						params.SortBy = lowVal
+						// Validate SortBy against whitelist to prevent path traversal
+						if ind.isValidSortBy(lowVal) {
+							params.SortBy = lowVal
+							ind.Lg.Trace("got query param sort",
+								logseal.F{
+									"sort": lowVal,
+								},
+							)
+						} else {
+							ind.Lg.Warn("invalid sort parameter, blocked",
+								logseal.F{"sort": lowVal},
+							)
+						}
 					}
 					if lowKey == "order" && lowVal == "asc" {
 						params.Ascending = true
@@ -58,7 +70,17 @@ func (ind Indexer) serveContent(w http.ResponseWriter, r *http.Request) {
 						params.Ascending = false
 					}
 					if lowKey == "filter" {
-						params.Filter = ind.parseFilterString(val)
+						filterParams := ind.parseFilterString(val)
+						if ind.isValidFilterParams(filterParams) {
+							params.Filter = filterParams
+							ind.Lg.Trace("got query param filter",
+								logseal.F{"filter": params.Filter},
+							)
+						} else {
+							ind.Lg.Warn("invalid filter parameter, blocked",
+								logseal.F{"filter": lowVal},
+							)
+						}
 					}
 				}
 			}
