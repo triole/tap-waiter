@@ -148,7 +148,5 @@ func (ind Indexer) decodeURL(s string) (t string, err error) {
 
 func (ind Indexer) return404(w http.ResponseWriter) {
 	w.WriteHeader(404)
-	w.Write([]byte(
-		fmt.Sprintf("[ \"404 - %s\" ]", http.StatusText(404)),
-	))
+	w.Write(fmt.Appendf(nil, "[ \"404 - %s\" ]", http.StatusText(404)))
 }
