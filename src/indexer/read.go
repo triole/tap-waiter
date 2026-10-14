@@ -100,7 +100,7 @@ func (ind Indexer) unmarshal(by []byte, ps conf.Endpoint) (content FileContent) 
 		)
 	}
 	if ps.Return.JSONPath != "" {
-		ind.returnJSONPath(content, ps.Return.JSONPath)
+		content = ind.extractWithJSONPath(content, ps.Return.JSONPath)
 	}
 	return
 }
@@ -108,7 +108,7 @@ func (ind Indexer) applyJSONPath(ti TapIndex, jsonPath string) TapIndex {
 	if jsonPath != "" {
 		for idx, el := range ti {
 			if el.Content.Error == nil {
-				ti[idx].Content = ind.returnJSONPath(
+				ti[idx].Content = ind.extractWithJSONPath(
 					el.Content, jsonPath,
 				)
 			}
@@ -117,7 +117,9 @@ func (ind Indexer) applyJSONPath(ti TapIndex, jsonPath string) TapIndex {
 	return ti
 }
 
-func (ind Indexer) returnJSONPath(content FileContent, jsonPath string) (r FileContent) {
+// extractWithJSONPath applies a JSONPath expression to extract nested values from structured content.
+// Returns the extracted data or an empty FileContent if extraction fails.
+func (ind Indexer) extractWithJSONPath(content FileContent, jsonPath string) (r FileContent) {
 	ind.Lg.Trace(
 		"parse unmarshalled data using json path",
 		logseal.F{
@@ -145,19 +147,18 @@ func (ind Indexer) returnJSONPath(content FileContent, jsonPath string) (r FileC
 	return
 }
 
-func (ind Indexer) returnRegexMatchFullIndex(ti TapIndex, regex []string) (arr []string) {
+func (ind Indexer) extractWithRegexFromIndex(ti TapIndex, regex []string) (arr []string) {
 	for _, el := range ti {
-		m := ind.returnRegexMatch(
-			el.Content, regex,
-		)
-		if len(m) > 0 {
-			arr = append(arr, m...)
+		matches := ind.extractWithRegex(el.Content, regex)
+		if len(matches) > 0 {
+			arr = append(arr, matches...)
 		}
 	}
 	return
 }
 
-func (ind Indexer) returnRegexMatch(content FileContent, regex []string) (r []string) {
+// extractWithRegex applies regex patterns to content string and returns all matches.
+func (ind Indexer) extractWithRegex(content FileContent, regex []string) (r []string) {
 	for _, rx := range regex {
 		r = append(
 			r,

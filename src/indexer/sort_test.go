@@ -22,7 +22,7 @@ func TestSort(t *testing.T) {
 		tc.params.Endpoint.IgnoreList = ign
 		tc.ind.flushCache()
 		tc.ind.updateTapIndex(tc.params)
-		ti := tc.ind.getTapIndexCache(tc.params.Endpoint.ID)
+		ti := tc.ind.lookupTapIndexCache(tc.params.Endpoint.ID)
 		if !tc.orderOK(ti, exp, t) {
 			t.Errorf(
 				"sort failed: %s, asc: %v, \n  exp: %v\n, got: %v",

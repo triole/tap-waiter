@@ -103,7 +103,7 @@ func (ind Indexer) serveContent(w http.ResponseWriter, r *http.Request) {
 			},
 		)
 		w.Header().Add("Content Type", "application/json")
-		ti := ind.getTapIndexCache(params.Endpoint.ID)
+		ti := ind.lookupTapIndexCache(params.Endpoint.ID)
 		json.NewEncoder(w).Encode(ti)
 	} else {
 		ind.return404(w)

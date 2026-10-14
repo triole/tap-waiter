@@ -47,7 +47,7 @@ func (ind *Indexer) updateTapIndex(params Params) {
 		logseal.F{"index_params": fmt.Sprintf("%+v", params)},
 	)
 
-	ti, tim := ind.getTapIndexCacheWithExpiration(params.Endpoint.ID)
+	ti, tim := ind.lookupTapIndexCacheWithExpiration(params.Endpoint.ID)
 	if len(ti) < 1 {
 		if !ut.IsEmpty(params.Response) {
 			content := ind.unmarshal([]byte(params.Response), params.Endpoint)
@@ -85,7 +85,7 @@ func (ind *Indexer) updateTapIndex(params Params) {
 			ti = ind.assembleTapIndex(params)
 			ti = ind.applyJSONPath(ti, params.Endpoint.Process.JSONPath)
 			if params.Endpoint.Process.Strategy == "use_as_url_list" {
-				urls := ind.returnRegexMatchFullIndex(ti, params.Endpoint.Process.RegexMatch)
+				urls := ind.extractWithRegexFromIndex(ti, params.Endpoint.Process.RegexMatch)
 				if len(urls) > 0 {
 					params.Sources = urls
 					params.Method = params.Endpoint.Process.Method
@@ -125,7 +125,7 @@ func (ind *Indexer) updateTapIndex(params Params) {
 			sort.Sort(sort.Reverse(TapIndex(ti)))
 		}
 		ti = ti.applyIgnoreList(params)
-		ind.setTapIndexCache(params.Endpoint.ID, ti)
+		ind.storeTapIndexCache(params.Endpoint.ID, ti)
 	} else {
 		ind.Lg.Debug(
 			"return from cache",
