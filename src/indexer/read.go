@@ -126,24 +126,30 @@ func (ind Indexer) extractWithJSONPath(content FileContent, jsonPath string) (r 
 			"json_path": jsonPath,
 		},
 	)
+	// Marshal content.Body once to get valid JSON bytes
 	marsh, err := json.Marshal(content.Body)
-	ind.Lg.IfErrError(
-		"can not prepare to apply json path",
-		logseal.F{"error": err},
-	)
-	if err == nil {
-		result := gjson.GetBytes(marsh, jsonPath)
-		if len(result.String()) < 1 {
-			ind.Lg.Warn(
-				"json path result is empty",
-				logseal.F{"json_path": jsonPath},
-			)
-		} else {
-			r = ind.unmarshalJSON([]byte(result.String()))
-		}
-	} else {
-		r = FileContent{}
+	if err != nil {
+		ind.Lg.Error(
+			"can not marshal content for json path extraction",
+			logseal.F{"error": err},
+		)
+		return FileContent{}
 	}
+
+	result := gjson.GetBytes(marsh, jsonPath)
+	if !result.Exists() {
+		ind.Lg.Warn(
+			"json path result not found",
+			logseal.F{"json_path": jsonPath},
+		)
+		return FileContent{}
+	}
+
+	// Use result.Raw to get the raw JSON value, avoiding double-marshalling.
+	// result.Raw contains the actual JSON (e.g., "hello", 123, {"key":"value"})
+	// result.String() would convert strings to Go representation with extra quotes.
+	// By using result.Raw, we preserve the original JSON structure and types.
+	r = ind.unmarshalJSON([]byte(result.Raw))
 	return
 }
 
