@@ -106,10 +106,28 @@ func (ut Util) Find(basedir string, rxFilter string) (filelist []string, err err
 }
 
 func (ut Util) FromTestFolder(s string) (r string) {
-	t, err := filepath.Abs("../../testdata")
-	if err == nil {
-		r = filepath.Join(t, s)
+	// Get the directory of the current executable or current working directory
+	binDir := ut.GetBinDir()
+	if binDir == "" {
+		binDir = "."
 	}
+	
+	// Testdata folder is relative to executable location
+	testdataPath := filepath.Join(binDir, "testdata")
+	
+	// Also try going up two levels for tests built outside workspace
+	upTwoLevels := filepath.Join(binDir, "../../../testdata")
+	
+	// Try each path until we find one that exists
+	for _, path := range []string{testdataPath, upTwoLevels} {
+		if _, err := os.Stat(path); err == nil {
+			r = filepath.Join(path, s)
+			return
+		}
+	}
+	
+	// Fallback to first option even if it doesn't exist
+	r = filepath.Join(testdataPath, s)
 	return
 }
 

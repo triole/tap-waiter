@@ -68,11 +68,11 @@ func (ind Indexer) serveContent(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("[ \"414 - URI Too Long\" ]"))
 			return
 		}
-		
+
 		queryParams := r.URL.Query()
 		for key, values := range queryParams {
 			lowKey := strings.ToLower(key)
-			
+
 			// Validate query parameter key length
 			if !checkInputLength(key, MaxQueryParamLength, "query.key", ind.Lg) {
 				ind.Lg.Warn(
@@ -81,7 +81,7 @@ func (ind Indexer) serveContent(w http.ResponseWriter, r *http.Request) {
 				)
 				continue
 			}
-			
+
 			for _, val := range values {
 				// Validate individual query parameter value length before processing
 				if !checkInputLength(val, MaxQueryParamLength, "query.value", ind.Lg) {
@@ -91,7 +91,7 @@ func (ind Indexer) serveContent(w http.ResponseWriter, r *http.Request) {
 					)
 					continue
 				}
-				
+
 				val, err = ind.decodeURL(val)
 				if err == nil {
 					// Validate decoded value length
@@ -102,7 +102,7 @@ func (ind Indexer) serveContent(w http.ResponseWriter, r *http.Request) {
 						)
 						continue
 					}
-					
+
 					lowVal := strings.ToLower(val)
 					// Validate total filter string length before parsing
 					if lowKey == "filter" && len(val) > MaxFilterStringLength {
@@ -112,7 +112,7 @@ func (ind Indexer) serveContent(w http.ResponseWriter, r *http.Request) {
 						)
 						continue
 					}
-					
+
 					if lowKey == "sortby" {
 						// Validate SortBy against whitelist to prevent path traversal
 						if ind.isValidSortBy(lowVal) {
@@ -174,7 +174,7 @@ func (ind Indexer) parseFilterString(s string) (fil FilterParams) {
 	fil.Operator = ind.Util.RxFind("^[^a-z0-9_\\-\\. ]+", strings.TrimPrefix(s, fil.Prefix))
 	fil.Suffix = strings.Split(strings.TrimPrefix(s, fil.Prefix+fil.Operator), ",")
 	sort.Strings(fil.Suffix)
-	
+
 	// Validate parsed components for path traversal BEFORE returning
 	// This catches malicious input that survived the regex extraction
 	if containsPathTraversalPrefix(fil.Prefix) {
@@ -186,7 +186,18 @@ func (ind Indexer) parseFilterString(s string) (fil FilterParams) {
 			logseal.F{"prefix": fil.Prefix},
 		)
 	}
-	
+
+	// Also check operator for path traversal patterns
+	if fil.Operator != "" && containsPathTraversalPrefix(fil.Operator) {
+		fil.Errors = append(
+			fil.Errors, errors.New("error parsed filter: path traversal detected in operator"),
+		)
+		ind.Lg.Warn(
+			"path traversal detected in filter operator",
+			logseal.F{"operator": fil.Operator},
+		)
+	}
+
 	for i, suffix := range fil.Suffix {
 		if containsPathTraversalPrefix(suffix) {
 			fil.Errors = append(

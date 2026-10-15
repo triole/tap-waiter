@@ -53,12 +53,13 @@ func containsPathTraversalPrefix(s string) bool {
 	if strings.Contains(s, "\\") {
 		return true
 	}
-	// Block forward slashes that indicate directory traversal (but allow them in valid field names like "body.content")
+	// Block forward slashes (path separators)
+	// Note: JSON field paths use dots ("body.content"), not slashes.
 	if strings.Contains(s, "/") {
 		return true
 	}
-	// Block other path-like patterns
-	if strings.Contains(s, ":\\") || strings.HasPrefix(s, "/") {
+	// Block Windows drive notation (e.g., "C:\")
+	if strings.Contains(s, ":\\") {
 		return true
 	}
 	return false
