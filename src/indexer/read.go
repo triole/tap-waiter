@@ -145,11 +145,7 @@ func (ind Indexer) extractWithJSONPath(content FileContent, jsonPath string) (r 
 		return FileContent{}
 	}
 
-	// Use result.Raw to get the raw JSON value, avoiding double-marshalling.
-	// result.Raw contains the actual JSON (e.g., "hello", 123, {"key":"value"})
-	// result.String() would convert strings to Go representation with extra quotes.
-	// By using result.Raw, we preserve the original JSON structure and types.
-	r = ind.unmarshalJSON([]byte(result.Raw))
+	r.Body = result.Value()
 	return
 }
 
