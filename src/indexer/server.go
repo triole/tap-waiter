@@ -140,10 +140,37 @@ func (ind Indexer) parseFilterString(s string) (fil FilterParams) {
 	return
 }
 
+// decodeURL safely decodes a URL-encoded string while blocking dangerous control characters.
+// Returns an empty string and error if decoding fails or dangerous characters are detected.
 func (ind Indexer) decodeURL(s string) (t string, err error) {
+	// Decode the URL-encoded string
 	t, err = url.QueryUnescape(s)
-	ind.Lg.IfErrError("can not decode url: %s, error: %s", s, err)
-	return
+	if err != nil {
+		ind.Lg.IfErrError("can not decode url: %s, error: %s", s, err)
+		return "", err
+	}
+
+	// Block control characters (ASCII 0-31 and 127) that could be used for injection
+	for i, r := range t {
+		if r < 32 || r == 127 {
+			ind.Lg.Warn(
+				"control character detected in URL parameter, blocking",
+				logseal.F{"position": i, "char": r, "original": s, "decoded": t},
+			)
+			return "", fmt.Errorf("control character %U blocked at position %d", r, i)
+		}
+	}
+
+	// Block null bytes which could be used for string truncation attacks
+	if strings.Contains(t, "\x00") {
+		ind.Lg.Warn(
+			"null byte detected in URL parameter, blocking",
+			logseal.F{"original": s, "decoded": t},
+		)
+		return "", fmt.Errorf("null byte blocked")
+	}
+
+	return t, nil
 }
 
 func (ind Indexer) return404(w http.ResponseWriter) {

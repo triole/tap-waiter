@@ -174,3 +174,55 @@ func BenchmarkServer(b *testing.B) {
 	}
 	fmt.Printf("%s took %s with b.N = %d\n", pos, b.Elapsed(), b.N)
 }
+
+func TestDecodeURL(t *testing.T) {
+	tc := InitTests(false)
+	ind := tc.ind
+
+	tests := []struct {
+		name        string
+		input       string
+		expectError bool
+	}{
+		// Valid inputs
+		{"normal text", "hello%20world", false},
+		{"empty string", "", false},
+		{"special chars", "%20%26%3D%3F", false},
+		{"numbers", "123%20456", false},
+		{"mixed content", "filter%3Dbody.title%3D%3Dhello", false},
+		
+		// Control characters (should be blocked)
+		{"null byte", "%00", true},
+		{"newline encoded", "%0a", true},
+		{"carriage return", "%0d", true},
+		{"tab encoded", "%09", true},
+		{"control char 0x01", "%01", true},
+		{"control char 0x1f", "%1f", true},
+		{"DEL character", "%7f", true},
+		
+		// Unicode edge cases (should pass if > 31)
+		{"unicode letter", "%C3%A9", false}, // é
+		{"unicode space", "%C2%A0", false}, // non-breaking space (160)
+		
+		// Invalid URL encoding (should return error)
+		{"invalid hex", "%GG", true},
+		{"incomplete escape", "%2", true},
+		{"trailing percent", "%", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := ind.decodeURL(tt.input)
+			
+			if tt.expectError {
+				if err == nil {
+					t.Errorf("decodeURL(%q) = %q, expected error", tt.input, result)
+				}
+			} else {
+				if err != nil {
+					t.Errorf("decodeURL(%q) = error %v, expected success", tt.input, err)
+				}
+			}
+		})
+	}
+}
