@@ -88,26 +88,30 @@ func (ti TapIndex) getRelevantSortFile(folder string, sfs tSortFiles) (sf tSortF
 	return
 }
 
-func (ti TapIndex) stringifySortIndex(li []interface{}) (r string) {
-	sep := "|"
-	for _, itf := range li {
+func (ti TapIndex) stringifySortIndex(li []interface{}) string {
+	var sb strings.Builder
+	
+	for i, itf := range li {
+		if i > 0 {
+			sb.WriteRune('|')
+		}
 		switch val := itf.(type) {
 		case int:
-			r += sep + fmt.Sprintf("%06d", val)
+			fmt.Fprintf(&sb, "%06d", val)
 		case bool:
 			if val {
-				r += sep + fmt.Sprintf("%06d", 1)
+				sb.WriteString("000001")
 			} else {
-				r += sep + fmt.Sprintf("%06d", 0)
+				sb.WriteString("000000")
 			}
+		case string:
+			sb.WriteString(val)
 		default:
-			r += sep + val.(string)
+			// Handle unexpected types gracefully instead of panicking
+			fmt.Fprintf(&sb, "%v", itf)
 		}
 	}
-	if len(r) > 1 {
-		r = r[1:]
-	}
-	return
+	return sb.String()
 }
 
 func (ti TapIndex) sortByCreated() {
