@@ -45,15 +45,74 @@ func (ind Indexer) serveContent(w http.ResponseWriter, r *http.Request) {
 		Filter:    FilterParams{Enabled: false},
 	}
 
+	// Validate URL path length to prevent DoS
+	if len(r.URL.Path) > MaxURLPathLength {
+		ind.Lg.Warn(
+			"URL path exceeds length limit",
+			logseal.F{"length": len(r.URL.Path), "max": MaxURLPathLength},
+		)
+		w.WriteHeader(414) // Request-URI Too Large
+		w.Write([]byte("[ \"414 - URI Too Long\" ]"))
+		return
+	}
+
 	url, err := ind.decodeURL(r.URL.Path)
 	if err == nil {
+		// Validate the decoded URL path length
+		if len(url) > MaxURLPathLength {
+			ind.Lg.Warn(
+				"decoded URL path exceeds length limit",
+				logseal.F{"length": len(url), "max": MaxURLPathLength},
+			)
+			w.WriteHeader(414) // Request-URI Too Large
+			w.Write([]byte("[ \"414 - URI Too Long\" ]"))
+			return
+		}
+		
 		queryParams := r.URL.Query()
 		for key, values := range queryParams {
 			lowKey := strings.ToLower(key)
+			
+			// Validate query parameter key length
+			if !checkInputLength(key, MaxQueryParamLength, "query.key", ind.Lg) {
+				ind.Lg.Warn(
+					"query parameter key exceeds length limit, skipping",
+					logseal.F{"key": key[:min(len(key), 100)]},
+				)
+				continue
+			}
+			
 			for _, val := range values {
+				// Validate individual query parameter value length before processing
+				if !checkInputLength(val, MaxQueryParamLength, "query.value", ind.Lg) {
+					ind.Lg.Warn(
+						"query parameter value exceeds length limit, skipping",
+						logseal.F{"key": key},
+					)
+					continue
+				}
+				
 				val, err = ind.decodeURL(val)
 				if err == nil {
+					// Validate decoded value length
+					if !checkInputLength(val, MaxQueryParamLength, "query.value.decoded", ind.Lg) {
+						ind.Lg.Warn(
+							"decoded query parameter value exceeds length limit, skipping",
+							logseal.F{"key": key},
+						)
+						continue
+					}
+					
 					lowVal := strings.ToLower(val)
+					// Validate total filter string length before parsing
+					if lowKey == "filter" && len(val) > MaxFilterStringLength {
+						ind.Lg.Warn(
+							"filter parameter exceeds total length limit",
+							logseal.F{"length": len(val), "max": MaxFilterStringLength},
+						)
+						continue
+					}
+					
 					if lowKey == "sortby" {
 						// Validate SortBy against whitelist to prevent path traversal
 						if ind.isValidSortBy(lowVal) {

@@ -50,6 +50,53 @@ func TestIsValidSortBy(t *testing.T) {
 	}
 }
 
+// Test input length limits for SortBy
+func TestIsValidSortByLengthLimits(t *testing.T) {
+	tc := InitTests(false)
+	ind := tc.ind
+
+	// Test exactly at limit
+	exactLimitString := "front_matter." + string(make([]byte, MaxSortByLength-15))
+	for i := range exactLimitString {
+		if exactLimitString[i] == 0 {
+			// Replace null bytes with valid chars for testing
+			// In practice this string would contain zeros, but we need valid char count
+			break
+		}
+	}
+	
+	// Generate a proper test string of correct length with valid characters
+	testPrefix := "front_matter.test_field."
+	remaining := MaxSortByLength - len(testPrefix)
+	if remaining > 0 {
+		padding := string(make([]byte, remaining))
+		for i := 0; i < remaining; i++ {
+			padding = padding[:i] + "a" + padding[i+1:]
+		}
+		testPrefix += padding
+	}
+
+	tests := []struct {
+		name     string
+		sortBy   string
+		expected bool
+	}{
+		{"max length sortBy", testPrefix, true},
+		{"exceeds max length by 1", testPrefix + "x", false},
+		{"way beyond max length", "front_matter." + string(make([]byte, MaxSortByLength*2)), false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := ind.isValidSortBy(tt.sortBy)
+			if result != tt.expected {
+				t.Errorf("isValidSortBy length check failed: len=%d, result=%v, expected=%v",
+					len(tt.sortBy), result, tt.expected)
+			}
+		})
+	}
+}
+
 func TestIsValidFilterParams(t *testing.T) {
 	tc := InitTests(false)
 	ind := tc.ind
@@ -137,6 +184,114 @@ func TestIsValidFilterParams(t *testing.T) {
 			result := ind.isValidFilterParams(tt.params)
 			if result != tt.expected {
 				t.Errorf("isValidFilterParams(%+v) = %v, expected %v", tt.params, result, tt.expected)
+			}
+		})
+	}
+}
+
+// Test input length limits for FilterParams
+func TestIsValidFilterParamsLengthLimits(t *testing.T) {
+	tc := InitTests(false)
+	ind := tc.ind
+
+	// Test prefix length limits
+	validPrefix := "front_matter.test.field"
+	longPrefix := "front_matter." + string(make([]byte, MaxFilterPrefixLength+10))
+	for i := 0; i < len(longPrefix); i++ {
+		if longPrefix[i] == 0 {
+			longPrefix = longPrefix[:i] + "a" + longPrefix[i+1:]
+		}
+	}
+
+	// Test suffix length limits
+	validSuffix := "test_value"
+	longSuffix := string(make([]byte, MaxFilterSuffixLength+50))
+	for i := 0; i < len(longSuffix); i++ {
+		longSuffix = longSuffix[:i] + "x" + longSuffix[i+1:]
+	}
+
+	// Test suffix count limit
+	lotsOfSuffixes := make([]string, MaxSuffixCount+5)
+	for i := 0; i < len(lotsOfSuffixes); i++ {
+		lotsOfSuffixes[i] = "valid_suffix"
+	}
+
+	tests := []struct {
+		name     string
+		params   FilterParams
+		expected bool
+	}{
+		{
+			"prefix at max length",
+			FilterParams{
+				Prefix:   validPrefix,
+				Operator: "==",
+				Suffix:   []string{"test"},
+			},
+			true,
+		},
+		{
+			"prefix exceeds max length",
+			FilterParams{
+				Prefix:   longPrefix,
+				Operator: "==",
+				Suffix:   []string{"test"},
+			},
+			false,
+		},
+		{
+			"suffix at max length",
+			FilterParams{
+				Prefix:   "body.title",
+				Operator: "==",
+				Suffix:   []string{validSuffix},
+			},
+			true,
+		},
+		{
+			"suffix exceeds max length",
+			FilterParams{
+				Prefix:   "body.title",
+				Operator: "==",
+				Suffix:   []string{longSuffix},
+			},
+			false,
+		},
+		{
+			"suffix count within limit",
+			FilterParams{
+				Prefix:   "body.title",
+				Operator: "==",
+				Suffix:   make([]string, MaxSuffixCount),
+			},
+			true,
+		},
+		{
+			"suffix count exceeds limit",
+			FilterParams{
+				Prefix:   "body.title",
+				Operator: "==",
+				Suffix:   lotsOfSuffixes,
+			},
+			false,
+		},
+		{
+			"regex suffix within stricter limit",
+			FilterParams{
+				Prefix:   "body.content",
+				Operator: "=~",
+				Suffix:   []string{"^valid_regex$"},
+			},
+			true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := ind.isValidFilterParams(tt.params)
+			if result != tt.expected {
+				t.Errorf("isValidFilterParams length check failed: prefix_len=%d, suffix_count=%d, result=%v, expected=%v",
+					len(tt.params.Prefix), len(tt.params.Suffix), result, tt.expected)
 			}
 		})
 	}
