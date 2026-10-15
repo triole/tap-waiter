@@ -184,6 +184,27 @@ func (ind *Indexer) isValidSortFileName(sortFileName string) bool {
 }
 
 func (ti TapIndex) readSortFile(filename string, sortFileName string, baseDir string) (sf tSortFile) {
+	// Validate sortFileName parameter to prevent path traversal
+	// Defense in depth: this should already be validated by isValidSortFileName in ti.go,
+	// but we validate here too for safety
+	if sortFileName != "" {
+		if containsPathTraversal(sortFileName) {
+			sf.Error = fmt.Errorf("invalid sort file name (path traversal detected)")
+			return
+		}
+		// Maximum length of 100 characters to prevent DoS
+		if len(sortFileName) > 100 {
+			sf.Error = fmt.Errorf("sort file name too long")
+			return
+		}
+		// Only allow alphanumeric, underscore, hyphen, and dot
+		matched, _ := regexp.MatchString(`^[a-zA-Z0-9._-]+$`, sortFileName)
+		if !matched {
+			sf.Error = fmt.Errorf("invalid sort file name (special characters)")
+			return
+		}
+	}
+
 	sf.IsSortFile = strings.HasSuffix(filename, sortFileName)
 	if !sf.IsSortFile {
 		return
