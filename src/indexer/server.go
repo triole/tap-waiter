@@ -174,6 +174,31 @@ func (ind Indexer) parseFilterString(s string) (fil FilterParams) {
 	fil.Operator = ind.Util.RxFind("^[^a-z0-9_\\-\\. ]+", strings.TrimPrefix(s, fil.Prefix))
 	fil.Suffix = strings.Split(strings.TrimPrefix(s, fil.Prefix+fil.Operator), ",")
 	sort.Strings(fil.Suffix)
+	
+	// Validate parsed components for path traversal BEFORE returning
+	// This catches malicious input that survived the regex extraction
+	if containsPathTraversalPrefix(fil.Prefix) {
+		fil.Errors = append(
+			fil.Errors, errors.New("error parsed filter: path traversal detected in prefix"),
+		)
+		ind.Lg.Warn(
+			"path traversal detected in filter prefix",
+			logseal.F{"prefix": fil.Prefix},
+		)
+	}
+	
+	for i, suffix := range fil.Suffix {
+		if containsPathTraversalPrefix(suffix) {
+			fil.Errors = append(
+				fil.Errors, fmt.Errorf("error parsed filter: path traversal detected in suffix[%d]", i),
+			)
+			ind.Lg.Warn(
+				"path traversal detected in filter suffix",
+				logseal.F{"suffix_index": i, "suffix": suffix},
+			)
+		}
+	}
+
 	if fil.Prefix == "" {
 		fil.Errors = append(
 			fil.Errors, errors.New("error parsed filter: no match for prefix"),

@@ -296,3 +296,89 @@ func TestIsValidFilterParamsLengthLimits(t *testing.T) {
 		})
 	}
 }
+
+// Test path traversal detection in parseFilterString
+func TestParseFilterStringPathTraversal(t *testing.T) {
+	tc := InitTests(false)
+	ind := tc.ind
+
+	tests := []struct {
+		name        string
+		filterStr   string
+		wantEnabled bool
+	}{
+		// Valid filter strings
+		{"valid simple filter", "body.title==Hello", true},
+		{"valid nested field", "body.author.name==John Doe", true},
+		{"valid front_matter", "front_matter.tags==tech,devops", true},
+		{"valid with spaces", "body.title==hello world", true},
+		{"valid with underscore", "body.field_name==value", true},
+		{"valid regex", "body.content=~test", true},
+
+		// Invalid - path traversal attempts in prefix
+		{"traversal in prefix", "../../etc/passwd==value", false},
+		{"traversal with dots", "body../field==value", false},
+		{"trailing slash prefix", "body/title==value", false},
+		{"absolute path prefix", "/etc/passwd==value", false},
+		{"windows path prefix", "C:\\Windows\\system.ini==value", false},
+
+		// Invalid - path traversal in suffix
+		{"traversal in suffix", "body.title==../etc/passwd", false},
+		{"slashed suffix", "body.title==path/to/file", false},
+		{"mixed traversal", "body.title==../value", false},
+
+		// Edge cases
+		{"empty string", "", false},
+		{"only dots", "..==value", false},
+		{"double dots without slash", "field..name==value", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			par := ind.parseFilterString(tt.filterStr)
+			if par.Enabled != tt.wantEnabled {
+				t.Errorf("parseFilterString(%q).Enabled = %v, want %v, errors: %v",
+					tt.filterStr, par.Enabled, tt.wantEnabled, par.Errors)
+			}
+		})
+	}
+}
+
+// Test containsPathTraversalPrefix helper function
+func TestContainsPathTraversalPrefix(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected bool
+	}{
+		// Valid field paths
+		{"simple field", "title", false},
+		{"body path", "body.title", false},
+		{"nested path", "body.author.name", false},
+		{"with underscore", "field_name", false},
+		{"with numbers", "field123", false},
+		{"with bracket", "field[0]", false},
+		{"front matter", "front_matter.tags", false},
+		{"with dash", "field-name", false},
+
+		// Invalid - path traversal
+		{"parent traversal", "../../etc/passwd", true},
+		{"sibling traversal", "../field", true},
+		{"embedded dots", "body../field", true},
+		{"trailing slash", "/etc/passwd", true},
+		{"internal slash", "body/title", true},
+		{"windows slash", "C:\\Windows", true},
+		{"mixed traversal", "/../etc", true},
+		{"double dot", "field..name", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := containsPathTraversalPrefix(tt.input)
+			if result != tt.expected {
+				t.Errorf("containsPathTraversalPrefix(%q) = %v, expected %v",
+					tt.input, result, tt.expected)
+			}
+		})
+	}
+}
