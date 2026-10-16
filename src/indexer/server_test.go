@@ -190,7 +190,7 @@ func TestDecodeURL(t *testing.T) {
 		{"special chars", "%20%26%3D%3F", false},
 		{"numbers", "123%20456", false},
 		{"mixed content", "filter%3Dbody.title%3D%3Dhello", false},
-		
+
 		// Control characters (should be blocked)
 		{"null byte", "%00", true},
 		{"newline encoded", "%0a", true},
@@ -199,11 +199,11 @@ func TestDecodeURL(t *testing.T) {
 		{"control char 0x01", "%01", true},
 		{"control char 0x1f", "%1f", true},
 		{"DEL character", "%7f", true},
-		
+
 		// Unicode edge cases (should pass if > 31)
 		{"unicode letter", "%C3%A9", false}, // é
-		{"unicode space", "%C2%A0", false}, // non-breaking space (160)
-		
+		{"unicode space", "%C2%A0", false},  // non-breaking space (160)
+
 		// Invalid URL encoding (should return error)
 		{"invalid hex", "%GG", true},
 		{"incomplete escape", "%2", true},
@@ -213,7 +213,7 @@ func TestDecodeURL(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := ind.decodeURL(tt.input)
-			
+
 			if tt.expectError {
 				if err == nil {
 					t.Errorf("decodeURL(%q) = %q, expected error", tt.input, result)

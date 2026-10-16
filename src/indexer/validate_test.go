@@ -64,7 +64,7 @@ func TestIsValidSortByLengthLimits(t *testing.T) {
 			break
 		}
 	}
-	
+
 	// Generate a proper test string of correct length with valid characters
 	testPrefix := "front_matter.test_field."
 	remaining := MaxSortByLength - len(testPrefix)
