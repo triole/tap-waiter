@@ -106,12 +106,6 @@ func (ut Util) Find(basedir string, rxFilter string) (filelist []string, err err
 }
 
 func (ut Util) FromTestFolder(s string) (r string) {
-	// Get the directory of the current executable or current working directory
-	binDir := ut.GetBinDir()
-	if binDir == "" {
-		binDir = "."
-	}
-
 	testdataPath := filepath.Join("testdata")
 	upTwoLevels := filepath.Join(testdataPath, "../../../testdata")
 
