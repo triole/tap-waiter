@@ -19,9 +19,7 @@ func (ind *Indexer) updateParams(params Params) Params {
 		src, _ = ind.Conf.Util.AbsPath(params.Endpoint.Source)
 		params.Type = ind.Util.FileOrFolder(src)
 	}
-	if len(params.Sources) < 1 {
-		params.Sources = []string{src}
-	}
+	params.Sources = []string{}
 	if params.Type == "url" {
 		if params.Method == "" {
 			params.Method = "GET"

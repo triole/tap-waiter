@@ -29,7 +29,6 @@ func (ind Indexer) readFileContent(filename string, ps conf.Endpoint) (content F
 			}
 		}
 	}
-
 	by, isTextfile, err := ind.Util.ReadFile(filename)
 	if isTextfile && err == nil {
 		switch filepath.Ext(filename) {
