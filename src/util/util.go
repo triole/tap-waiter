@@ -111,21 +111,17 @@ func (ut Util) FromTestFolder(s string) (r string) {
 	if binDir == "" {
 		binDir = "."
 	}
-	
-	// Testdata folder is relative to executable location
-	testdataPath := filepath.Join(binDir, "testdata")
-	
-	// Also try going up two levels for tests built outside workspace
-	upTwoLevels := filepath.Join(binDir, "../../../testdata")
-	
-	// Try each path until we find one that exists
+
+	testdataPath := filepath.Join("testdata")
+	upTwoLevels := filepath.Join(testdataPath, "../../../testdata")
+
 	for _, path := range []string{testdataPath, upTwoLevels} {
 		if _, err := os.Stat(path); err == nil {
 			r = filepath.Join(path, s)
 			return
 		}
 	}
-	
+
 	// Fallback to first option even if it doesn't exist
 	r = filepath.Join(testdataPath, s)
 	return
