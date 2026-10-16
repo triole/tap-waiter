@@ -161,7 +161,6 @@ func (ind Indexer) serveContent(w http.ResponseWriter, r *http.Request) {
 				"url": url, "path": val.Source, "rxfilter": val.RxFilter, "duration": time.Since(start),
 			},
 		)
-		w.Header().Add("Content Type", "application/json")
 		ti := ind.lookupTapIndexCache(params.Endpoint.ID)
 		json.NewEncoder(w).Encode(ti)
 	} else {
