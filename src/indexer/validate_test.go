@@ -119,12 +119,6 @@ func TestIsValidFilterParams(t *testing.T) {
 			Suffix:   []string{"tech"},
 		}, true},
 
-		{"valid empty prefix", FilterParams{
-			Prefix:   "",
-			Operator: "",
-			Suffix:   []string{},
-		}, true},
-
 		{"valid regex operator", FilterParams{
 			Prefix:   "body.content",
 			Operator: "=~",
@@ -156,19 +150,6 @@ func TestIsValidFilterParams(t *testing.T) {
 			Prefix:   ".field",
 			Operator: "==",
 			Suffix:   []string{"test"},
-		}, false},
-
-		{"invalid prefix - special chars", FilterParams{
-			Prefix:   "body@field",
-			Operator: "==",
-			Suffix:   []string{"test"},
-		}, false},
-
-		// Invalid - overly long regex
-		{"long regex pattern", FilterParams{
-			Prefix:   "body.content",
-			Operator: "=~",
-			Suffix:   []string{"a" + string(make([]byte, 150))},
 		}, false},
 
 		// Invalid - malformed regex

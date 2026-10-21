@@ -70,6 +70,7 @@ func (tc testContext) validateParseFilter(filter string, exp FilterParams, t *te
 func TestServeContent(t *testing.T) {
 	tc := InitTests(false)
 	fol := ut.FromTestFolder("specs/server")
+	fmt.Printf("%+v\n", fol)
 	specFiles, err := tc.ind.Util.Find(fol, "\\.yaml$")
 	if err != nil {
 		t.Errorf("can not find specs files: %q", fol)

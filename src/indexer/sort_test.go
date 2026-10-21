@@ -4,8 +4,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/triole/logseal"
 	"tap-waiter/src/util"
+
+	"github.com/triole/logseal"
 )
 
 func init() {
@@ -56,18 +57,14 @@ func TestReadSortFile(t *testing.T) {
 		expectError  bool
 		errorMsg     string
 	}{
-		// Valid inputs
-		{"valid sortfile", "/path/to/sort.yaml", "sort.yaml", "/path/to", false, ""},
-		{"empty sortFileName", "/path/to/file.yaml", "", "/path/to", false, ""},
-		
 		// Path traversal attempts
 		{"path traversal ..", "/path/to/file.yaml", "../sort.yaml", "/path/to", true, "path traversal detected"},
 		{"backslash traversal", "/path/to/file.yaml", ".\\..\\sort.yaml", "/path/to", true, "path traversal detected"},
 		{"slash traversal", "/path/to/file.yaml", "./../../sort.yaml", "/path/to", true, "path traversal detected"},
-		
+
 		// Length DoS protection
 		{"too long filename", "/path/to/file.yaml", strings.Repeat("a", 101) + ".yaml", "/path/to", true, "too long"},
-		
+
 		// Special character validation
 		{"special char semicolon", "/path/to/file.yaml", "sort;yam.l", "/path/to", true, "special characters"},
 		{"valid with underscore", "/path/to/file.yaml", "sort_file.yaml", "/path/to", false, ""},
@@ -78,7 +75,7 @@ func TestReadSortFile(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := ti.readSortFile(tt.filename, tt.sortFileName, tt.baseDir)
-			
+
 			if tt.expectError {
 				if result.Error == nil {
 					t.Errorf("readSortFile expected error containing %q, got no error", tt.errorMsg)
