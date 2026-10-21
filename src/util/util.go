@@ -77,6 +77,11 @@ func (ut Util) Find(basedir string, rxFilter string) (filelist []string, err err
 			return filelist, fmt.Errorf("regex compilation failed: %w", compileErr)
 		}
 		err = filepath.Walk(basedir, func(path string, f os.FileInfo, err error) error {
+			path, err = filepath.Abs(path)
+			ut.Lg.IfErrError(
+				"can not determin absolute path",
+				logseal.F{"path": path, "error": err},
+			)
 			if rxf.MatchString(path) {
 				inf, err := os.Stat(path)
 				if err == nil {
