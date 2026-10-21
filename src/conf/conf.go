@@ -4,6 +4,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/c2h5oh/datasize"
@@ -13,19 +14,23 @@ import (
 
 func (conf *Conf) readConfig() {
 	var content ConfContent
-	by, err := os.ReadFile(conf.FileName)
+	pth, err := filepath.Abs(conf.FileName)
 	conf.Lg.IfErrFatal(
-		"can not read file", logseal.F{"path": conf.FileName, "error": err},
+		"can not determine absolute path", logseal.F{"path": conf.FileName, "error": err},
+	)
+	by, err := os.ReadFile(pth)
+	conf.Lg.IfErrFatal(
+		"can not read file", logseal.F{"path": pth, "error": err},
 	)
 
 	by, err = conf.TemplateFile(by)
 	conf.Lg.IfErrFatal(
-		"can not expand config variables", logseal.F{"path": conf.FileName, "error": err},
+		"can not expand config variables", logseal.F{"path": pth, "error": err},
 	)
 
 	err = yaml.Unmarshal(by, &content)
 	conf.Lg.IfErrFatal(
-		"can not unmarshal config", logseal.F{"path": conf.FileName, "error": err},
+		"can not unmarshal config", logseal.F{"path": pth, "error": err},
 	)
 
 	conf.Bind = strings.TrimSpace(content.Bind)
@@ -44,7 +49,7 @@ func (conf *Conf) readConfig() {
 	_, err = url.Parse(conf.ServerURL)
 	if err != nil {
 		conf.Lg.IfErrFatal(
-			"invalid server url", logseal.F{"path": conf.FileName, "error": err},
+			"invalid server url", logseal.F{"path": pth, "error": err},
 		)
 	}
 	if content.DefaultCacheLifetimeStr == "" {
