@@ -30,7 +30,7 @@ func TestGetContentVal(t *testing.T) {
 
 func (tc testContext) validateGetContentVal(key string, mp FileContent, exp []string) {
 	b := false
-	ti := tc.ind.lookupTapIndexCache(tc.params.SortBy)
+	ti := TapIndex{}
 	res := ti.getContentVal(key, mp)
 	if len(exp) == len(res) {
 		for i, x := range res {

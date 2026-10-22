@@ -77,7 +77,16 @@ func (ti TapIndex) Swap(i, j int) {
 // getCacheKey generates a unique cache key based on all parameters that affect the result.
 // This ensures different sort orders, filters, and other parameters get separate cache entries.
 func (p Params) getCacheKey() string {
-	return fmt.Sprintf("%s:%s:%s:%t", p.Endpoint.ID, p.SortBy, p.getFilterKey(), p.Ascending)
+	return fmt.Sprintf("%s:%s:%s:%s:%s:%t", p.Endpoint.ID, p.SortBy,
+		p.getFilterKey(), p.Endpoint.SortFileName, p.getIgnoreListKey(), p.Ascending)
+}
+
+// getIgnoreListKey generates a unique key for ignore list parameters.
+func (p Params) getIgnoreListKey() string {
+	if len(p.Endpoint.IgnoreList) == 0 {
+		return "no-ignore"
+	}
+	return fmt.Sprintf("%v", p.Endpoint.IgnoreList)
 }
 
 // getFilterKey generates a unique key for filter parameters.
