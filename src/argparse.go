@@ -16,7 +16,7 @@ var (
 	BUILDTAGS      string
 	appName        = "tap-waiter"
 	appDescription = "scan folders for toml, yaml, json or markdown files and offer a web server to fetch information about them"
-	appMainversion = "0.1"
+	appMainversion = "0.2"
 )
 
 var CLI struct {
