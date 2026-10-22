@@ -23,7 +23,7 @@ func (ind *Indexer) assembleTapIndex(params Params) (ti TapIndex) {
 					chin, chout,
 				)
 			default:
-				ind.Lg.Debug("read file", logseal.F{"path": pth})
+				ind.Lg.Trace("read file", logseal.F{"path": pth})
 				go ind.readFile(
 					pth, params.Endpoint,
 					chin, chout,

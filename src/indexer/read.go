@@ -46,7 +46,7 @@ func (ind Indexer) readFileContent(filename string, ps conf.Endpoint) (content F
 			},
 		)
 	} else {
-		ind.Lg.Debug(
+		ind.Lg.Trace(
 			"no text file, skip reading",
 			logseal.F{"path": filename, "is_text_file": isTextfile},
 		)
