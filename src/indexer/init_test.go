@@ -67,11 +67,12 @@ func newTestEndpoint() conf.Endpoint {
 	}}
 }
 
-func (tc testContext) orderOK(ti TapIndex, exp []string, t *testing.T) bool {
+func (tc testContext) orderOK(ti TapIndex, exp []string, spec map[string]interface{}, t *testing.T) bool {
 	if len(ti) != len(exp) {
 		t.Errorf(
-			"sort failed, lengths differ: %-4d != %-4d\n exp: %+v,\n got: %+v ",
-			len(exp), len(ti), exp, tc.getTapIndexFileNames(ti))
+			"sort failed, lengths differ: %-4d != %-4d\n exp: %+v,\n got: %+v,\n spec: %v",
+			len(exp), len(ti), exp, tc.getTapIndexFileNames(ti), spec,
+		)
 	} else {
 		for i := 0; i <= len(exp)-1; i++ {
 			if ti[i].Path != exp[i] {

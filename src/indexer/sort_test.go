@@ -34,13 +34,14 @@ func TestSort(t *testing.T) {
 		tc.ind.flushCache()
 		tc.ind.updateTapIndex(tc.params)
 		ti := tc.ind.lookupTapIndexCache(tc.params.Endpoint.ID)
-		if !tc.orderOK(ti, exp, t) {
+		if !tc.orderOK(ti, exp, spec, t) {
 			t.Errorf(
-				"sort failed: %s, asc: %v, \n  exp: %v\n, got: %v",
+				"sort failed: %s, asc: %v, \n  exp: %v\n, got: %v,\n spec: %v",
 				spec["content_folder"].(string),
 				tc.params.Ascending,
 				exp,
 				tc.getTapIndexPaths(ti),
+				spec,
 			)
 		}
 	}
