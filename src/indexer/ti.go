@@ -45,7 +45,7 @@ func (ind *Indexer) updateTapIndex(params Params) {
 		logseal.F{"index_params": fmt.Sprintf("%+v", params)},
 	)
 
-	ti, tim := ind.lookupTapIndexCacheWithExpiration(params.Endpoint.ID)
+	ti, tim := ind.lookupTapIndexCacheWithExpiration(params.getCacheKey())
 	if len(ti) < 1 {
 		if !ut.IsEmpty(params.Response) {
 			content := ind.unmarshal([]byte(params.Response), params.Endpoint)
@@ -123,7 +123,7 @@ func (ind *Indexer) updateTapIndex(params Params) {
 			sort.Sort(sort.Reverse(TapIndex(ti)))
 		}
 		ti = ti.applyIgnoreList(params)
-		ind.storeTapIndexCache(params.Endpoint.ID, ti)
+		ind.storeTapIndexCache(params.getCacheKey(), ti)
 	} else {
 		ind.Lg.Debug(
 			"return from cache",

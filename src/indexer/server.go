@@ -162,7 +162,7 @@ func (ind Indexer) serveContent(w http.ResponseWriter, r *http.Request) {
 				"url": url, "path": val.Source, "rxfilter": val.RxFilter, "duration": time.Since(start),
 			},
 		)
-		ti := ind.lookupTapIndexCache(params.Endpoint.ID)
+		ti := ind.lookupTapIndexCache(params.getCacheKey())
 		json.NewEncoder(w).Encode(ti)
 	} else {
 		ind.return404(w)

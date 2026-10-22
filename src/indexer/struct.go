@@ -1,6 +1,10 @@
 package indexer
 
-import "tap-waiter/src/conf"
+import (
+	"fmt"
+
+	"tap-waiter/src/conf"
+)
 
 type DataSources struct {
 	Paths  []string
@@ -68,4 +72,18 @@ func (ti TapIndex) Less(i, j int) bool {
 
 func (ti TapIndex) Swap(i, j int) {
 	ti[i], ti[j] = ti[j], ti[i]
+}
+
+// getCacheKey generates a unique cache key based on all parameters that affect the result.
+// This ensures different sort orders, filters, and other parameters get separate cache entries.
+func (p Params) getCacheKey() string {
+	return fmt.Sprintf("%s:%s:%s:%t", p.Endpoint.ID, p.SortBy, p.getFilterKey(), p.Ascending)
+}
+
+// getFilterKey generates a unique key for filter parameters.
+func (p Params) getFilterKey() string {
+	if !p.Filter.Enabled {
+		return "no-filter"
+	}
+	return fmt.Sprintf("%s:%s:%v", p.Filter.Operator, p.Filter.Prefix, p.Filter.Suffix)
 }
